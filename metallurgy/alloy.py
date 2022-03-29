@@ -4,12 +4,35 @@ from collections import OrderedDict
 
 class Alloy():
     def __init__(self, composition):
-
         self.composition = parse_composition(composition)
 
-        self.compositionStr = alloy_to_string(self)
-
         self.elements = list(self.composition.keys())
+
+    def to_string(self):
+        composition_str = ""
+        for element in self.elements:
+            percentage_str = str(self.composition[element] * 100.0)
+
+            split_str = percentage_str.split('.')
+            decimal = split_str[1]
+            if decimal == '0':
+                percentage_str = split_str[0]
+            else:
+                decimal_places = len(str(self.composition[element]).split('.')[1])
+                percentage_str = str(round(float(percentage_str), decimal_places))
+
+                split_str = percentage_str.split('.')
+                decimal = split_str[1]
+                if decimal == '0':
+                    percentage_str = split_str[0]
+
+            composition_str += element + percentage_str
+
+        return composition_str
+
+    def to_pretty_string(self):
+        numbers = re.compile(r'(\d+)')
+        return numbers.sub(r'$_{\1}$', self.to_string())
 
 
 def parse_composition(composition):
@@ -17,6 +40,8 @@ def parse_composition(composition):
         return parse_composition_string(composition)
     elif isinstance(composition, dict):
         return parse_composition_dict(composition)
+    elif isinstance(composition, Alloy):
+        return composition.composition
 
 
 def parse_composition_string(composition_string):
@@ -108,40 +133,9 @@ def filter_order_composition(composition):
     return ordered_composition
 
 
-def alloy_to_string(alloy):
-    if not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
+def valid_composition(composition):
 
-    composition_str = ""
-    for element in alloy.composition:
-        percentage_str = str(alloy.composition[element] * 100.0)
-
-        split_str = percentage_str.split('.')
-        decimal = split_str[1]
-        if decimal == '0':
-            percentage_str = split_str[0]
-        else:
-            decimal_places = len(str(alloy.composition[element]).split('.')[1])
-            percentage_str = str(round(float(percentage_str), decimal_places))
-
-            split_str = percentage_str.split('.')
-            decimal = split_str[1]
-            if decimal == '0':
-                percentage_str = split_str[0]
-
-        composition_str += element + percentage_str
-
-    return composition_str
-
-
-def pretty_composition_str(alloy):
-    numbers = re.compile(r'(\d+)')
-    return numbers.sub(r'$_{\1}$', alloy_to_string(alloy))
-
-
-def valid_composition(composition_string):
-
-    alloy = Alloy(composition_string)
+    alloy = Alloy(composition)
 
     total = 0
     for element in alloy.elements:
