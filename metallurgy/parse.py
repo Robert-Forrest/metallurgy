@@ -2,6 +2,13 @@ import re
 from collections import OrderedDict
 
 
+def parse_composition(composition):
+    if isinstance(composition, str):
+        return parse_composition_string(composition)
+    elif isinstance(composition, dict):
+        return parse_composition_dict(composition)
+
+
 def parse_composition_string(composition_string):
 
     composition = {}
