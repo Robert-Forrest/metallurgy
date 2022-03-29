@@ -1,4 +1,3 @@
-import elementy
 import metallurgy as mg
 from .alloy import Alloy
 
