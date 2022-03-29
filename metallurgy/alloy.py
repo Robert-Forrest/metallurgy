@@ -12,7 +12,7 @@ class Alloy():
 
         self.compositionStr = alloy_to_string(self)
 
-        self.elements = self.composition.keys()
+        self.elements = list(self.composition.keys())
 
 
 def parse_composition_string(composition_string):
