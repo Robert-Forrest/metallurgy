@@ -1,7 +1,6 @@
 import numpy as np
 from pandas.api.types import is_numeric_dtype
 import metallurgy as mg
-from . import calculations
 from .alloy import Alloy
 
 

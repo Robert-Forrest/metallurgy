@@ -140,9 +140,9 @@ def pretty_composition_str(alloy):
 
 
 def valid_composition(composition_string):
-    
+
     alloy = Alloy(composition_string)
-    
+
     total = 0
     for element in alloy.elements:
         total += alloy.composition[element]
