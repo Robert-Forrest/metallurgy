@@ -31,7 +31,8 @@ def parse_composition_string(composition_string):
             split_element_percentage = re.split(
                 r'(\d+(?:\.\d+)?)', element_percentage)
             composition[split_element_percentage[0]] = (float(
-                split_element_percentage[1]) / 100.0) * major_composition_percentage
+                split_element_percentage[1]) / 100.0) * \
+                major_composition_percentage
 
         minor_composition = composition_string.split(
             ')')[1][len(str(int(major_composition_percentage * 100))):]
