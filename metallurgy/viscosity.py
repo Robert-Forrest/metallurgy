@@ -7,7 +7,7 @@ from .alloy import Alloy
 
 
 def calculate_molar_volume(element):
-    return mg.periodic_table.dict[element]['mass'] / mg.periodic_table.dict[element]['density']
+    return mg.periodic_table.data[element]['mass'] / mg.periodic_table.data[element]['density']
 
 
 def calculate_viscosity(alloy, mixing_enthalpy=None):
@@ -18,17 +18,17 @@ def calculate_viscosity(alloy, mixing_enthalpy=None):
     elementalViscosity = {}
     for element in alloy.elements:
         elementalViscosity[element] = const * np.sqrt(
-            (mg.periodic_table.dict[element]['mass'] / 1000) *
-            mg.periodic_table.dict[element]['melting_temperature']) / \
+            (mg.periodic_table.data[element]['mass'] / 1000) *
+            mg.periodic_table.data[element]['melting_temperature']) / \
             (calculate_molar_volume(element) * 1.0E-6)
 
     sum_aG = 0
     for element in alloy.elements:
-        sum_aG += mg.periodic_table.dict[element]['melting_temperature'] * \
+        sum_aG += mg.periodic_table.data[element]['melting_temperature'] * \
             alloy.composition[element] * np.log((elementalViscosity[element] * (
-                mg.periodic_table.dict[element]['mass'] / 1000)) / (
+                mg.periodic_table.data[element]['mass'] / 1000)) / (
                 constants.plankConstant * constants.avogadroNumber * (
-                    mg.periodic_table.dict[element]['density']) * 1000))
+                    mg.periodic_table.data[element]['density']) * 1000))
 
     sum_aG *= constants.idealGasConstant
 

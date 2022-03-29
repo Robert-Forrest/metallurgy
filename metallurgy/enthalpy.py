@@ -1,23 +1,24 @@
-import numpy as np
 import metallurgy as mg
 from .alloy import Alloy
 from . import linear_mixture
 from . import constants
+from . import entropy
 
 
 def Gamma(elementA, elementB):
     Q, P, R = calculate_QPR(elementA, elementB)
     return calculate_electronegativity_enthalpy_component(
-        elementA, elementB, P) + calculate_WS_enthalpy_component(elementA, elementB, Q) - R
+        elementA, elementB, P) + \
+        calculate_WS_enthalpy_component(elementA, elementB, Q) - R
 
 
 def calculate_QPR(elementA, elementB):
 
-    seriesA = mg.periodic_table.dict[elementA]['series']
+    seriesA = mg.periodic_table.data[elementA]['series']
     if(elementA == 'Ca' or elementA == 'Sr' or elementA == 'Ba'):
         seriesA = 'nonTransitionMetal'
 
-    seriesB = mg.periodic_table.dict[elementB]['series']
+    seriesB = mg.periodic_table.data[elementB]['series']
     if(elementB == 'Ca' or elementB == 'Sr' or elementB == 'Ba'):
         seriesB = 'nonTransitionMetal'
 
@@ -29,8 +30,8 @@ def calculate_QPR(elementA, elementB):
         R = 0
     else:
         P = 12.3
-        R = extra_data.Rparams(elementA) * \
-            extra_data.Rparams(elementB)
+        R = mg.periodic_table.data[elementA]['miedema_R'] * \
+            mg.periodic_table.data[elementB]['miedema_R']
 
     Q = P * 9.4
 
@@ -38,8 +39,8 @@ def calculate_QPR(elementA, elementB):
 
 
 def calculate_electronegativity_enthalpy_component(elementA, elementB, P):
-    electronegativityDiff = mg.periodic_table.dict[elementA]['electronegativity_miedema'] \
-        - mg.periodic_table.dict[elementB]['electronegativity_miedema']
+    electronegativityDiff = mg.periodic_table.data[elementA]['electronegativity_miedema'] \
+        - mg.periodic_table.data[elementB]['electronegativity_miedema']
 
     return -P * (electronegativityDiff**2)
 
@@ -49,8 +50,8 @@ def calculate_WS_enthalpy_component(elementA, elementB, Q):
 
 
 def diffDiscontinuity(elementA, elementB):
-    densityA = mg.periodic_table.dict[elementA]['wigner_seitz_electron_density']
-    densityB = mg.periodic_table.dict[elementB]['wigner_seitz_electron_density']
+    densityA = mg.periodic_table.data[elementA]['wigner_seitz_electron_density']
+    densityB = mg.periodic_table.data[elementB]['wigner_seitz_electron_density']
     return (densityA**(1. / 3.)) - (densityB**(1. / 3.))
 
 
@@ -64,10 +65,10 @@ def calculate_surface_concentration(elements, volumes, composition):
 
 def calculate_corrected_volume(elementA, elementB, Cs_A):
 
-    pureV = mg.periodic_table.dict[elementA]['volume_miedema']
+    pureV = mg.periodic_table.data[elementA]['volume_miedema']
 
-    electronegativityDiff = mg.periodic_table.dict[elementA]['electronegativity_miedema'] \
-        - mg.periodic_table.dict[elementB]['electronegativity_miedema']
+    electronegativityDiff = mg.periodic_table.data[elementA]['electronegativity_miedema'] \
+        - mg.periodic_table.data[elementB]['electronegativity_miedema']
 
     a = None
     if(elementA in ['Ca', 'Sr', 'Ba']):
@@ -76,11 +77,11 @@ def calculate_corrected_volume(elementA, elementB, Cs_A):
         a = 0.07
 
     if a is None:
-        if(mg.periodic_table.dict[elementA]['series'] == 'alkaliMetal'):
+        if(mg.periodic_table.data[elementA]['series'] == 'alkaliMetal'):
             a = 0.14
-        elif(mg.periodic_table.dict[elementA]['valence_electrons'] == 2):
+        elif(mg.periodic_table.data[elementA]['valence_electrons'] == 2):
             a = 0.1
-        elif(mg.periodic_table.dict[elementA]['valence_electrons'] == 3):
+        elif(mg.periodic_table.data[elementA]['valence_electrons'] == 3):
             a = 0.07
         else:
             a = 0.04
@@ -94,8 +95,8 @@ def calculate_corrected_volume(elementA, elementB, Cs_A):
 
 def calculate_interface_enthalpy(elementA, elementB, volumeA):
 
-    densityA = mg.periodic_table.dict[elementA]['wigner_seitz_electron_density']
-    densityB = mg.periodic_table.dict[elementB]['wigner_seitz_electron_density']
+    densityA = mg.periodic_table.data[elementA]['wigner_seitz_electron_density']
+    densityB = mg.periodic_table.data[elementB]['wigner_seitz_electron_density']
 
     return 2 * volumeA * Gamma(elementA, elementB) / \
         (densityA**(-1. / 3.) + densityB**(-1. / 3.))
@@ -104,7 +105,7 @@ def calculate_interface_enthalpy(elementA, elementB, volumeA):
 def calculate_topological_enthalpy(composition):
     topological_enthalpy = 0
     for element in composition:
-        topological_enthalpy += mg.periodic_table.dict[element]['fusion_enthalpy'] * \
+        topological_enthalpy += mg.periodic_table.data[element]['fusion_enthalpy'] * \
             composition[element]
 
     return topological_enthalpy
@@ -130,8 +131,8 @@ def calculate_mixing_enthalpy(alloy):
                     subComposition
 
             Cs_A = None
-            V_A_alloy = mg.periodic_table.dict[pair[0]]['volume_miedema']
-            V_B_alloy = mg.periodic_table.dict[pair[1]]['volume_miedema']
+            V_A_alloy = mg.periodic_table.data[pair[0]]['volume_miedema']
+            V_B_alloy = mg.periodic_table.data[pair[1]]['volume_miedema']
 
             for _ in range(10):
 
@@ -144,10 +145,12 @@ def calculate_mixing_enthalpy(alloy):
                 V_B_alloy = calculate_corrected_volume(
                     pair[1], pair[0], 1 - Cs_A)
 
-            chemical_enthalpy = alloy.composition[pair[0]] * alloy.composition[pair[1]] * (
-                (1 - Cs_A) * calculate_interface_enthalpy(pair[0], pair[1], V_A_alloy) +
-                Cs_A *
-                calculate_interface_enthalpy(pair[1], pair[0], V_B_alloy)
+            chemical_enthalpy = alloy.composition[pair[0]] * \
+                alloy.composition[pair[1]] * (
+                    (1 - Cs_A) *
+                    calculate_interface_enthalpy(pair[0], pair[1], V_A_alloy) +
+                    Cs_A *
+                    calculate_interface_enthalpy(pair[1], pair[0], V_B_alloy)
             )
 
             total_mixing_enthalpy += chemical_enthalpy
@@ -158,15 +161,18 @@ def calculate_mixing_enthalpy(alloy):
     return total_mixing_enthalpy
 
 
-def calculate_mixing_Gibbs_free_energy(alloy, mixing_enthalpy=None, melting_temperature=None, mixing_entropy=None):
+def calculate_mixing_Gibbs_free_energy(alloy, mixing_enthalpy=None,
+                                       melting_temperature=None,
+                                       mixing_entropy=None):
     if not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if mixing_enthalpy is None:
-        mixing_enthalpy = enthalpy.calculate_mixing_enthalpy(alloy)
+        mixing_enthalpy = calculate_mixing_enthalpy(alloy)
     if melting_temperature is None:
-        melting_temperature = linear_mix(alloy, "melting_temperature")
+        melting_temperature = linear_mixture(alloy, "melting_temperature")
     if mixing_entropy is None:
         mixing_entropy = entropy.calculate_mixing_entropy(alloy)
 
-    return (mixing_enthalpy * 1e3) - melting_temperature * mixing_entropy * constants.idealGasConstant
+    return (mixing_enthalpy * 1e3) - melting_temperature * \
+        mixing_entropy * constants.idealGasConstant

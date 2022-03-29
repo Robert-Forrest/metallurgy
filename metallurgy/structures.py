@@ -9,10 +9,10 @@ def calculate_structure_mismatch(alloy):
 
     structures = {}
     for element in alloy.elements:
-        if(mg.periodic_table.dict[element]['phase'] == 'solid'):
-            structure = mg.periodic_table.dict[element]['crystal_structure']
+        if(mg.periodic_table.data[element]['phase'] == 'solid'):
+            structure = mg.periodic_table.data[element]['crystal_structure']
         else:
-            structure = mg.periodic_table.dict[element]['phase']
+            structure = mg.periodic_table.data[element]['phase']
 
         if structure not in structures:
             structures[structure] = 0

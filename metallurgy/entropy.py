@@ -22,12 +22,13 @@ def calculate_ideal_entropy_xia(alloy):
     cube_sum = 0
     for element in alloy.elements:
         cube_sum += alloy.composition[element] * \
-            mg.periodic_table.dict[element]['atomic_volume']
+            mg.periodic_table.data[element]['atomic_volume']
 
     ideal_entropy = 0
     for element in alloy.composition:
         ideal_entropy += alloy.composition[element] * np.log(
-            (alloy.composition[element] * mg.periodic_table.dict[element]['atomic_volume']) / cube_sum)
+            (alloy.composition[element] *
+             mg.periodic_table.data[element]['atomic_volume']) / cube_sum)
 
     return -ideal_entropy
 
@@ -38,7 +39,7 @@ def calculate_mismatch_entropy(alloy):
 
     diameters = {}
     for element in alloy.composition:
-        diameters[element] = mg.periodic_table.dict[element]['radius'] * 2
+        diameters[element] = mg.periodic_table.data[element]['radius'] * 2
 
     sigma_2 = 0
     for element in alloy.composition:
@@ -61,10 +62,12 @@ def calculate_mismatch_entropy(alloy):
             otherElement = alloy.elements[j]
 
             y_1 += (diameters[element] + diameters[otherElement]) * (
-                (diameters[element] - diameters[otherElement])**2) * alloy.composition[element] * alloy.composition[otherElement]
+                (diameters[element] - diameters[otherElement])**2) \
+                * alloy.composition[element] * alloy.composition[otherElement]
 
             y_2 += diameters[element] * diameters[otherElement] * (
-                (diameters[element] - diameters[otherElement])**2) * alloy.composition[element] * alloy.composition[otherElement]
+                (diameters[element] - diameters[otherElement])**2) \
+                * alloy.composition[element] * alloy.composition[otherElement]
 
     y_1 /= sigma_3
 
@@ -73,8 +76,9 @@ def calculate_mismatch_entropy(alloy):
     packing_fraction = 0.64
     zeta = 1.0 / (1 - packing_fraction)
 
-    mismatch_entropy = (((3.0 / 2.0) * ((zeta**2) - 1) * y_1) + ((3.0 / 2.0) * (
-        (zeta - 1)**2) * y_2) - (1 - y_3) * (0.5 * (zeta - 1) * (zeta - 3) + np.log(zeta)))
+    mismatch_entropy = (((3.0 / 2.0) * ((zeta**2) - 1) * y_1) +
+                        ((3.0 / 2.0) * ((zeta - 1)**2) * y_2) - (1 - y_3) *
+                        (0.5 * (zeta - 1) * (zeta - 3) + np.log(zeta)))
 
     return mismatch_entropy
 

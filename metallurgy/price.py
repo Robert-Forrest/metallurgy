@@ -11,8 +11,8 @@ def calculate_price(alloy):
 
     price = 0
     for element in alloy.elements:
-        weight_percent = mg.periodic_table.dict[element]['mass'] * \
+        weight_percent = mg.periodic_table.data[element]['mass'] * \
             alloy.composition[element] / total_weight
-        price += weight_percent * mg.periodic_table.dict[element]['price']
+        price += weight_percent * mg.periodic_table.data[element]['price']
 
     return price

@@ -1,5 +1,4 @@
 import numpy as np
-from pandas.api.types import is_numeric_dtype
 import metallurgy as mg
 from .alloy import Alloy
 
@@ -9,7 +8,7 @@ def deviation(alloy, feature_name):
     if not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    data = mg.periodic_table.dict
+    data = mg.periodic_table.data
 
     if(len(alloy.elements) > 1):
 

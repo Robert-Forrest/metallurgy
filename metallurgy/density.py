@@ -7,7 +7,7 @@ def calculate_theoretical_density(alloy):
     if not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    data = mg.periodic_table.dict
+    data = mg.periodic_table.data
 
     massFractions = {}
     masses = {}
