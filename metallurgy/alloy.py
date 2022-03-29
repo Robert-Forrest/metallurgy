@@ -59,13 +59,17 @@ def parse_composition_string(composition_string):
             split_element_percentage = re.split(
                 r'(\d+(?:\.\d+)?)', element_percentage)
 
-            decimal_places = 2
-            if '.' in str(split_element_percentage[1]):
-                decimal_places += len(
-                    str(split_element_percentage[1]).split('.')[1])
+            if(len(split_element_percentage) > 1):
+                decimal_places = 2
+                if '.' in str(split_element_percentage[1]):
+                    decimal_places += len(
+                        str(split_element_percentage[1]).split('.')[1])
 
-            composition[split_element_percentage[0]] = round(
-                float(split_element_percentage[1]) / 100.0, decimal_places)
+                composition[split_element_percentage[0]] = round(
+                    float(split_element_percentage[1]) / 100.0, decimal_places)
+            else:
+                composition[split_element_percentage[0]] = 1.0 / \
+                    len(split_composition)
 
     return filter_order_composition(composition)
 
