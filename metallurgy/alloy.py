@@ -3,10 +3,15 @@ from collections import OrderedDict
 
 
 class Alloy():
-    def __init__(self, compositionString):
-        self.compositionString = compositionString
+    def __init__(self, compositionSeed):
 
-        self.composition = parse_composition_string(self.compositionString)
+        if isinstance(compositionSeed, str):
+            self.composition = parse_composition_string(compositionSeed)
+        elif isinstance(compositionSeed, dict):
+            self.composition = parse_composition_dict(compositionSeed)
+
+        self.compositionStr = alloy_to_string(self)
+
         self.elements = self.composition.keys()
 
 
@@ -61,6 +66,26 @@ def parse_composition_string(composition_string):
             composition[split_element_percentage[0]] = round(
                 float(split_element_percentage[1]) / 100.0, decimal_places)
 
+    return filter_order_composition(composition)
+
+
+def parse_composition_dict(composition):
+
+    needRescale = False
+    for element in composition:
+        if composition[element] > 1:
+            needRescale = True
+            break
+
+    if needRescale:
+        for element in composition:
+            composition[element] /= 100.0
+
+    return filter_order_composition(composition)
+
+
+def filter_order_composition(composition):
+
     filtered_composition = {}
     for element in composition:
         if(composition[element] > 0):
@@ -72,3 +97,27 @@ def parse_composition_string(composition_string):
         ordered_composition[element] = filtered_composition[element]
 
     return ordered_composition
+
+
+def alloy_to_string(alloy):
+
+    composition_str = ""
+    for element in alloy.composition:
+        percentage_str = str(alloy.composition[element] * 100.0)
+
+        split_str = percentage_str.split('.')
+        decimal = split_str[1]
+        if decimal == '0':
+            percentage_str = split_str[0]
+        else:
+            decimal_places = len(str(alloy.composition[element]).split('.')[1])
+            percentage_str = str(round(float(percentage_str), decimal_places))
+
+            split_str = percentage_str.split('.')
+            decimal = split_str[1]
+            if decimal == '0':
+                percentage_str = split_str[0]
+
+        composition_str += element + percentage_str
+
+    return composition_str
