@@ -10,6 +10,9 @@ from . import radii
 from . import structures
 from . import viscosity
 from . import price
+from . import binary
+from . import ternary
+
 
 periodic_table = PeriodicTable()
 
@@ -25,5 +28,7 @@ __all__ = [
     "price",
     "viscosity",
     "Alloy",
-    "periodic_table"
+    "periodic_table",
+    "binary",
+    "ternary"
 ]
