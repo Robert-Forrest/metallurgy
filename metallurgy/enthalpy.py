@@ -1,6 +1,8 @@
 import numpy as np
 import metallurgy as mg
 from .alloy import Alloy
+from . import linear_mixture
+from . import constants
 
 
 def Gamma(elementA, elementB):
@@ -154,3 +156,17 @@ def calculate_mixing_enthalpy(alloy):
         total_mixing_enthalpy = 0
 
     return total_mixing_enthalpy
+
+
+def calculate_mixing_Gibbs_free_energy(alloy, mixing_enthalpy=None, melting_temperature=None, mixing_entropy=None):
+    if not isinstance(alloy, Alloy):
+        alloy = Alloy(alloy)
+
+    if mixing_enthalpy is None:
+        mixing_enthalpy = enthalpy.calculate_mixing_enthalpy(alloy)
+    if melting_temperature is None:
+        melting_temperature = linear_mix(alloy, "melting_temperature")
+    if mixing_entropy is None:
+        mixing_entropy = entropy.calculate_mixing_entropy(alloy)
+
+    return (mixing_enthalpy * 1e3) - melting_temperature * mixing_entropy * constants.idealGasConstant
