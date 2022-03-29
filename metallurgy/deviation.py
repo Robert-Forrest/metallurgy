@@ -1,34 +1,63 @@
+import numpy as np
+from pandas.api.types import is_numeric_dtype
 import metallurgy as mg
+from . import calculations
 from .alloy import Alloy
 
 
-def deviation(alloy, feature_name, periodic_table=None, data=None):
+def deviation(alloy, feature_name):
 
     if not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    if periodic_table is None:
-        periodic_table = mg.periodic_table
-
-    if data is None:
-        data = periodic_table.get_data(feature_name, alloy.elements)
-
-    if not data['symbol'].isin(alloy.elements).all():
-        return None
+    data = mg.periodic_table.dict
 
     if(len(alloy.elements) > 1):
-        mean = 0
-        for element in alloy.elements:
-            mean += alloy.composition[element] * \
-                data[data['symbol'] == element][feature_name].iloc[0]
 
-        deviation = 0
-        for element in alloy.elements:
-            deviation += alloy.composition[element] * \
-                ((data[data['symbol'] == element][feature_name].iloc[0] -
-                  mean)**2)
+        if(isinstance(data[alloy.elements[0]][feature_name], (int, float, list))):
 
-        return deviation**0.5
+            mean = 0
+            for element in alloy.elements:
+                value = data[element][feature_name]
+                if value is None:
+                    return None
+
+                if(isinstance(value, list)):
+                    value = value[0]
+
+                mean += alloy.composition[element] * value
+
+            deviation = 0
+            for element in alloy.elements:
+                value = data[element][feature_name]
+
+                if(isinstance(value, list)):
+                    value = value[0]
+
+                deviation += alloy.composition[element] * \
+                    ((value - mean)**2)
+
+            return deviation**0.5
+
+        else:
+            values = {}
+            for element in alloy.elements:
+                value = data[element][feature_name]
+                if value is None:
+                    return None
+
+                if value not in values:
+                    values[value] = 0
+                values[value] += alloy.composition[element]
+
+            if(len(values) > 1):
+                shannonEntropy = 0
+                for value in values:
+                    shannonEntropy -= values[value] * \
+                        np.log(values[value])
+                return shannonEntropy
+            else:
+                return 0
 
     else:
         return 0

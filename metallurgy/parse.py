@@ -120,3 +120,19 @@ def alloy_to_string(alloy):
         composition_str += element + percentage_str
 
     return composition_str
+
+
+def pretty_composition_str(alloy):
+    numbers = re.compile(r'(\d+)')
+    return numbers.sub(r'$_{\1}$', alloy_to_string(alloy))
+
+
+def valid_composition(composition_string):
+    alloy = parse_composition(composition_string)
+
+    total = 0
+    for element in alloy.elements:
+        total += alloy.composition[element]
+    if(1 - total > 0.05):
+        return False
+    return True
