@@ -1,4 +1,5 @@
 import re
+import numpy as np
 from collections import OrderedDict
 
 
@@ -140,6 +141,6 @@ def valid_composition(composition):
     total = 0
     for element in alloy.elements:
         total += alloy.composition[element]
-    if(1 - total > 0.05):
+    if(np.abs(1 - total) > 0.05):
         return False
     return True
