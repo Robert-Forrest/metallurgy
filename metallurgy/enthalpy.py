@@ -1,3 +1,4 @@
+import numpy as np
 import metallurgy as mg
 from .alloy import Alloy
 from . import linear_mixture
@@ -176,3 +177,55 @@ def calculate_mixing_Gibbs_free_energy(alloy, mixing_enthalpy=None,
 
     return (mixing_enthalpy * 1e3) - melting_temperature * \
         mixing_entropy * constants.idealGasConstant
+
+
+def calculate_mismatch_PHS(alloy, mixing_enthalpy=None, mismatch_entropy=None):
+    if not isinstance(alloy, Alloy):
+        alloy = Alloy(alloy)
+
+    if mixing_enthalpy is None:
+        mixing_enthalpy = calculate_mixing_enthalpy(alloy)
+    if mismatch_entropy is None:
+        mismatch_entropy = entropy.calculate_mismatch_entropy(alloy)
+
+    return mixing_enthalpy * mismatch_entropy
+
+
+def calculate_mixing_PHS(alloy, mixing_enthalpy=None, mixing_entropy=None):
+    if not isinstance(alloy, Alloy):
+        alloy = Alloy(alloy)
+
+    if mixing_enthalpy is None:
+        mixing_enthalpy = calculate_mixing_enthalpy(alloy)
+    if mixing_entropy is None:
+        mixing_entropy = entropy.calculate_mixing_entropy(alloy)
+
+    return mixing_enthalpy * mixing_entropy
+
+
+def calculate_PHSS(alloy, mixing_enthalpy=None, mixing_entropy=None, mismatch_entropy=None):
+    if not isinstance(alloy, Alloy):
+        alloy = Alloy(alloy)
+
+    if mixing_enthalpy is None:
+        mixing_enthalpy = calculate_mixing_enthalpy(alloy)
+    if mixing_entropy is None:
+        mixing_entropy = entropy.calculate_mixing_entropy(alloy)
+    if mismatch_entropy is None:
+        mismatch_entropy = entropy.calculate_mismatch_entropy(alloy)
+
+    return mixing_enthalpy * mixing_entropy * mismatch_entropy
+
+
+def calculate_thermodynamic_factor(alloy, melting_temperature=None, mixing_enthalpy=None, mixing_entropy=None):
+    if not isinstance(alloy, Alloy):
+        alloy = Alloy(alloy)
+
+    if melting_temperature is None:
+        melting_temperature = linear_mixture(alloy, 'melting_temperature')
+    if mixing_enthalpy is None:
+        mixing_enthalpy = calculate_mixing_enthalpy(alloy)
+    if mixing_entropy is None:
+        mixing_entropy = entropy.calculate_mixing_entropy(alloy)
+
+    return (melting_temperature * mixing_entropy) / (np.abs(mixing_enthalpy * 1e3) + 1e-10)
