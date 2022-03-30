@@ -4,7 +4,9 @@ from .alloy import Alloy
 
 
 def calculate_price(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_price(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     total_weight = linear_mixture(alloy, 'mass')

@@ -4,7 +4,9 @@ from .alloy import Alloy
 
 
 def calculate_radius_gamma(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_radius_gamma(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     maxR = 0
@@ -33,7 +35,9 @@ def calculate_radius_gamma(alloy):
 
 
 def calculate_lattice_distortion(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_lattice_distortion(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     meanR = 0

@@ -4,7 +4,9 @@ from .alloy import Alloy
 
 
 def calculate_ideal_entropy(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_ideal_entropy(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     ideal_entropy = 0
@@ -16,7 +18,9 @@ def calculate_ideal_entropy(alloy):
 
 
 def calculate_ideal_entropy_xia(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_ideal_entropy_xia(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     cube_sum = 0
@@ -34,7 +38,9 @@ def calculate_ideal_entropy_xia(alloy):
 
 
 def calculate_mismatch_entropy(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_mismatch_entropy(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     diameters = {}
@@ -84,7 +90,9 @@ def calculate_mismatch_entropy(alloy):
 
 
 def calculate_mixing_entropy(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_mixing_entropy(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     return calculate_ideal_entropy(alloy) + calculate_mismatch_entropy(alloy)

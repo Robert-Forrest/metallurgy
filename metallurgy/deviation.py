@@ -4,8 +4,9 @@ from .alloy import Alloy
 
 
 def deviation(alloy, feature_name):
-
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [deviation(a, feature_name) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     data = mg.periodic_table.data
@@ -25,17 +26,17 @@ def deviation(alloy, feature_name):
 
                 mean += alloy.composition[element] * value
 
-            deviation = 0
+            total_deviation = 0
             for element in alloy.elements:
                 value = data[element][feature_name]
 
                 if(isinstance(value, list)):
                     value = value[0]
 
-                deviation += alloy.composition[element] * \
+                total_deviation += alloy.composition[element] * \
                     ((value - mean)**2)
 
-            return deviation**0.5
+            return total_deviation**0.5
 
         else:
             values = {}

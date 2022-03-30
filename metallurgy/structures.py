@@ -4,7 +4,9 @@ from .alloy import Alloy
 
 
 def calculate_structure_mismatch(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_structure_mismatch(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     structures = {}

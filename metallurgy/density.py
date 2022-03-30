@@ -3,8 +3,9 @@ from .alloy import Alloy
 
 
 def calculate_theoretical_density(alloy):
-
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_theoretical_density(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     data = mg.periodic_table.data

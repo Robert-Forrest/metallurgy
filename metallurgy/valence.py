@@ -4,7 +4,9 @@ from .alloy import Alloy
 
 
 def calculate_valence_proportion(alloy, orbital):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_valence_proportion(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     totalValence = linear_mixture(alloy, 'valence_electrons')

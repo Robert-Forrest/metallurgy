@@ -3,8 +3,9 @@ from .alloy import Alloy
 
 
 def linear_mixture(alloy, feature_name):
-
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [linear_mixture(a, feature_name) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     mixed_property = 0

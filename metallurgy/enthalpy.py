@@ -113,7 +113,9 @@ def calculate_topological_enthalpy(composition):
 
 
 def calculate_mixing_enthalpy(alloy):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_mixing_enthalpy(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if(len(alloy.elements) > 1):
@@ -165,7 +167,9 @@ def calculate_mixing_enthalpy(alloy):
 def calculate_mixing_Gibbs_free_energy(alloy, mixing_enthalpy=None,
                                        melting_temperature=None,
                                        mixing_entropy=None):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_mixing_Gibbs_free_energy(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if mixing_enthalpy is None:
@@ -180,7 +184,9 @@ def calculate_mixing_Gibbs_free_energy(alloy, mixing_enthalpy=None,
 
 
 def calculate_mismatch_PHS(alloy, mixing_enthalpy=None, mismatch_entropy=None):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_mismatch_PHS(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if mixing_enthalpy is None:
@@ -192,7 +198,9 @@ def calculate_mismatch_PHS(alloy, mixing_enthalpy=None, mismatch_entropy=None):
 
 
 def calculate_mixing_PHS(alloy, mixing_enthalpy=None, mixing_entropy=None):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_mixing_PHS(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if mixing_enthalpy is None:
@@ -204,7 +212,9 @@ def calculate_mixing_PHS(alloy, mixing_enthalpy=None, mixing_entropy=None):
 
 
 def calculate_mixing_PHSS(alloy, mixing_enthalpy=None, mixing_entropy=None, mismatch_entropy=None):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_mixing_PHSS(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if mixing_enthalpy is None:
@@ -218,7 +228,9 @@ def calculate_mixing_PHSS(alloy, mixing_enthalpy=None, mixing_entropy=None, mism
 
 
 def calculate_thermodynamic_factor(alloy, melting_temperature=None, mixing_enthalpy=None, mixing_entropy=None):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_thermodynamic_factor(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if melting_temperature is None:

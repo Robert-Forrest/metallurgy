@@ -11,7 +11,9 @@ def calculate_molar_volume(element):
 
 
 def calculate_viscosity(alloy, mixing_enthalpy=None):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [calculate_viscosity(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     const = 3.077e-3

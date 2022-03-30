@@ -3,7 +3,9 @@ from .alloy import Alloy
 
 
 def shell_to_valence_electron_concentration(alloy, period=None, valence_electrons=None):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [shell_to_valence_electron_concentration(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if period is None:
@@ -15,7 +17,9 @@ def shell_to_valence_electron_concentration(alloy, period=None, valence_electron
 
 
 def shell_to_mendeleev_number(alloy, period=None, mendeleev=None):
-    if not isinstance(alloy, Alloy):
+    if isinstance(alloy, list):
+        return [shell_to_mendeleev_number(a) for a in alloy]
+    elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     if period is None:
