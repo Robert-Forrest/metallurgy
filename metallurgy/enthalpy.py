@@ -203,7 +203,7 @@ def calculate_mixing_PHS(alloy, mixing_enthalpy=None, mixing_entropy=None):
     return mixing_enthalpy * mixing_entropy
 
 
-def calculate_PHSS(alloy, mixing_enthalpy=None, mixing_entropy=None, mismatch_entropy=None):
+def calculate_mixing_PHSS(alloy, mixing_enthalpy=None, mixing_entropy=None, mismatch_entropy=None):
     if not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
