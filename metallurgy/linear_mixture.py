@@ -1,3 +1,5 @@
+import numbers
+
 import metallurgy as mg
 from .alloy import Alloy
 
@@ -16,6 +18,9 @@ def linear_mixture(alloy, feature_name):
 
         if(isinstance(value, list)):
             value = value[0]
+
+        if(not isinstance(value, numbers.Number)):
+            return None
 
         mixed_property += alloy.composition[element] * value
 
