@@ -14,6 +14,7 @@ from . import price
 from . import binary
 from . import ternary
 from . import ratios
+from . import plots
 
 periodic_table = PeriodicTable()
 
@@ -31,6 +32,7 @@ __all__ = [
     "ratios",
     "Alloy",
     "periodic_table",
+    "plots",
     "binary",
     "ternary"
 ]

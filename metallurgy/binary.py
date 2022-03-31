@@ -3,13 +3,13 @@ from .alloy import Alloy
 
 def generate_alloys(elements, step=0.5):
 
-    x = 0
+    x = 100
     alloys = []
     percentages = []
-    while x <= 100:
+    while x > 0:
         alloys.append(Alloy(
             elements[0] + str(x) + elements[1] + str(100 - x)))
         percentages.append(x)
-        x += step
+        x -= step
 
     return alloys, percentages
