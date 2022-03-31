@@ -72,7 +72,7 @@ def binary(alloys, data, xlabel=None, ylabel=None, labels=None, scatter_data=Non
 
 
 def ternary_heatmap(alloys, data, step=0.01, scatter_data=None,
-                    save_path=None, quaternary=None, label=None, title=None,
+                    save_path=None, label=None, title=None,
                     vmin=None, vmax=None, ax=None, showColorbar=True):
 
     scale = 1 / step
@@ -124,17 +124,16 @@ def ternary_heatmap(alloys, data, step=0.01, scatter_data=None,
     tax.set_custom_ticks(
         fontsize=tick_fontsize, offset=tick_offset, multiple=multiple)
 
-    tax.left_axis_label(elements[2], fontsize=fontsize, offset=0.12)
-    tax.right_axis_label(elements[1], fontsize=fontsize, offset=0.12)
-    tax.bottom_axis_label(elements[0], fontsize=fontsize, offset=0.12)
+    tax.left_axis_label(elements[2] + ' %', fontsize=fontsize, offset=0.12)
+    tax.right_axis_label(elements[1] + ' %', fontsize=fontsize, offset=0.12)
+    tax.bottom_axis_label(elements[0] + ' %', fontsize=fontsize, offset=0.12)
     tax.clear_matplotlib_ticks()
 
-    tax.set_title(title)
+    tax.set_title(title, pad=15)
 
     jet_cmap = mpl.cm.get_cmap('jet')
     tax.heatmap(heatmap_data, cmap=jet_cmap, vmax=vmax,
                 vmin=vmin, cbarlabel=label, colorbar=showColorbar)
-    # ternary_scatter(realData, tax)
 
     if scatter_data is not None:
         for scatter_datum in scatter_data:

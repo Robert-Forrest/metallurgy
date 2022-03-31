@@ -1,3 +1,3 @@
 elementy
 matplotlib
-ternary
+python-ternary
