@@ -1,4 +1,5 @@
 import numbers
+from collections.abc import Iterable
 
 import numpy as np
 import metallurgy as mg
@@ -7,8 +8,8 @@ from .alloy import Alloy
 
 
 def deviation(alloy, feature_name):
-    if isinstance(alloy, list):
-        return [deviation(a, feature_name) for a in alloy]
+    if isinstance(alloy, Iterable) and not isinstance(alloy, str):
+        return [deviation(a, feature_name) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
