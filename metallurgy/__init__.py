@@ -13,6 +13,7 @@ from . import viscosity
 from . import price
 from . import binary
 from . import ternary
+from . import generate
 from . import ratios
 from . import plots
 
@@ -34,5 +35,6 @@ __all__ = [
     "periodic_table",
     "plots",
     "binary",
-    "ternary"
+    "ternary",
+    "generate"
 ]
