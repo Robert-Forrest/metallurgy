@@ -15,6 +15,7 @@ from . import binary
 from . import ternary
 from . import generate
 from . import ratios
+from .calculate import calculate
 from . import plots
 
 periodic_table = PeriodicTable()
@@ -36,5 +37,6 @@ __all__ = [
     "plots",
     "binary",
     "ternary",
-    "generate"
+    "generate",
+    "calculate"
 ]
