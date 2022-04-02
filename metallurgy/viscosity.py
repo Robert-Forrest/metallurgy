@@ -1,4 +1,7 @@
+from collections.abc import Iterable
+
 import numpy as np
+
 import metallurgy as mg
 from . import enthalpy
 from . import linear_mixture
@@ -11,7 +14,7 @@ def calculate_molar_volume(element):
 
 
 def calculate_viscosity(alloy, mixing_enthalpy=None):
-    if isinstance(alloy, list):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [calculate_viscosity(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)

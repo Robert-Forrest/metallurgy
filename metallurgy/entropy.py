@@ -1,11 +1,14 @@
+from collections.abc import Iterable
+
 import numpy as np
+
 import metallurgy as mg
 from .alloy import Alloy
 
 
 def calculate_ideal_entropy(alloy):
-    if isinstance(alloy, list):
-        return [calculate_ideal_entropy(a) for a in alloy]
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
+        return [calculate_ideal_entropy(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
@@ -18,7 +21,7 @@ def calculate_ideal_entropy(alloy):
 
 
 def calculate_ideal_entropy_xia(alloy):
-    if isinstance(alloy, list):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [calculate_ideal_entropy_xia(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
@@ -38,7 +41,7 @@ def calculate_ideal_entropy_xia(alloy):
 
 
 def calculate_mismatch_entropy(alloy):
-    if isinstance(alloy, list):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [calculate_mismatch_entropy(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
@@ -90,7 +93,7 @@ def calculate_mismatch_entropy(alloy):
 
 
 def calculate_mixing_entropy(alloy):
-    if isinstance(alloy, list):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [calculate_mixing_entropy(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)

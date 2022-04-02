@@ -1,9 +1,11 @@
+from collections.abc import Iterable
+
 from . import linear_mixture
 from .alloy import Alloy
 
 
 def shell_to_valence_electron_concentration(alloy, period=None, valence_electrons=None):
-    if isinstance(alloy, list):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [shell_to_valence_electron_concentration(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
@@ -17,7 +19,7 @@ def shell_to_valence_electron_concentration(alloy, period=None, valence_electron
 
 
 def shell_to_mendeleev_number(alloy, period=None, mendeleev=None):
-    if isinstance(alloy, list):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [shell_to_mendeleev_number(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)

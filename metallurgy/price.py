@@ -1,10 +1,12 @@
+from collections.abc import Iterable
+
 import metallurgy as mg
 from . import linear_mixture
 from .alloy import Alloy
 
 
 def calculate_price(alloy):
-    if isinstance(alloy, list):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [calculate_price(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)

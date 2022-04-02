@@ -6,7 +6,7 @@ from .alloy import Alloy
 
 
 def linear_mixture(alloy, feature_name):
-    if isinstance(alloy, Iterable) and not isinstance(alloy, str):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [linear_mixture(a, feature_name) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
@@ -16,8 +16,7 @@ def linear_mixture(alloy, feature_name):
         value = mg.periodic_table.data[element][feature_name]
         if value is None:
             return None
-
-        if(isinstance(value, list)):
+        elif(isinstance(value, list)):
             value = value[0]
 
         if(not isinstance(value, numbers.Number)):

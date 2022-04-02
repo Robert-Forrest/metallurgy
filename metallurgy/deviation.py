@@ -8,7 +8,7 @@ from .alloy import Alloy
 
 
 def deviation(alloy, feature_name):
-    if isinstance(alloy, Iterable) and not isinstance(alloy, str):
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [deviation(a, feature_name) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
