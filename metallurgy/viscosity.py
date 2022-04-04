@@ -9,13 +9,9 @@ from . import constants
 from .alloy import Alloy
 
 
-def calculate_molar_volume(element):
-    return mg.periodic_table.data[element]['mass'] / mg.periodic_table.data[element]['density']
-
-
-def calculate_viscosity(alloy, mixing_enthalpy=None):
+def viscosity(alloy, mixing_enthalpy=None):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_viscosity(a) for a in alloy]
+        return [viscosity(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
@@ -25,7 +21,7 @@ def calculate_viscosity(alloy, mixing_enthalpy=None):
         elementalViscosity[element] = const * np.sqrt(
             (mg.periodic_table.data[element]['mass'] / 1000) *
             mg.periodic_table.data[element]['melting_temperature']) / \
-            (calculate_molar_volume(element) * 1.0E-6)
+            (mg.periodic_table.data[element]['molar_volume'] * 1.0E-6)
 
     sum_aG = 0
     for element in alloy.elements:
@@ -40,10 +36,10 @@ def calculate_viscosity(alloy, mixing_enthalpy=None):
     averageMolarVolume = 0
     for element in alloy.elements:
         averageMolarVolume += alloy.composition[element] * \
-            (calculate_molar_volume(element) * 1.0E-6)
+            (mg.periodic_table.data[element]['molar_volume'] * 1.0E-6)
 
     if mixing_enthalpy is None:
-        mixing_enthalpy = enthalpy.calculate_mixing_enthalpy(alloy)
+        mixing_enthalpy = enthalpy.mixing_enthalpy(alloy)
 
     viscosity = ((constants.plankConstant * constants.avogadroNumber) /
                  (averageMolarVolume)) * \

@@ -4,9 +4,9 @@ import metallurgy as mg
 from .alloy import Alloy
 
 
-def calculate_theoretical_density(alloy):
+def theoretical_density(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_theoretical_density(a) for a in list(alloy)]
+        return [theoretical_density(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 

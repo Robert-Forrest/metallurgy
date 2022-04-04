@@ -6,9 +6,9 @@ import metallurgy as mg
 from .alloy import Alloy
 
 
-def calculate_ideal_entropy(alloy):
+def ideal_entropy(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_ideal_entropy(a) for a in list(alloy)]
+        return [ideal_entropy(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
@@ -20,9 +20,9 @@ def calculate_ideal_entropy(alloy):
     return -ideal_entropy
 
 
-def calculate_ideal_entropy_xia(alloy):
+def ideal_entropy_xia(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_ideal_entropy_xia(a) for a in alloy]
+        return [ideal_entropy_xia(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
@@ -40,14 +40,17 @@ def calculate_ideal_entropy_xia(alloy):
     return -ideal_entropy
 
 
-def calculate_mismatch_entropy(alloy):
+def mismatch_entropy(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_mismatch_entropy(a) for a in alloy]
+        return [mismatch_entropy(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
     diameters = {}
     for element in alloy.composition:
+        if mg.periodic_table.data[element]['radius'] is None:
+            return None
+
         diameters[element] = mg.periodic_table.data[element]['radius'] * 2
 
     sigma_2 = 0
@@ -92,10 +95,16 @@ def calculate_mismatch_entropy(alloy):
     return mismatch_entropy
 
 
-def calculate_mixing_entropy(alloy):
+def mixing_entropy(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_mixing_entropy(a) for a in alloy]
+        return [mixing_entropy(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    return calculate_ideal_entropy(alloy) + calculate_mismatch_entropy(alloy)
+    ideal = ideal_entropy(alloy)
+    mismatch = mismatch_entropy(alloy)
+
+    if ideal is not None and mismatch is not None:
+        return ideal + mismatch
+    else:
+        return None

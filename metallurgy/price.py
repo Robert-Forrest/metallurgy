@@ -5,9 +5,9 @@ from . import linear_mixture
 from .alloy import Alloy
 
 
-def calculate_price(alloy):
+def price(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_price(a) for a in alloy]
+        return [price(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 

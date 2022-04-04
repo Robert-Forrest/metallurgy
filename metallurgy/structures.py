@@ -6,9 +6,9 @@ import metallurgy as mg
 from .alloy import Alloy
 
 
-def calculate_structure_mismatch(alloy):
+def structure_mismatch(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_structure_mismatch(a) for a in alloy]
+        return [structure_mismatch(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 

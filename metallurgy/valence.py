@@ -5,13 +5,13 @@ from . import linear_mixture
 from .alloy import Alloy
 
 
-def calculate_valence_proportion(alloy, orbital):
+def valence_proportion(alloy, orbital):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_valence_proportion(a) for a in alloy]
+        return [valence_proportion(a, orbital) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    totalValence = linear_mixture(alloy, 'valence_electrons')
+    total_valence = linear_mixture(alloy, 'valence_electrons')
 
     orbitalCount = {}
     for element in alloy.elements:
@@ -28,8 +28,27 @@ def calculate_valence_proportion(alloy, orbital):
                 orbitalCount[element] += orbitals[-1 - i]['electrons']
             i += 1
 
-    total = 0
-    for element in alloy.elements:
-        total += orbitalCount[element] * alloy.composition[element]
+    if total_valence > 0:
+        total = 0
+        for element in alloy.elements:
+            total += orbitalCount[element] * alloy.composition[element]
+        return total / total_valence
 
-    return total / totalValence
+    else:
+        return 0
+
+
+def s_valence(alloy):
+    return valence_proportion(alloy, 's')
+
+
+def p_valence(alloy):
+    return valence_proportion(alloy, 'p')
+
+
+def d_valence(alloy):
+    return valence_proportion(alloy, 'd')
+
+
+def f_valence(alloy):
+    return valence_proportion(alloy, 'f')

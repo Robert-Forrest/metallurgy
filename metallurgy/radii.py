@@ -6,9 +6,9 @@ import metallurgy as mg
 from .alloy import Alloy
 
 
-def calculate_radius_gamma(alloy):
+def radius_gamma(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_radius_gamma(a) for a in alloy]
+        return [radius_gamma(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
@@ -37,9 +37,9 @@ def calculate_radius_gamma(alloy):
     return numerator / denominator
 
 
-def calculate_lattice_distortion(alloy):
+def lattice_distortion(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [calculate_lattice_distortion(a) for a in alloy]
+        return [lattice_distortion(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 

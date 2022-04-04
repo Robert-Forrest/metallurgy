@@ -3,6 +3,7 @@ from elementy.periodictable import PeriodicTable
 from .linear_mixture import linear_mixture
 from .deviation import deviation
 from .alloy import Alloy
+from . import features
 from . import density
 from . import valence
 from . import entropy
@@ -19,6 +20,7 @@ from .calculate import calculate
 from . import plots
 
 periodic_table = PeriodicTable()
+
 
 __all__ = [
     "linear_mixture",
@@ -38,5 +40,6 @@ __all__ = [
     "binary",
     "ternary",
     "generate",
-    "calculate"
+    "calculate",
+    "features"
 ]
