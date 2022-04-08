@@ -140,6 +140,9 @@ def mixing_enthalpy(alloy):
             V_A_alloy = mg.periodic_table.data[pair[0]]['volume_miedema']
             V_B_alloy = mg.periodic_table.data[pair[1]]['volume_miedema']
 
+            if V_A_alloy is None or V_B_alloy is None:
+                return None
+
             for _ in range(10):
 
                 Cs_A = calculate_surface_concentration(
@@ -167,83 +170,81 @@ def mixing_enthalpy(alloy):
     return total_mixing_enthalpy
 
 
-def mixing_Gibbs_free_energy(alloy, mixing_enthalpy=None,
-                             melting_temperature=None,
-                             mixing_entropy=None):
+def mixing_Gibbs_free_energy(alloy):
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_Gibbs_free_energy(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    if mixing_enthalpy is None:
-        mixing_enthalpy = mixing_enthalpy(alloy)
-    if melting_temperature is None:
-        melting_temperature = linear_mixture(alloy, "melting_temperature")
-    if mixing_entropy is None:
-        mixing_entropy = entropy.mixing_entropy(alloy)
+    H = mixing_enthalpy(alloy)
+    Tm = linear_mixture(alloy, "melting_temperature")
+    S = entropy.mixing_entropy(alloy)
 
-    return (mixing_enthalpy * 1e3) - melting_temperature * \
-        mixing_entropy * constants.idealGasConstant
+    if H is None or Tm is None or S is None:
+        return None
+    return (H * 1e3) - Tm * S * constants.idealGasConstant
 
 
-def mismatch_PHS(alloy, mixing_enthalpy=None, mismatch_entropy=None):
+def mismatch_PHS(alloy):
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mismatch_PHS(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    if mixing_enthalpy is None:
-        mixing_enthalpy = mixing_enthalpy(alloy)
-    if mismatch_entropy is None:
-        mismatch_entropy = entropy.mismatch_entropy(alloy)
+    H = mixing_enthalpy(alloy)
+    S = entropy.mismatch_entropy(alloy)
 
-    return mixing_enthalpy * mismatch_entropy
+    if H is not None and S is not None:
+        return H * S
+    else:
+        return None
 
 
-def mixing_PHS(alloy, mixing_enthalpy=None, mixing_entropy=None):
+def mixing_PHS(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_PHS(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    if mixing_enthalpy is None:
-        mixing_enthalpy = mixing_enthalpy(alloy)
-    if mixing_entropy is None:
-        mixing_entropy = entropy.mixing_entropy(alloy)
+    H = mixing_enthalpy(alloy)
+    S = entropy.mixing_entropy(alloy)
 
-    return mixing_enthalpy * mixing_entropy
+    if H is not None and S is not None:
+        return H * S
+    else:
+        return None
 
 
-def mixing_PHSS(alloy, mixing_enthalpy=None, mixing_entropy=None, mismatch_entropy=None):
+def mixing_PHSS(alloy):
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_PHSS(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    if mixing_enthalpy is None:
-        mixing_enthalpy = mixing_enthalpy(alloy)
-    if mixing_entropy is None:
-        mixing_entropy = entropy.mixing_entropy(alloy)
-    if mismatch_entropy is None:
-        mismatch_entropy = entropy.mismatch_entropy(alloy)
+    H = mixing_enthalpy(alloy)
+    Smix = entropy.mixing_entropy(alloy)
+    Smismatch = entropy.mismatch_entropy(alloy)
 
-    return mixing_enthalpy * mixing_entropy * mismatch_entropy
+    if H is None or Smix is None or Smismatch is None:
+        return None
+    else:
+        return H*Smix*Smismatch
 
 
-def thermodynamic_factor(alloy, melting_temperature=None, mixing_enthalpy=None, mixing_entropy=None):
+def thermodynamic_factor(alloy):
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [thermodynamic_factor(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    if melting_temperature is None:
-        melting_temperature = linear_mixture(alloy, 'melting_temperature')
-    if mixing_enthalpy is None:
-        mixing_enthalpy = mixing_enthalpy(alloy)
-    if mixing_entropy is None:
-        mixing_entropy = entropy.mixing_entropy(alloy)
+    Tm = linear_mixture(alloy, 'melting_temperature')
+    H = mixing_enthalpy(alloy)
+    S = entropy.mixing_entropy(alloy)
 
-    return (melting_temperature * mixing_entropy) / (np.abs(mixing_enthalpy * 1e3) + 1e-10)
+    if Tm is None or H is None or S is None:
+        return None
+
+    return (Tm * S) / (np.abs(H * 1e3) + 1e-10)
