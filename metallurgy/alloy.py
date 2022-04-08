@@ -127,8 +127,7 @@ def filter_order_composition(composition):
             filtered_composition[element] = composition[element]
 
     ordered_composition = OrderedDict()
-    elements = filtered_composition.keys()
-    for element in sorted(elements):
+    for element in sorted(composition, key=composition.get, reverse=True):
         ordered_composition[element] = filtered_composition[element]
 
     return ordered_composition
