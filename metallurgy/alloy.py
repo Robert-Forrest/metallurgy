@@ -307,7 +307,7 @@ class Alloy():
 
     def constraints_satisfied(self) -> bool:
         """Check for satisfaction of the constraints acting on an alloy"""
-        
+
         satisfied = True
         if self.constraints is not None:
 
@@ -360,7 +360,7 @@ class Alloy():
 
     def clamp_composition(self):
         """Adjust elemental percentages such that they sum to 1.0"""
-        
+
         total_percentage = sum(self.composition.values())
 
         for element in self.elements:
@@ -373,7 +373,7 @@ class Alloy():
         minimum percentage values for each element depend on the
         others.
         """
-        
+
         if self.constraints is None:
             return
 
@@ -423,7 +423,7 @@ class Alloy():
 
     def to_string(self) -> str:
         """Convert the alloy composition dict to a string"""
-        
+
         composition_str = ""
         for element in self.elements:
             percentage_str = str(self.composition[element] * 100.0)
@@ -452,7 +452,7 @@ class Alloy():
 
     def round_composition(self):
         """Round elemental percentages in composition while maintaining sum"""
-        
+
         if(len(self.composition) == 0):
             return
 
@@ -540,7 +540,7 @@ class Alloy():
                     self.composition[element], percentage_step), sigfigs)
 
 
-def parse_composition(composition: Union[str,dict,Alloy]) -> dict:
+def parse_composition(composition: Union[str, dict, Alloy]) -> dict:
     """Parse elemental percentages of an alloy from input"""
     if isinstance(composition, str):
         return parse_composition_string(composition)
@@ -552,7 +552,7 @@ def parse_composition(composition: Union[str,dict,Alloy]) -> dict:
 
 def parse_composition_string(composition_string: str) -> dict:
     """Parse elemental percentages of an alloy from a string"""
-    
+
     composition = {}
     if('(' in composition_string):
         major_composition = composition_string.split(')')[0].split('(')[1]
@@ -612,7 +612,7 @@ def parse_composition_string(composition_string: str) -> dict:
 
 def parse_composition_dict(composition: dict) -> dict:
     """Parse elemental percentages of an alloy from a dict"""
-    
+
     tmp_composition = copy.deepcopy(composition)
 
     needRescale = False
@@ -649,12 +649,12 @@ def filter_order_composition(composition: dict) -> OrderedDict:
 
 
 def parse_constraints(
-        min_elements: int=1,
-        max_elements: int=10,
-        percentages: dict={},
-        allowed_elements: list=[e.symbol for e in elementy.PeriodicTable().elements],
-        sigfigs: int=3,
-        percentage_step: float=0.01) -> dict:
+        min_elements: int = 1,
+        max_elements: int = 10,
+        percentages: dict = {},
+        allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
+        sigfigs: int = 3,
+        percentage_step: float = 0.01) -> dict:
     """Parse constraint rules from input
 
     Args:
@@ -714,7 +714,7 @@ def parse_constraints(
     }
 
 
-def normal_round(num: float, ndigits:int=0) -> float:
+def normal_round(num: float, ndigits: int = 0) -> float:
     """Rounds a float to the specified number of decimal places.
 
     Args:
@@ -728,7 +728,7 @@ def normal_round(num: float, ndigits:int=0) -> float:
         return int(num * digit_value + 0.5) / digit_value
 
 
-def multiple_round(num: float, multiple: Union[float,int]) -> Union[float,int]:
+def multiple_round(num: float, multiple: Union[float, int]) -> Union[float, int]:
     """Round a number to the nearest multiple of another number.
 
     Args:
