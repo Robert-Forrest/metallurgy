@@ -1,13 +1,39 @@
+import copy
 import re
-import numpy as np
 from collections import OrderedDict
+
+import numpy as np
 
 
 class Alloy():
+    class Composition(dict):
+
+        def __init__(self, value, *args, **kwargs):
+            super().__init__(value, *args, **kwargs)
+
+        def __setitem__(self, key, value):
+            if value >= 0.01:
+                super().__setitem__(key, value)
+            else:
+                if key in self.keys():
+                    super().__delitem__(key)
+
     def __init__(self, composition):
         self.composition = parse_composition(composition)
 
-        self.elements = list(self.composition.keys())
+    @property
+    def composition(self):
+        return self._composition
+
+    @composition.setter
+    def composition(self, value):
+        if isinstance(value, (dict, OrderedDict)):
+            value = self.Composition(value)
+        self._composition = value
+
+    @property
+    def elements(self):
+        return list(self.composition.keys())
 
     def to_string(self):
         composition_str = ""
@@ -105,18 +131,19 @@ def parse_composition_string(composition_string):
 
 
 def parse_composition_dict(composition):
+    tmp_composition = copy.deepcopy(composition)
 
     needRescale = False
-    for element in composition:
-        if composition[element] > 1:
+    for element in tmp_composition:
+        if tmp_composition[element] > 1:
             needRescale = True
             break
 
     if needRescale:
-        for element in composition:
-            composition[element] /= 100.0
+        for element in tmp_composition:
+            tmp_composition[element] /= 100.0
 
-    return filter_order_composition(composition)
+    return filter_order_composition(tmp_composition)
 
 
 def filter_order_composition(composition):
@@ -127,7 +154,7 @@ def filter_order_composition(composition):
             filtered_composition[element] = composition[element]
 
     ordered_composition = OrderedDict()
-    for element in sorted(composition, key=composition.get, reverse=True):
+    for element in sorted(filtered_composition, key=filtered_composition.get, reverse=True):
         ordered_composition[element] = filtered_composition[element]
 
     return ordered_composition

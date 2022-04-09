@@ -11,7 +11,7 @@ def random_alloy(
         min_elements=1,
         max_elements=10,
         required_elements=[],
-        allowed_elements=[e for e in elementy.PeriodicTable().elements]):
+        allowed_elements=[e.symbol for e in elementy.PeriodicTable().elements]):
 
     requirements = parse_requirements(
         min_elements,
@@ -20,23 +20,24 @@ def random_alloy(
         allowed_elements)
 
     if min_elements < max_elements:
-        num_alloy_elements = np.random.randint(
+        num_extra_elements = np.random.randint(
             min_elements, max_elements)
     else:
-        num_alloy_elements = max_elements
-    num_alloy_elements -= len(requirements['elements'])
+        num_extra_elements = max_elements
+    num_extra_elements -= len(requirements['elements'])
 
-    if num_alloy_elements > 0:
+    if num_extra_elements > 0:
         other_elements = requirements['allowed_elements'][:]
         for element in requirements['elements'].keys():
-            other_elements.remove(element)
+            if element in other_elements:
+                other_elements.remove(element)
         elements = list(requirements['elements'].keys(
-        )) + list(np.random.choice(other_elements, num_alloy_elements, replace=False))
+        )) + list(np.random.choice(other_elements, num_extra_elements, replace=False))
 
     else:
         elements = list(np.random.choice(
             list(requirements['elements'].keys()),
-            num_alloy_elements + len(requirements['elements']),
+            num_extra_elements + len(requirements['elements']),
             replace=False))
 
     percentages = list(np.random.dirichlet(np.ones(len(elements)), size=1)[0])
@@ -45,22 +46,25 @@ def random_alloy(
     for j in range(len(elements)):
         composition[elements[j]] = percentages[j]
 
-    composition = rescale(composition, requirements)
-    if composition is None:
+    alloy = Alloy(composition)
+
+    alloy = rescale(alloy, requirements)
+
+    if alloy is None:
         return random_alloy(
             min_elements=min_elements,
             max_elements=max_elements,
             required_elements=requirements['elements'],
             allowed_elements=requirements['allowed_elements'])
 
-    return Alloy(composition)
+    return alloy
 
 
 def random_alloys(num_alloys,
                   min_elements=1,
                   max_elements=10,
                   required_elements=[],
-                  allowed_elements=[e for e in elementy.PeriodicTable().elements]):
+                  allowed_elements=[e.symbol for e in elementy.PeriodicTable().elements]):
 
     return [random_alloy(min_elements, max_elements, required_elements, allowed_elements) for _ in range(num_alloys)]
 
@@ -97,25 +101,30 @@ def apply_requirements(alloy, requirements=None):
 
         constraints_applied = True
         if(len(alloy.composition) == 1):
-            composition = {}
+            alloy.composition = {}
             break
 
         precedence = {}
         for element in requirements['elements']:
             if requirements['elements'][element]['min'] > 0:
                 if element not in alloy.composition:
-                    alloy.composition[element] = 0
+                    alloy.composition[element] = 0.01
+
             precedence[element] = requirements['elements'][element]['precedence']
 
         precedence_order = sorted(precedence, key=precedence.get, reverse=True)
         reverse_precedence_order = sorted(precedence, key=precedence.get)
 
         requirements['elements'] = determine_element_requirements(
-            composition, requirements)
+            alloy.composition, requirements)
 
         for element in precedence_order:
             if element not in alloy.composition:
-                continue
+                if requirements['elements'][element]['min'] > 0:
+                    alloy.composition[element] = requirements['elements'][element]['min']
+                else:
+                    continue
+
             if alloy.composition[element] < requirements['elements'][element]['min']:
                 for other_element in reverse_precedence_order:
                     if element != other_element and other_element in alloy.composition:
@@ -140,8 +149,16 @@ def apply_requirements(alloy, requirements=None):
                                 alloy.composition[element] += element_deficit
                                 alloy.composition[other_element] -= element_deficit
 
+                            if element not in alloy.composition:
+                                break
                             if alloy.composition[element] >= requirements['elements'][element]['min']:
                                 break
+
+            if element not in alloy.composition:
+                if requirements['elements'][element]['min'] > 0:
+                    alloy.composition[element] = alloy.composition[element] = requirements['elements'][element]['min']
+                else:
+                    continue
 
             if alloy.composition[element] < requirements['elements'][element]['min']:
                 for other_element in sorted(alloy.composition.keys(), key=lambda k: random.random()):
@@ -174,8 +191,16 @@ def apply_requirements(alloy, requirements=None):
                                 alloy.composition[element] += element_deficit
                                 alloy.composition[other_element] -= element_deficit
 
+                            if element not in alloy.composition:
+                                break
                             if alloy.composition[element] >= requirements['elements'][element]['min']:
                                 break
+
+            if element not in alloy.composition:
+                if requirements['elements'][element]['min'] > 0:
+                    alloy.composition[element] = requirements['elements'][element]['min']
+                else:
+                    continue
 
             if alloy.composition[element] > requirements['elements'][element]['max']:
                 for other_element in reverse_precedence_order:
@@ -202,8 +227,16 @@ def apply_requirements(alloy, requirements=None):
                                 alloy.composition[element] -= element_surplus
                                 alloy.composition[other_element] += element_surplus
 
+                            if element not in alloy.composition:
+                                break
                             if alloy.composition[element] <= requirements['elements'][element]['max']:
                                 break
+
+            if element not in alloy.composition:
+                if requirements['elements'][element]['min'] > 0:
+                    alloy.composition[element] = alloy.composition[element] = requirements['elements'][element]['min']
+                else:
+                    continue
 
             if alloy.composition[element] > requirements['elements'][element]['max']:
                 for other_element in sorted(alloy.composition.keys(), key=lambda k: random.random()):
@@ -238,6 +271,8 @@ def apply_requirements(alloy, requirements=None):
                             alloy.composition[element] -= element_surplus
                             alloy.composition[other_element] += element_surplus
 
+                        if element not in alloy.composition:
+                            break
                         if alloy.composition[element] <= requirements['elements'][element]['max']:
                             break
 
@@ -276,11 +311,12 @@ def apply_requirements(alloy, requirements=None):
                     percentage = np.random.uniform()
                     alloy.composition[element_to_add] = percentage
 
-        alloy.composition = clamp_composition(alloy.composition)
+        alloy = clamp_alloy_composition(alloy)
 
     if not constraints_applied:
-        composition = clamp_composition(alloy.composition)
-    alloy.composition = round_composition(alloy.composition, requirements)
+        alloy = clamp_alloy_composition(alloy)
+
+    alloy = round_alloy_composition(alloy, requirements)
 
     return alloy
 
@@ -335,13 +371,13 @@ def constraints_satisfied(composition, requirements=None):
                 # print("too few elements")
                 # print(composition)
                 # print()
-    
+
     return satisfied
 
 
-def round_composition(composition, requirements=None):
-    if(len(composition) == 0):
-        return composition
+def round_alloy_composition(alloy, requirements=None):
+    if(len(alloy.composition) == 0):
+        return alloy
 
     if requirements is not None:
         sigfigs = requirements['sigfigs']
@@ -352,15 +388,17 @@ def round_composition(composition, requirements=None):
 
     integer_parts = []
     decimal_parts = []
-    toDelete = []
-    for element in composition:
+
+    elements = list(alloy.composition.keys())
+
+    for element in elements:
+
         rounded_percentage = normal_round(
-            composition[element], sigfigs)
-        # rounded_percentage = normal_round(multiple_round(
-        #     composition[element], percentage_step), sigfigs)
+            alloy.composition[element], sigfigs)
+
         if rounded_percentage > 0:
 
-            percentage = str(composition[element] *
+            percentage = str(alloy.composition[element] *
                              (10**sigfigs))
             split_percentage = percentage.split('.')
 
@@ -371,21 +409,15 @@ def round_composition(composition, requirements=None):
             else:
                 decimal_parts.append(0.0)
 
-        elif element in composition:
-            toDelete.append(element)
-
-    for element in toDelete:
-        del composition[element]
-
     undershoot = (10**sigfigs)-sum(integer_parts)
 
     if(undershoot > 0):
         if requirements is not None:
             requirements['elements'] = determine_element_requirements(
-                composition, requirements)
+                alloy.composition, requirements)
 
             precedence = {}
-            for element in composition:
+            for element in elements:
                 if element in requirements['elements']:
                     precedence[element] = requirements['elements'][element]['precedence']
                 else:
@@ -394,22 +426,22 @@ def round_composition(composition, requirements=None):
 
             filtered_precedence_order = []
             for element in precedence_order:
-                if element in composition:
+                if element in alloy.composition:
                     filtered_precedence_order.append(element)
         else:
-            filtered_precedence_order = list(composition.keys())
-                    
+            filtered_precedence_order = list(alloy.composition.keys())
+
         i = 0
         while(undershoot > 0):
             decimal_part_index = list(
-                composition.keys()).index(filtered_precedence_order[i])
+                alloy.composition.keys()).index(filtered_precedence_order[i])
 
             constraints_violated = False
             if requirements is not None:
                 if filtered_precedence_order[i] in requirements['elements']:
-                   if ((integer_parts[decimal_part_index] + 1)/(10**sigfigs)
-                           > requirements['elements'][filtered_precedence_order[i]]['max']):
-                       constraints_violated = True
+                    if ((integer_parts[decimal_part_index] + 1)/(10**sigfigs)
+                            > requirements['elements'][filtered_precedence_order[i]]['max']):
+                        constraints_violated = True
 
             if not constraints_violated:
                 integer_parts[decimal_part_index] += 1
@@ -419,34 +451,33 @@ def round_composition(composition, requirements=None):
             if i >= len(filtered_precedence_order):
                 i = 0
 
+        elements = list(alloy.composition.keys())
+
         i = 0
-        for element in composition:
-            composition[element] = normal_round(
+        for element in elements:
+            alloy.composition[element] = normal_round(
                 integer_parts[i] / (10**sigfigs), sigfigs)
             i += 1
 
     else:
-        for element in composition:
-            composition[element] = normal_round(multiple_round(
-                composition[element], percentage_step), sigfigs)
-            # composition[element] = normal_round(
-            #     composition[element], sigfigs)
+        elements = list(alloy.composition.keys())
+        for element in elements:
+            alloy.composition[element] = normal_round(multiple_round(
+                alloy.composition[element], percentage_step), sigfigs)
 
-    return composition
+    return alloy
 
 
-def clamp_composition(composition):
-    for element in composition:
-        if composition[element] < 0:
-            composition[element] = 0
+def clamp_alloy_composition(alloy):
 
-    total_percentage = sum(composition.values())
-    # # if normal_round(total_percentage, requirements['sigfigs']) != 1.0:
-    # if multiple_round(total_percentage, percentage_step) != 1.0:
-    for element in composition:
-        composition[element] = composition[element] / total_percentage
+    total_percentage = sum(alloy.composition.values())
 
-    return composition
+    elements = list(alloy.composition.keys())
+
+    for element in elements:
+        alloy.composition[element] /= total_percentage
+
+    return alloy
 
 
 def determine_element_requirements(composition, requirements):
@@ -476,10 +507,6 @@ def determine_element_requirements(composition, requirements):
     if lowest_precedence['element'] is not None:
         for element in composition:
             if element not in tmp_required_elements['elements']:
-                # if lowest_precedence['element'] in composition:
-                #     maxPercent = composition[lowest_precedence['element']]
-                # else:
-                #     maxPercent = 0
                 maxPercent = lowest_precedence['percentage']
 
                 tmp_required_elements['elements'][element] = {
