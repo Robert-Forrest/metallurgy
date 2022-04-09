@@ -9,7 +9,6 @@ from . import valence
 from . import entropy
 from . import enthalpy
 from . import radii
-from . import structures
 from . import viscosity
 from . import price
 from . import binary
@@ -30,7 +29,6 @@ __all__ = [
     "entropy",
     "enthalpy",
     "radii",
-    "structures",
     "price",
     "viscosity",
     "ratios",
