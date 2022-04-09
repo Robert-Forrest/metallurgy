@@ -10,13 +10,11 @@ def theoretical_density(alloy):
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    data = mg.periodic_table.data
-
     massFractions = {}
     masses = {}
     totalMass = 0
     for element in alloy.elements:
-        masses[element] = data[element]['mass']
+        masses[element] = mg.periodic_table.elements[element]['mass']
         totalMass += masses[element] * alloy.composition[element]
 
     for element in alloy.elements:
@@ -26,6 +24,6 @@ def theoretical_density(alloy):
     total = 0
     for element in alloy.elements:
         total += massFractions[element] / \
-            data[element]['density']
+            mg.periodic_table.elements[element]['density']
 
     return 1 / total

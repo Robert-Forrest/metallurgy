@@ -13,7 +13,7 @@ def linear_mixture(alloy, feature_name):
 
     mixed_property = 0
     for element in alloy.elements:
-        value = mg.periodic_table.data[element][feature_name]
+        value = mg.periodic_table.elements[element][feature_name]
         if value is None:
             return None
         elif(isinstance(value, list)):

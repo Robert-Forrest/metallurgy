@@ -8,7 +8,7 @@ def random_alloy(
         min_elements=1,
         max_elements=10,
         percentage_constraints={},
-        allowed_elements=[e.symbol for e in elementy.PeriodicTable().elements]):
+        allowed_elements=[e for e in elementy.PeriodicTable().elements]):
 
     if isinstance(percentage_constraints, (list)):
         parsed_percentage_constraints = {}
@@ -67,7 +67,7 @@ def random_alloys(num_alloys,
                   min_elements=1,
                   max_elements=10,
                   percentage_constraints={},
-                  allowed_elements=[e.symbol for e in elementy.PeriodicTable().elements]):
+                  allowed_elements=[e for e in elementy.PeriodicTable().elements]):
 
     return [
         random_alloy(

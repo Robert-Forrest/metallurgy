@@ -18,9 +18,9 @@ def viscosity(alloy):
     const = 3.077e-3
     elementalViscosity = {}
     for element in alloy.elements:
-        mass = mg.periodic_table.data[element]['mass']
-        Tm = mg.periodic_table.data[element]['melting_temperature']
-        molar_volume = mg.periodic_table.data[element]['molar_volume']
+        mass = mg.periodic_table.elements[element]['mass']
+        Tm = mg.periodic_table.elements[element]['melting_temperature']
+        molar_volume = mg.periodic_table.elements[element]['molar_volume']
         if mass is None or Tm is None or molar_volume is None:
             return None
 
@@ -30,9 +30,9 @@ def viscosity(alloy):
 
     sum_aG = 0
     for element in alloy.elements:
-        mass = mg.periodic_table.data[element]['mass']
-        density = mg.periodic_table.data[element]['density']
-        Tm = mg.periodic_table.data[element]['melting_temperature']
+        mass = mg.periodic_table.elements[element]['mass']
+        density = mg.periodic_table.elements[element]['density']
+        Tm = mg.periodic_table.elements[element]['melting_temperature']
         if mass is None or density is None or Tm is None:
             return None
 
@@ -44,7 +44,7 @@ def viscosity(alloy):
     averageMolarVolume = 0
     for element in alloy.elements:
         averageMolarVolume += alloy.composition[element] * \
-            (mg.periodic_table.data[element]['molar_volume'] * 1.0E-6)
+            (mg.periodic_table.elements[element]['molar_volume'] * 1.0E-6)
 
     H = enthalpy.mixing_enthalpy(alloy)
     if H is None:

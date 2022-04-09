@@ -17,8 +17,8 @@ def valence_proportion(alloy, orbital):
     for element in alloy.elements:
         orbitalCount[element] = 0
 
-        valence_electrons = mg.periodic_table.data[element]['valence_electrons']
-        orbitals = mg.periodic_table.data[element]['orbitals']
+        valence_electrons = mg.periodic_table.elements[element]['valence_electrons']
+        orbitals = mg.periodic_table.elements[element]['orbitals']
 
         i = 0
         electrons = 0

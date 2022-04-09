@@ -29,13 +29,13 @@ def ideal_entropy_xia(alloy):
     cube_sum = 0
     for element in alloy.elements:
         cube_sum += alloy.composition[element] * \
-            mg.periodic_table.data[element]['atomic_volume']
+            mg.periodic_table.elements[element]['atomic_volume']
 
     ideal_entropy = 0
     for element in alloy.composition:
         ideal_entropy += alloy.composition[element] * np.log(
             (alloy.composition[element] *
-             mg.periodic_table.data[element]['atomic_volume']) / cube_sum)
+             mg.periodic_table.elements[element]['atomic_volume']) / cube_sum)
 
     return -ideal_entropy
 
@@ -48,10 +48,10 @@ def mismatch_entropy(alloy):
 
     diameters = {}
     for element in alloy.composition:
-        if mg.periodic_table.data[element]['radius'] is None:
+        if mg.periodic_table.elements[element]['radius'] is None:
             return None
 
-        diameters[element] = mg.periodic_table.data[element]['radius'] * 2
+        diameters[element] = mg.periodic_table.elements[element]['radius'] * 2
 
     sigma_2 = 0
     for element in alloy.composition:
