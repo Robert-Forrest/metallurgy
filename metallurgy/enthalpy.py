@@ -20,16 +20,16 @@ def calculate_QPR(elementA, elementB):
 
     seriesA = mg.periodic_table.elements[elementA]['series']
     if(elementA == 'Ca' or elementA == 'Sr' or elementA == 'Ba'):
-        seriesA = 'nonTransitionMetal'
+        seriesA = 'non_transition_metal'
 
     seriesB = mg.periodic_table.elements[elementB]['series']
     if(elementB == 'Ca' or elementB == 'Sr' or elementB == 'Ba'):
-        seriesB = 'nonTransitionMetal'
+        seriesB = 'non_transition_metal'
 
-    if seriesA == 'transitionMetal' and seriesB == 'transitionMetal':
+    if seriesA == 'transition_metal' and seriesB == 'transition_metal':
         P = 14.1
         R = 0
-    elif seriesA != 'transitionMetal' and seriesB != 'transitionMetal':
+    elif seriesA != 'transition_metal' and seriesB != 'transition_metal':
         P = 10.6
         R = 0
     else:
@@ -45,15 +45,15 @@ def calculate_QPR(elementA, elementB):
 def calculate_electronegativity_enthalpy_component(elementA, elementB, P):
     electronegativityDiff = mg.periodic_table.elements[elementA]['electronegativity_miedema'] \
         - mg.periodic_table.elements[elementB]['electronegativity_miedema']
-
     return -P * (electronegativityDiff**2)
 
 
 def calculate_WS_enthalpy_component(elementA, elementB, Q):
-    return Q * (diffDiscontinuity(elementA, elementB)**2)
+    return Q * (wigner_seitz_electron_density_discontinuity_delta(
+        elementA, elementB)**2)
 
 
-def diffDiscontinuity(elementA, elementB):
+def wigner_seitz_electron_density_discontinuity_delta(elementA, elementB):
     densityA = mg.periodic_table.elements[elementA]['wigner_seitz_electron_density']
     densityB = mg.periodic_table.elements[elementB]['wigner_seitz_electron_density']
     return (densityA**(1. / 3.)) - (densityB**(1. / 3.))
