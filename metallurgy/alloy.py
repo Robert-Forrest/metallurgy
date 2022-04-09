@@ -42,11 +42,11 @@ class Alloy():
             else:
                 if element in self.keys():
                     super().__delitem__(element)
-
             self.on_change()
 
     def __init__(self, composition: Union[str, dict, Alloy], constraints: dict = None):
         self.composition = parse_composition(composition)
+
         self.constraints = None
 
         self.clamp_composition()
@@ -54,6 +54,8 @@ class Alloy():
 
         if constraints is not None:
             self.constraints = parse_constraints(**constraints)
+        else:
+            self.constraints = None
 
     @property
     def composition(self) -> Composition:
@@ -137,10 +139,9 @@ class Alloy():
                                     self.composition[other_element] -= element_deficit
 
                                 if element not in self.composition:
-                                    break
+                                    self.composition[element] = self.constraints['local_percentages'][element]['min']
                                 if self.composition[element] >= \
                                    self.constraints['local_percentages'][element]['min']:
-
                                     break
 
                 if element not in self.composition:
@@ -185,7 +186,7 @@ class Alloy():
                                     self.composition[other_element] -= element_deficit
 
                                 if element not in self.composition:
-                                    break
+                                    self.composition[element] = self.constraints['local_percentages'][element]['min']
                                 if self.composition[element] >= self.constraints['local_percentages'][element]['min']:
                                     break
 
@@ -222,7 +223,7 @@ class Alloy():
                                     self.composition[other_element] += element_surplus
 
                                 if element not in self.composition:
-                                    break
+                                    self.composition[element] = self.constraints['local_percentages'][element]['max']
                                 if self.composition[element] <= \
                                    self.constraints['local_percentages'][element]['max']:
                                     break
@@ -266,7 +267,7 @@ class Alloy():
                                 self.composition[other_element] += element_surplus
 
                             if element not in self.composition:
-                                break
+                                self.composition[element] = self.constraints['local_percentages'][element]['max']
                             if self.composition[element] <= self.constraints['local_percentages'][element]['max']:
                                 break
 
@@ -296,8 +297,7 @@ class Alloy():
                     element_to_add = np.random.choice(
                         self.constraints['allowed_elements'], 1)[0]
                     if element_to_add not in self.composition:
-                        percentage = np.random.uniform()
-                        self.composition[element_to_add] = percentage
+                        self.composition[element_to_add] = np.random.uniform()
 
             self.clamp_composition()
 
@@ -364,7 +364,14 @@ class Alloy():
         total_percentage = sum(self.composition.values())
 
         for element in self.elements:
-            self.composition[element] /= total_percentage
+            clamped_value = self.composition[element] / total_percentage
+            if self.constraints is not None:
+                if element in self.constraints['percentages']:
+                    self.composition[element] = max(clamped_value, self.constraints['percentages'][element]['min'])
+                else:
+                    self.composition[element] = clamped_value
+            else:
+                self.composition[element] = clamped_value
 
     def determine_percentage_constraints(self):
         """Determine the current constraints on an alloy composition.
@@ -455,13 +462,13 @@ class Alloy():
 
         if(len(self.composition) == 0):
             return
+        elif(len(self.composition) == 1):
+            self.composition[self.elements[0]] = 1.0
 
         if self.constraints is not None:
             sigfigs = self.constraints['sigfigs']
-            percentage_step = self.constraints['percentage_step']
         else:
-            sigfigs = 2
-            percentage_step = 0.01
+            sigfigs = 3
 
         integer_parts = []
         decimal_parts = []
@@ -492,8 +499,8 @@ class Alloy():
 
                 precedence = {}
                 for element in elements:
-                    if element in self.constraints['percentages']:
-                        precedence[element] = self.constraints['percentages'][element]['precedence']
+                    if element in self.constraints['local_percentages']:
+                        precedence[element] = self.constraints['local_percentages'][element]['precedence']
                     else:
                         precedence[element] = 0
                 precedence_order = sorted(precedence, key=precedence.get, reverse=True)
@@ -512,9 +519,9 @@ class Alloy():
 
                 constraints_violated = False
                 if self.constraints is not None:
-                    if filtered_precedence_order[i] in self.constraints['percentages']:
+                    if filtered_precedence_order[i] in self.constraints['local_percentages']:
                         if ((integer_parts[decimal_part_index] + 1)/(10**sigfigs)
-                                > self.constraints['percentages'][filtered_precedence_order[i]]['max']):
+                                > self.constraints['local_percentages'][filtered_precedence_order[i]]['max']):
                             constraints_violated = True
 
                 if not constraints_violated:
@@ -534,10 +541,23 @@ class Alloy():
                 i += 1
 
         else:
+
             elements = list(self.composition.keys())
+            i = 0
             for element in elements:
-                self.composition[element] = normal_round(multiple_round(
-                    self.composition[element], percentage_step), sigfigs)
+
+                rounded_value = integer_parts[i]/(10**sigfigs)
+
+                if self.constraints is not None:
+                    if element in self.constraints['local_percentages']:
+                        self.composition[element] = max(
+                            self.constraints['local_percentages'][element]['min'], rounded_value)
+                    else:
+                        self.composition[element] = rounded_value
+                else:
+                    self.composition[element] = rounded_value
+
+                i += 1
 
 
 def parse_composition(composition: Union[str, dict, Alloy]) -> dict:
