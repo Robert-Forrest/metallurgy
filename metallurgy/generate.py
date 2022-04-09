@@ -51,14 +51,8 @@ def random_alloy(
             'max_elements': max_elements
         }
     )
-    alloy.rescale()
 
-    if len(alloy.elements) == 0:
-        return random_alloy(
-            min_elements=min_elements,
-            max_elements=max_elements,
-            percentage_constraints=percentage_constraints,
-            allowed_elements=allowed_elements)
+    alloy.rescale()
 
     return alloy
 
