@@ -46,6 +46,9 @@ def mismatch_entropy(alloy):
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
+    if len(alloy.elements) == 1:
+        return 0.0
+
     diameters = {}
     for element in alloy.composition:
         if mg.periodic_table.elements[element]['radius'] is None:

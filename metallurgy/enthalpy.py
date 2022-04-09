@@ -165,7 +165,7 @@ def mixing_enthalpy(alloy):
             total_mixing_enthalpy += chemical_enthalpy
 
     else:
-        total_mixing_enthalpy = 0
+        total_mixing_enthalpy = 0.0
 
     return total_mixing_enthalpy
 
