@@ -24,7 +24,7 @@ def test_requirements():
 
     num_alloys = 100
 
-    required_elements = {
+    percentage_constraints = {
         'Cu': {
             'min': 0.2,
             'max': 0.6
@@ -39,13 +39,13 @@ def test_requirements():
         }
 
     }
-    random_alloys = mg.generate.random_alloys(num_alloys, required_elements=required_elements)
+    random_alloys = mg.generate.random_alloys(num_alloys, percentage_constraints=percentage_constraints)
 
     for random_alloy in random_alloys:
-        for element in required_elements:
-            if required_elements[element]['min'] > 0:
+        for element in percentage_constraints:
+            if percentage_constraints[element]['min'] > 0:
                 assert element in random_alloy.composition
 
             if element in random_alloy.composition:
-                assert random_alloy.composition[element] >= required_elements[element]['min']
-                assert random_alloy.composition[element] <= required_elements[element]['max']
+                assert random_alloy.composition[element] >= percentage_constraints[element]['min']
+                assert random_alloy.composition[element] <= percentage_constraints[element]['max']
