@@ -15,6 +15,7 @@ from . import generate
 from . import ratios
 from .calculate import calculate
 from . import plots
+from . import analyse
 
 periodic_table = PeriodicTable()
 
@@ -35,5 +36,6 @@ __all__ = [
     "plots",
     "generate",
     "calculate",
-    "features"
+    "features",
+    "analyse"
 ]
