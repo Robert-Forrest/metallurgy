@@ -11,8 +11,6 @@ from . import enthalpy
 from . import radii
 from . import viscosity
 from . import price
-from . import binary
-from . import ternary
 from . import generate
 from . import ratios
 from .calculate import calculate
@@ -22,6 +20,8 @@ periodic_table = PeriodicTable()
 
 
 __all__ = [
+    "periodic_table",
+    "Alloy",
     "linear_mixture",
     "deviation",
     "density",
@@ -32,11 +32,7 @@ __all__ = [
     "price",
     "viscosity",
     "ratios",
-    "Alloy",
-    "periodic_table",
     "plots",
-    "binary",
-    "ternary",
     "generate",
     "calculate",
     "features"

@@ -1,7 +1,10 @@
+import re
+
 import numpy as np
 import elementy
 
 from .alloy import Alloy
+from .calculate import calculate
 
 
 def random_alloy(
@@ -70,3 +73,77 @@ def random_alloys(num_alloys,
             percentage_constraints,
             allowed_elements
         ) for _ in range(num_alloys)]
+
+
+def system(elements, step=1, min_percent=0, max_percent=100, feature_name=None, quaternary=None):
+    if isinstance(elements, str):
+        elements = re.findall('[A-Z][^A-Z]*', elements)
+
+    if len(elements) == 2:
+        return binary(elements, step, feature_name)
+    elif len(elements) == 3:
+        return ternary(elements, step, min_percent, max_percent, feature_name, quaternary)
+
+
+def binary(elements, step=0.5, feature_name=None):
+    if isinstance(elements, str):
+        elements = re.findall('[A-Z][^A-Z]*', elements)
+
+    x = 100
+    alloys = []
+    percentages = []
+    while x >= 0:
+        alloys.append(Alloy(
+            elements[0] + str(x) + elements[1] + str(100 - x), rescale=False))
+        percentages.append(x)
+        x -= step
+
+    if feature_name is not None:
+        values = calculate(alloys, feature_name)
+        return alloys, percentages, values
+
+    return alloys, percentages
+
+
+def ternary(elements, step=1, min_percent=0, max_percent=100, feature_name=None, quaternary=None):
+    if isinstance(elements, str):
+        elements = re.findall('[A-Z][^A-Z]*', elements)
+
+    alloys = []
+    percentages = []
+
+    tmp_percentages = [max_percent+step]*3
+    while tmp_percentages[0] >= min_percent+step:
+        tmp_percentages[0] -= step
+        tmp_percentages[1] = max_percent+step
+        tmp_percentages[2] = max_percent+step
+
+        while tmp_percentages[1] >= min_percent+step:
+            tmp_percentages[1] -= step
+            tmp_percentages[2] = max_percent + step
+
+            while tmp_percentages[2] >= min_percent+step:
+                tmp_percentages[2] -= step
+
+                if(sum(tmp_percentages) == 100):
+
+                    composition_str = ""
+                    for i in range(len(elements)):
+                        if(tmp_percentages[i] > 0):
+                            composition_str += elements[i] + \
+                                str(tmp_percentages[i])
+
+                    if quaternary is not None:
+                        composition_str = "(" + composition_str + ")" + str(
+                            100 - quaternary[1]) + quaternary[0] + str(quaternary[1])
+
+                    alloy = Alloy(composition_str, rescale=False)
+
+                    alloys.append(alloy)
+                    percentages.append(list(alloy.composition.values()))
+
+    if feature_name is not None:
+        values = calculate(alloys, feature_name)
+        return alloys, percentages, values
+
+    return alloys, percentages
