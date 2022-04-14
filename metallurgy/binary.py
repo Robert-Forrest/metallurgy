@@ -8,7 +8,7 @@ def generate_alloys(elements, step=0.5):
     percentages = []
     while x >= 0:
         alloys.append(Alloy(
-            elements[0] + str(x) + elements[1] + str(100 - x)))
+            elements[0] + str(x) + elements[1] + str(100 - x), rescale=False))
         percentages.append(x)
         x -= step
 

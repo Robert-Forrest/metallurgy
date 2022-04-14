@@ -31,7 +31,8 @@ def generate_alloys(elements, step=1, minPercent=0, maxPercent=100, quaternary=N
                         composition_str = "(" + composition_str + ")" + str(
                             100 - quaternary[1]) + quaternary[0] + str(quaternary[1])
 
-                    alloy = Alloy(composition_str)
+                    alloy = Alloy(composition_str, rescale=False)
+
                     compositions.append(alloy)
                     percentages.append(list(alloy.composition.values()))
 
