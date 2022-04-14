@@ -44,18 +44,23 @@ class Alloy():
                     super().__delitem__(element)
             self.on_change()
 
-    def __init__(self, composition: Union[str, dict, Alloy], constraints: dict = None):
+    def __init__(self, composition: Union[str, dict, Alloy], constraints: dict = None, rescale: bool = True):
+
         self.composition = parse_composition(composition)
 
         self.constraints = None
 
-        self.clamp_composition()
-        self.round_composition()
+        if rescale:
+            self.clamp_composition()
+            self.round_composition()
 
         if constraints is not None:
             self.constraints = parse_constraints(**constraints)
         else:
             self.constraints = None
+
+    def __repr__(self):
+        return self.to_string()
 
     @property
     def composition(self) -> Composition:
