@@ -48,7 +48,7 @@ def lattice_distortion(alloy):
         meanR += alloy.composition[element] * \
             mg.periodic_table.elements[element]['radius']
 
-    lattice_distortion = 0
+    tmp_lattice_distortion = 0
     for i in range(len(alloy.elements) - 1):
         for j in range(i + 1, len(alloy.elements)):
             element = alloy.elements[i]
@@ -59,7 +59,7 @@ def lattice_distortion(alloy):
             radiusB = alloy.composition[element] * \
                 mg.periodic_table.elements[otherElement]['radius']
 
-            lattice_distortion += (alloy.composition[element] * alloy.composition[otherElement] * np.abs(
+            tmp_lattice_distortion += (alloy.composition[element] * alloy.composition[otherElement] * np.abs(
                 radiusA + radiusB - 2 * meanR)) / (2 * meanR)
 
-    return lattice_distortion
+    return tmp_lattice_distortion
