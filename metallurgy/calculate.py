@@ -15,6 +15,13 @@ def list_functions(mod):
 
 
 def calculate(alloys, feature_name):
+    if mg.get_model() is not None:
+        import cerebral as cb
+
+        model = mg.get_model()
+        if feature_name in [f['name'] for f in cb.models.get_model_prediction_features(model)]:
+            return cb.models.predict(model, alloys)[feature_name]
+
     if "_linearmix" in feature_name:
         return mg.linear_mixture(alloys, feature_name.split("_linearmix")[0])
     elif "_deviation" in feature_name:

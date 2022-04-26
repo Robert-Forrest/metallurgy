@@ -18,6 +18,16 @@ from . import plots
 from . import analyse
 
 periodic_table = PeriodicTable()
+model = None
+
+
+def set_model(model_in):
+    global model
+    model = model_in
+
+
+def get_model():
+    return model
 
 
 __all__ = [
@@ -37,5 +47,8 @@ __all__ = [
     "generate",
     "calculate",
     "features",
-    "analyse"
+    "analyse",
+    'model',
+    'set_model',
+    'get_model'
 ]
