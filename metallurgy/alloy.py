@@ -1,7 +1,7 @@
 from __future__ import annotations
 import copy
 import re
-from typing import Union, Callable
+from typing import Union, Callable, Optional
 from collections import OrderedDict
 
 import numpy as np
@@ -44,7 +44,7 @@ class Alloy():
                     super().__delitem__(element)
             self.on_change()
 
-    def __init__(self, composition: Union[str, dict, Alloy], constraints: dict = None, rescale: bool = True):
+    def __init__(self, composition: Union[str, dict, Alloy], constraints: Optional[dict] = None, rescale: bool = True):
 
         self.composition = parse_composition(composition)
 
