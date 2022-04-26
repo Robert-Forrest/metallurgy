@@ -1,4 +1,5 @@
 import re
+from typing import Union, Optional
 
 import numpy as np
 import elementy
@@ -8,8 +9,8 @@ from .calculate import calculate
 
 
 def random_alloy(
-        min_elements=1,
-        max_elements=10,
+        min_elements: int = 1,
+        max_elements: int = 10,
         percentage_constraints={},
         allowed_elements=[e for e in elementy.PeriodicTable().elements]):
 
@@ -60,11 +61,11 @@ def random_alloy(
     return alloy
 
 
-def random_alloys(num_alloys,
-                  min_elements=1,
-                  max_elements=10,
-                  percentage_constraints={},
-                  allowed_elements=[e for e in elementy.PeriodicTable().elements]):
+def random_alloys(num_alloys: int,
+                  min_elements: int = 1,
+                  max_elements: int = 10,
+                  percentage_constraints: dict = {},
+                  allowed_elements: list = [e for e in elementy.PeriodicTable().elements]):
 
     return [
         random_alloy(
@@ -75,7 +76,35 @@ def random_alloys(num_alloys,
         ) for _ in range(num_alloys)]
 
 
-def system(elements, step=1, min_percent=0, max_percent=100, feature_name=None, quaternary=None):
+def mixture(alloys, weights: Optional[list] = None):
+    shared_composition_space = []
+
+    for alloy in alloys:
+        for element in alloy.elements:
+            if element not in shared_composition_space:
+                shared_composition_space.append(element)
+
+    if weights is None:
+        weights = [1.0]*len(alloys)
+
+    mixed_composition = {}
+    for element in shared_composition_space:
+        mixed_composition[element] = 0
+        for i in range(len(alloys)):
+            if element in alloys[i].elements:
+                mixed_composition[element] += alloys[i].composition[element]*weights[i]
+
+    return Alloy(mixed_composition)
+
+
+def system(
+        elements: Union[list, str],
+        step: Union[int, float] = 1,
+        min_percent: Union[int, float] = 0,
+        max_percent: Union[int, float] = 100,
+        feature_name: Optional[str] = None,
+        quaternary: Optional[dict] = None):
+
     if isinstance(elements, str):
         elements = re.findall('[A-Z][^A-Z]*', elements)
 
@@ -85,7 +114,11 @@ def system(elements, step=1, min_percent=0, max_percent=100, feature_name=None, 
         return ternary(elements, step, min_percent, max_percent, feature_name, quaternary)
 
 
-def binary(elements, step=0.5, feature_name=None):
+def binary(
+        elements: Union[list, str],
+        step: Union[int, float] = 0.5,
+        feature_name: Optional[str] = None):
+
     if isinstance(elements, str):
         elements = re.findall('[A-Z][^A-Z]*', elements)
 
@@ -105,7 +138,14 @@ def binary(elements, step=0.5, feature_name=None):
     return alloys, percentages
 
 
-def ternary(elements, step=1, min_percent=0, max_percent=100, feature_name=None, quaternary=None):
+def ternary(
+        elements: Union[list, str],
+        step: Union[int, float] = 1,
+        min_percent: Union[int, float] = 0,
+        max_percent: Union[int, float] = 100,
+        feature_name: Optional[str] = None,
+        quaternary: Optional[dict] = None):
+
     if isinstance(elements, str):
         elements = re.findall('[A-Z][^A-Z]*', elements)
 

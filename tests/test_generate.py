@@ -20,6 +20,36 @@ def test_random_alloys():
         test_random_alloy(random_alloy)
 
 
+def test_generate_binary_alloys():
+
+    elements = ["Cu", "Zr"]
+
+    step = 1
+    alloys, percentages = mg.generate.binary(elements, step)
+    assert len(alloys) == len(percentages) == 101
+
+    step = 2
+    alloys, percentages = mg.generate.binary(elements, step)
+    assert len(alloys) == len(percentages) == 51
+
+    step = 0.5
+    alloys, percentages = mg.generate.binary(elements, step)
+    assert len(alloys) == len(percentages) == 201
+
+
+def test_generate_ternary_alloys():
+
+    elements = ["Cu", "Zr", "Al"]
+
+    step = 1
+    alloys, percentages = mg.generate.ternary(elements, step)
+    assert len(alloys) == len(percentages) == 5151
+
+    step = 2
+    alloys, percentages = mg.generate.ternary(elements, step)
+    assert len(alloys) == len(percentages) == 1326
+
+
 def test_requirements():
 
     num_alloys = 100
@@ -49,3 +79,22 @@ def test_requirements():
             if element in random_alloy.composition:
                 assert random_alloy.composition[element] >= percentage_constraints[element]['min']
                 assert random_alloy.composition[element] <= percentage_constraints[element]['max']
+
+
+def test_mixture():
+
+    A = mg.Alloy("Cu50Zr50")
+
+    mixed = mg.generate.mixture([A])
+
+    assert mixed.composition == A.composition
+
+    B = mg.Alloy("Fe50Ni50")
+
+    mixed = mg.generate.mixture([A, B])
+
+    assert mixed.composition == {"Cu": 0.25, "Zr": 0.25, "Fe": 0.25, "Ni": 0.25}
+
+    mixed = mg.generate.mixture([A, B], [0.9, 0.1])
+
+    assert mixed.composition == {"Cu": 0.45, "Zr": 0.45, "Fe": 0.05, "Ni": 0.05}
