@@ -56,6 +56,9 @@ class Alloy():
 
         if constraints is not None:
             self.constraints = parse_constraints(**constraints)
+            if rescale:
+                self.rescale()
+
         else:
             self.constraints = None
 
