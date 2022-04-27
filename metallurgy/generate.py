@@ -49,14 +49,12 @@ def random_alloy(
 
     alloy = Alloy(
         composition,
-        {
+        constraints={
             'percentages': percentage_constraints,
             'min_elements': min_elements,
             'max_elements': max_elements
         }
     )
-
-    alloy.rescale()
 
     return alloy
 
@@ -77,12 +75,56 @@ def random_alloys(num_alloys: int,
 
 
 def mixture(alloys, weights: Optional[list] = None):
-    shared_composition_space = []
 
+    shared_composition_space = []
     for alloy in alloys:
         for element in alloy.elements:
             if element not in shared_composition_space:
                 shared_composition_space.append(element)
+
+    constraints = None
+    for alloy in alloys:
+        if alloy.constraints is not None:
+            if constraints is None:
+                constraints = {
+                    'percentages': {},
+                    'min_elements': 1,
+                    'max_elements': 1
+                }
+
+            if 'min_elements' in alloy.constraints:
+                constraints['min_elements'] = max(
+                    constraints['min_elements'],
+                    alloy.constraints['min_elements']
+                )
+            if 'max_elements' in alloy.constraints:
+                constraints['max_elements'] = max(
+                    constraints['max_elements'],
+                    alloy.constraints['max_elements']
+                )
+
+            if 'percentages' in alloy.constraints:
+                for element in alloy.constraints['percentages']:
+                    if element not in constraints:
+                        constraints['percentages'][element] = {}
+
+                    if 'min' in alloy.constraints['percentages'][element]:
+                        if 'min' not in constraints['percentages'][element]:
+                            constraints['percentages'][element]['min'] = alloy.constraints['percentages'][element]['min']
+                        else:
+                            constraints['percentages'][element]['min'] = min(
+                                constraints['percentages'][element]['min'],
+                                alloy.constraints['percentages'][element]['min']
+                            )
+
+                    if 'max' in alloy.constraints['percentages'][element]:
+                        if 'max' not in constraints['percentages'][element]:
+                            constraints['percentages'][element]['max'] = alloy.constraints['percentages'][element]['max']
+                        else:
+                            constraints['percentages'][element]['max'] = max(
+                                constraints['percentages'][element]['max'],
+                                alloy.constraints['percentages'][element]['max']
+                            )
 
     if weights is None:
         weights = [1.0]*len(alloys)
@@ -94,7 +136,7 @@ def mixture(alloys, weights: Optional[list] = None):
             if element in alloys[i].elements:
                 mixed_composition[element] += alloys[i].composition[element]*weights[i]
 
-    return Alloy(mixed_composition)
+    return Alloy(mixed_composition, constraints=constraints)
 
 
 def system(
