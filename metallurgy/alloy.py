@@ -681,6 +681,7 @@ def parse_constraints(
         max_elements: int = 10,
         percentages: dict = {},
         allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
+        disallowed_elements: list = [],
         sigfigs: int = 3,
         percentage_step: float = 0.01) -> dict:
     """Parse constraint rules from input
@@ -691,6 +692,8 @@ def parse_constraints(
         percentages: Dict of maximum and minimum percentages
                             per element
         allowed_elements: List of elements allowed in an alloy
+        disallowed_elements: List of elements not allowed in an
+                             alloy
         sigfigs: Number of significant figures to consider for
                        percentages
         percentage_step: Increment between percentages
@@ -730,6 +733,10 @@ def parse_constraints(
     min_sum = sum([percentages[e]['min'] for e in percentages])
     if min_sum > 1:
         print("Impossible constraints, mins for each element sum greater than 1")
+
+    for element in disallowed_elements:
+        if element in allowed_elements:
+            allowed_elements.remove(element)
 
     return {
         'percentages': percentages,
