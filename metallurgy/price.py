@@ -13,10 +13,13 @@ def price(alloy):
 
     total_weight = linear_mixture(alloy, 'mass')
 
-    price = 0
+    total_price = 0
     for element in alloy.elements:
-        weight_percent = mg.periodic_table.elements[element]['mass'] * \
-            alloy.composition[element] / total_weight
-        price += weight_percent * mg.periodic_table.elements[element]['price']
+        if mg.periodic_table.elements[element]['price'] is not None:
+            weight_percent = mg.periodic_table.elements[element]['mass'] * \
+                alloy.composition[element] / total_weight
+            total_price += weight_percent * mg.periodic_table.elements[element]['price']
+        else:
+            return None
 
-    return price
+    return total_price

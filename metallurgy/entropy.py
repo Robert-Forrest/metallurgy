@@ -12,12 +12,12 @@ def ideal_entropy(alloy):
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    ideal_entropy = 0
+    total_ideal_entropy = 0
     for element in alloy.elements:
-        ideal_entropy += alloy.composition[element] * \
+        total_ideal_entropy += alloy.composition[element] * \
             np.log(alloy.composition[element])
 
-    return -ideal_entropy
+    return -total_ideal_entropy
 
 
 def ideal_entropy_xia(alloy):
