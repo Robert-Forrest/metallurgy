@@ -27,14 +27,20 @@ def test_generate_binary_alloys():
     step = 1
     alloys, percentages = mg.generate.binary(elements, step)
     assert len(alloys) == len(percentages) == 101
+    assert alloys[0].composition == {elements[0]: 1.0}
+    assert alloys[-1].composition == {elements[1]: 1.0}
 
     step = 2
     alloys, percentages = mg.generate.binary(elements, step)
     assert len(alloys) == len(percentages) == 51
+    assert alloys[0].composition == {elements[0]: 1.0}
+    assert alloys[-1].composition == {elements[1]: 1.0}
 
     step = 0.5
     alloys, percentages = mg.generate.binary(elements, step)
     assert len(alloys) == len(percentages) == 201
+    assert alloys[0].composition == {elements[0]: 1.0}
+    assert alloys[-1].composition == {elements[1]: 1.0}
 
 
 def test_generate_ternary_alloys():
@@ -44,10 +50,14 @@ def test_generate_ternary_alloys():
     step = 1
     alloys, percentages = mg.generate.ternary(elements, step)
     assert len(alloys) == len(percentages) == 5151
+    assert alloys[0].composition == {elements[0]: 1.0}
+    assert alloys[-1].composition == {elements[2]: 1.0}
 
     step = 2
     alloys, percentages = mg.generate.ternary(elements, step)
     assert len(alloys) == len(percentages) == 1326
+    assert alloys[0].composition == {elements[0]: 1.0}
+    assert alloys[-1].composition == {elements[2]: 1.0}
 
 
 def test_requirements():
