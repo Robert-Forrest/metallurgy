@@ -91,11 +91,9 @@ def mismatch_entropy(alloy):
     packing_fraction = 0.64
     zeta = 1.0 / (1 - packing_fraction)
 
-    mismatch_entropy = (((3.0 / 2.0) * ((zeta**2) - 1) * y_1) +
-                        ((3.0 / 2.0) * ((zeta - 1)**2) * y_2) - (1 - y_3) *
-                        (0.5 * (zeta - 1) * (zeta - 3) + np.log(zeta)))
-
-    return mismatch_entropy
+    return (((3.0 / 2.0) * ((zeta**2) - 1) * y_1) +
+            ((3.0 / 2.0) * ((zeta - 1)**2) * y_2) - (1 - y_3) *
+            (0.5 * (zeta - 1) * (zeta - 3) + np.log(zeta)))
 
 
 def mixing_entropy(alloy):

@@ -50,10 +50,8 @@ def viscosity(alloy):
     if H is None:
         return None
 
-    viscosity = ((constants.plankConstant * constants.avogadroNumber) /
-                 (averageMolarVolume)) * \
+    return ((constants.plankConstant * constants.avogadroNumber) /
+            (averageMolarVolume)) * \
         np.exp((sum_aG - 0.155 * H) /
                (constants.idealGasConstant *
                 linear_mixture(alloy, 'melting_temperature')))
-
-    return viscosity
