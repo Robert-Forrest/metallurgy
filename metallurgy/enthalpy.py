@@ -11,9 +11,12 @@ from . import entropy
 
 def Gamma(elementA, elementB):
     Q, P, R = calculate_QPR(elementA, elementB)
-    return calculate_electronegativity_enthalpy_component(
-        elementA, elementB, P) + \
-        calculate_WS_enthalpy_component(elementA, elementB, Q) - R
+    if R is not None:
+        return calculate_electronegativity_enthalpy_component(
+            elementA, elementB, P) + \
+            calculate_WS_enthalpy_component(elementA, elementB, Q) - R
+    else:
+        return None
 
 
 def calculate_QPR(elementA, elementB):
@@ -34,8 +37,13 @@ def calculate_QPR(elementA, elementB):
         R = 0
     else:
         P = 12.3
-        R = mg.periodic_table.elements[elementA]['miedema_R'] * \
-            mg.periodic_table.elements[elementB]['miedema_R']
+
+        if hasattr(mg.periodic_table.elements[elementA], 'miedema_R') and \
+           hasattr(mg.periodic_table.elements[elementB], 'miedema_R'):
+            R = mg.periodic_table.elements[elementA]['miedema_R'] * \
+                mg.periodic_table.elements[elementB]['miedema_R']
+        else:
+            R = None
 
     Q = P * 9.4
 
@@ -102,8 +110,10 @@ def calculate_interface_enthalpy(elementA, elementB, volumeA):
     densityA = mg.periodic_table.elements[elementA]['wigner_seitz_electron_density']
     densityB = mg.periodic_table.elements[elementB]['wigner_seitz_electron_density']
 
-    return 2 * volumeA * Gamma(elementA, elementB) / \
-        (densityA**(-1. / 3.) + densityB**(-1. / 3.))
+    gamma = Gamma(elementA, elementB)
+    if gamma is not None:
+        return 2 * volumeA * gamma / \
+            (densityA**(-1. / 3.) + densityB**(-1. / 3.))
 
 
 def calculate_topological_enthalpy(composition):
@@ -154,15 +164,19 @@ def mixing_enthalpy(alloy):
                 V_B_alloy = calculate_corrected_volume(
                     pair[1], pair[0], 1 - Cs_A)
 
-            chemical_enthalpy = alloy.composition[pair[0]] * \
-                alloy.composition[pair[1]] * (
-                    (1 - Cs_A) *
-                    calculate_interface_enthalpy(pair[0], pair[1], V_A_alloy) +
-                    Cs_A *
-                    calculate_interface_enthalpy(pair[1], pair[0], V_B_alloy)
-            )
+            interface_AB = calculate_interface_enthalpy(pair[0], pair[1], V_A_alloy)
+            interface_BA = calculate_interface_enthalpy(pair[1], pair[0], V_B_alloy)
 
-            total_mixing_enthalpy += chemical_enthalpy
+            if interface_AB is not None and interface_BA is not None:
+
+                chemical_enthalpy = alloy.composition[pair[0]] * \
+                    alloy.composition[pair[1]] * \
+                    ((1 - Cs_A) * interface_AB +
+                     Cs_A * interface_BA)
+                total_mixing_enthalpy += chemical_enthalpy
+
+            else:
+                return None
 
     else:
         total_mixing_enthalpy = 0.0
