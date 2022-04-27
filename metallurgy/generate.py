@@ -110,7 +110,8 @@ def mixture(alloys, weights: Optional[list] = None):
 
                     if 'min' in alloy.constraints['percentages'][element]:
                         if 'min' not in constraints['percentages'][element]:
-                            constraints['percentages'][element]['min'] = alloy.constraints['percentages'][element]['min']
+                            constraints['percentages'][element]['min'] = \
+                                alloy.constraints['percentages'][element]['min']
                         else:
                             constraints['percentages'][element]['min'] = min(
                                 constraints['percentages'][element]['min'],
@@ -119,7 +120,8 @@ def mixture(alloys, weights: Optional[list] = None):
 
                     if 'max' in alloy.constraints['percentages'][element]:
                         if 'max' not in constraints['percentages'][element]:
-                            constraints['percentages'][element]['max'] = alloy.constraints['percentages'][element]['max']
+                            constraints['percentages'][element]['max'] = \
+                                alloy.constraints['percentages'][element]['max']
                         else:
                             constraints['percentages'][element]['max'] = max(
                                 constraints['percentages'][element]['max'],
