@@ -70,6 +70,12 @@ class Alloy:
     def __repr__(self):
         return self.to_string()
 
+    def __eq__(self, other):
+        return self.to_string() == other.to_string()
+
+    def __hash__(self):
+        return hash(self.to_string())
+
     @property
     def composition(self) -> Composition:
         """Dictionary of elements and percentages in the alloy."""
