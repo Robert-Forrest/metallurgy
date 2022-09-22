@@ -7,7 +7,7 @@ from . import generate
 
 def find_max(elements, feature_name):
     if isinstance(elements, str):
-        elements = re.findall('[A-Z][^A-Z]*', elements)
+        elements = re.findall("[A-Z][^A-Z]*", elements)
 
     system = generate.system(elements, feature_name=feature_name)
     if system is not None:
@@ -21,7 +21,7 @@ def find_max(elements, feature_name):
 
 def find_min(elements, feature_name):
     if isinstance(elements, str):
-        elements = re.findall('[A-Z][^A-Z]*', elements)
+        elements = re.findall("[A-Z][^A-Z]*", elements)
 
     system = generate.system(elements, feature_name=feature_name)
     if system is not None:

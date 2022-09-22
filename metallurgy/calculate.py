@@ -4,14 +4,17 @@ import metallurgy as mg
 
 
 def is_mod_function(mod, func):
-    ' checks that func is a function defined in module mod '
+    "checks that func is a function defined in module mod"
     return inspect.isfunction(func) and inspect.getmodule(func) == mod
 
 
 def list_functions(mod):
-    ' list of functions defined in module mod '
-    return [func.__name__ for func in mod.__dict__.values()
-            if is_mod_function(mod, func)]
+    "list of functions defined in module mod"
+    return [
+        func.__name__
+        for func in mod.__dict__.values()
+        if is_mod_function(mod, func)
+    ]
 
 
 def calculate(alloys, feature_name):
@@ -19,7 +22,9 @@ def calculate(alloys, feature_name):
         import cerebral as cb
 
         model = mg.get_model()
-        if feature_name in [f['name'] for f in cb.models.get_model_prediction_features(model)]:
+        if feature_name in [
+            f["name"] for f in cb.models.get_model_prediction_features(model)
+        ]:
             return cb.models.predict(model, alloys)[feature_name]
 
     if "_linearmix" in feature_name:

@@ -4,17 +4,23 @@ import metallurgy as mg
 
 def test_mixing_enthalpy():
     assert mg.enthalpy.mixing_enthalpy("Cu") == 0
-    assert mg.enthalpy.mixing_enthalpy("Cu50Zr50") == pytest.approx(-22.598395865085948)
+    assert mg.enthalpy.mixing_enthalpy("Cu50Zr50") == pytest.approx(
+        -22.598395865085948
+    )
 
 
 def test_mixing_Gibbs_free_energy():
     assert mg.enthalpy.mixing_Gibbs_free_energy("Cu") == 0
-    assert mg.enthalpy.mixing_Gibbs_free_energy("CuZr") == pytest.approx(-35625.153905259554)
+    assert mg.enthalpy.mixing_Gibbs_free_energy("CuZr") == pytest.approx(
+        -35625.153905259554
+    )
 
 
 def test_mismatch_PHS():
     assert mg.enthalpy.mismatch_PHS("Fe") == 0
-    assert mg.enthalpy.mismatch_PHS("CuZr") == pytest.approx(-4.661624378630986)
+    assert mg.enthalpy.mismatch_PHS("CuZr") == pytest.approx(
+        -4.661624378630986
+    )
 
 
 def test_mixing_PHS():
@@ -29,7 +35,9 @@ def test_mixing_PHSS():
 
 def test_thermodynamic_factor():
     assert mg.enthalpy.thermodynamic_factor("Fe") == 0
-    assert mg.enthalpy.thermodynamic_factor("CuZr") == pytest.approx(0.06936776640549777)
+    assert mg.enthalpy.thermodynamic_factor("CuZr") == pytest.approx(
+        0.06936776640549777
+    )
 
 
 def test_Gamma():
@@ -44,8 +52,11 @@ def test_calculate_QPR():
 
 def test_wigner_seitz_discontinuity():
     assert mg.enthalpy.wigner_seitz_electron_density_discontinuity_delta(
-        "Cu", "Zr") == pytest.approx(0.06107640860538699)
+        "Cu", "Zr"
+    ) == pytest.approx(0.06107640860538699)
 
 
 def test_topological_enthalpy():
-    assert mg.enthalpy.calculate_topological_enthalpy({"Cu": 0.5, "Zr": 0.5}) == pytest.approx(13.629999999999999)
+    assert mg.enthalpy.calculate_topological_enthalpy(
+        {"Cu": 0.5, "Zr": 0.5}
+    ) == pytest.approx(13.629999999999999)

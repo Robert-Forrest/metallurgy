@@ -4,8 +4,20 @@ import matplotlib.collections as mcoll
 import matplotlib as mpl
 import ternary as ternary_plt
 
+plt.style.use("ggplot")
+plt.rc("axes", axisbelow=True)
 
-def binary(alloys, data, xlabel=None, ylabel=None, labels=None, scatter_data=None, use_colorline=False, save_path=None):
+
+def binary(
+    alloys,
+    data,
+    xlabel=None,
+    ylabel=None,
+    labels=None,
+    scatter_data=None,
+    use_colorline=False,
+    save_path=None,
+):
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
 
@@ -18,9 +30,11 @@ def binary(alloys, data, xlabel=None, ylabel=None, labels=None, scatter_data=Non
     percentages = []
     for alloy in alloys:
         if elements[0] in alloy.composition:
-            percentages.append(alloy.composition[elements[0]]*100)
+            percentages.append(alloy.composition[elements[0]] * 100)
         else:
             percentages.append(0)
+
+    percentages, data = zip(*sorted(zip(percentages, data)))
 
     if use_colorline:
         lc = colorline(data[0], data[1], ax1, z=percentages)
@@ -39,8 +53,14 @@ def binary(alloys, data, xlabel=None, ylabel=None, labels=None, scatter_data=Non
 
     if scatter_data is not None:
         for scatter_datum in scatter_data:
-            ax1.scatter(scatter_datum['data'][0], scatter_datum['data'][1],
-                        marker=scatter_datum['marker'], label=scatter_datum['label'], edgecolors='k', zorder=20)
+            ax1.scatter(
+                scatter_datum["data"][0],
+                scatter_datum["data"][1],
+                marker=scatter_datum["marker"],
+                label=scatter_datum["label"],
+                edgecolors="k",
+                zorder=20,
+            )
         ax1.legend(loc="best")
     ax1.autoscale()
 
@@ -71,9 +91,19 @@ def binary(alloys, data, xlabel=None, ylabel=None, labels=None, scatter_data=Non
     plt.close()
 
 
-def ternary_heatmap(alloys, data, step=0.01, scatter_data=None,
-                    save_path=None, label=None, title=None,
-                    vmin=None, vmax=None, ax=None, showColorbar=True):
+def ternary_heatmap(
+    alloys,
+    data,
+    step=0.01,
+    scatter_data=None,
+    save_path=None,
+    label=None,
+    title=None,
+    vmin=None,
+    vmax=None,
+    ax=None,
+    showColorbar=True,
+):
 
     scale = 1 / step
     multiple = 0.1 / step
@@ -81,8 +111,8 @@ def ternary_heatmap(alloys, data, step=0.01, scatter_data=None,
     tick_fontsize = 6
     tick_offset = 0.018
     gridline_width = 0.3
-    gridline_style = '--'
-    gridline_color = 'white'
+    gridline_style = "--"
+    gridline_color = "white"
 
     elements = []
     for alloy in alloys:
@@ -99,9 +129,9 @@ def ternary_heatmap(alloys, data, step=0.01, scatter_data=None,
             percent_A = 0
             percent_B = 0
 
-            if(elements[0] in alloys[i].composition):
+            if elements[0] in alloys[i].composition:
                 percent_A = round(alloys[i].composition[elements[0]] / step, 2)
-            if(elements[1] in alloys[i].composition):
+            if elements[1] in alloys[i].composition:
                 percent_B = round(alloys[i].composition[elements[1]] / step, 2)
 
             heatmap_data[(percent_A, percent_B)] = data[i]
@@ -113,34 +143,47 @@ def ternary_heatmap(alloys, data, step=0.01, scatter_data=None,
     else:
         figure, tax = ternary_plt.figure(scale=scale, ax=ax)
 
-    tax.get_axes().axis('off')
+    tax.get_axes().axis("off")
 
-    tax.gridlines(color=gridline_color, multiple=multiple,
-                  linewidth=gridline_width, ls=gridline_style)
+    tax.gridlines(
+        color=gridline_color,
+        multiple=multiple,
+        linewidth=gridline_width,
+        ls=gridline_style,
+    )
 
-    tax.set_axis_limits(
-        {'b': [0, 100], 'l': [0, 100], 'r': [0, 100]})
+    tax.set_axis_limits({"b": [0, 100], "l": [0, 100], "r": [0, 100]})
     tax.get_ticks_from_axis_limits(multiple=multiple)
     tax.set_custom_ticks(
-        fontsize=tick_fontsize, offset=tick_offset, multiple=multiple)
+        fontsize=tick_fontsize, offset=tick_offset, multiple=multiple
+    )
 
-    tax.left_axis_label(elements[2] + ' %', fontsize=fontsize, offset=0.12)
-    tax.right_axis_label(elements[1] + ' %', fontsize=fontsize, offset=0.12)
-    tax.bottom_axis_label(elements[0] + ' %', fontsize=fontsize, offset=0.12)
+    tax.left_axis_label(elements[2] + " %", fontsize=fontsize, offset=0.12)
+    tax.right_axis_label(elements[1] + " %", fontsize=fontsize, offset=0.12)
+    tax.bottom_axis_label(elements[0] + " %", fontsize=fontsize, offset=0.12)
     tax.clear_matplotlib_ticks()
 
     tax.set_title(title, pad=15)
 
-    jet_cmap = mpl.cm.get_cmap('jet')
-    tax.heatmap(heatmap_data, cmap=jet_cmap, vmax=vmax,
-                vmin=vmin, cbarlabel=label, colorbar=showColorbar)
+    jet_cmap = mpl.cm.get_cmap("jet")
+    tax.heatmap(
+        heatmap_data,
+        cmap=jet_cmap,
+        vmax=vmax,
+        vmin=vmin,
+        cbarlabel=label,
+        colorbar=showColorbar,
+    )
 
     if scatter_data is not None:
         for scatter_datum in scatter_data:
-            tax.scatter(scatter_datum['data'],
-                        marker=scatter_datum['marker'],
-                        label=scatter_datum['label'],
-                        edgecolors='k', zorder=20)
+            tax.scatter(
+                scatter_datum["data"],
+                marker=scatter_datum["marker"],
+                label=scatter_datum["label"],
+                edgecolors="k",
+                zorder=20,
+            )
 
         tax.legend(loc="upper right", handletextpad=0.1, frameon=False)
 
@@ -151,13 +194,22 @@ def ternary_heatmap(alloys, data, step=0.01, scatter_data=None,
         if save_path is None:
             tax.show()
         else:
-            tax.savefig(save_path + '.png')
+            tax.savefig(save_path + ".png")
 
         tax.close()
         figure.clf()
 
 
-def colorline(x, y, ax, z=None, cmap='jet', norm=plt.Normalize(0.0, 100.0), linewidth=2, alpha=1.0):
+def colorline(
+    x,
+    y,
+    ax,
+    z=None,
+    cmap="jet",
+    norm=plt.Normalize(0.0, 100.0),
+    linewidth=2,
+    alpha=1.0,
+):
     """
     http://nbviewer.ipython.org/github/dpsanders/matplotlib-examples/blob/master/colorline.ipynb
     http://matplotlib.org/examples/pylab_examples/multicolored_line.html
@@ -179,8 +231,14 @@ def colorline(x, y, ax, z=None, cmap='jet', norm=plt.Normalize(0.0, 100.0), line
 
     segments = make_segments(x, y)
 
-    lc = mcoll.LineCollection(segments, array=z, cmap=cmap, norm=norm,
-                              linewidth=linewidth, alpha=alpha)
+    lc = mcoll.LineCollection(
+        segments,
+        array=z,
+        cmap=cmap,
+        norm=norm,
+        linewidth=linewidth,
+        alpha=alpha,
+    )
 
     ax.add_collection(lc)
     return lc

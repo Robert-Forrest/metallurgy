@@ -11,21 +11,23 @@ def valence_proportion(alloy, orbital):
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    total_valence = linear_mixture(alloy, 'valence_electrons')
+    total_valence = linear_mixture(alloy, "valence_electrons")
 
     orbitalCount = {}
     for element in alloy.elements:
         orbitalCount[element] = 0
 
-        valence_electrons = mg.periodic_table.elements[element]['valence_electrons']
-        orbitals = mg.periodic_table.elements[element]['orbitals']
+        valence_electrons = mg.periodic_table.elements[element][
+            "valence_electrons"
+        ]
+        orbitals = mg.periodic_table.elements[element]["orbitals"]
 
         i = 0
         electrons = 0
         while electrons < valence_electrons:
-            electrons += orbitals[-1 - i]['electrons']
-            if orbitals[-1 - i]['orbital'][-1] == orbital:
-                orbitalCount[element] += orbitals[-1 - i]['electrons']
+            electrons += orbitals[-1 - i]["electrons"]
+            if orbitals[-1 - i]["orbital"][-1] == orbital:
+                orbitalCount[element] += orbitals[-1 - i]["electrons"]
             i += 1
 
     if total_valence > 0:
@@ -39,16 +41,16 @@ def valence_proportion(alloy, orbital):
 
 
 def s_valence(alloy):
-    return valence_proportion(alloy, 's')
+    return valence_proportion(alloy, "s")
 
 
 def p_valence(alloy):
-    return valence_proportion(alloy, 'p')
+    return valence_proportion(alloy, "p")
 
 
 def d_valence(alloy):
-    return valence_proportion(alloy, 'd')
+    return valence_proportion(alloy, "d")
 
 
 def f_valence(alloy):
-    return valence_proportion(alloy, 'f')
+    return valence_proportion(alloy, "f")

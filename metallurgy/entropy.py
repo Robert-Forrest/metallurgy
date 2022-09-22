@@ -14,8 +14,9 @@ def ideal_entropy(alloy):
 
     total_ideal_entropy = 0
     for element in alloy.elements:
-        total_ideal_entropy += alloy.composition[element] * \
-            np.log(alloy.composition[element])
+        total_ideal_entropy += alloy.composition[element] * np.log(
+            alloy.composition[element]
+        )
 
     return -total_ideal_entropy
 
@@ -28,14 +29,20 @@ def ideal_entropy_xia(alloy):
 
     cube_sum = 0
     for element in alloy.elements:
-        cube_sum += alloy.composition[element] * \
-            mg.periodic_table.elements[element]['atomic_volume']
+        cube_sum += (
+            alloy.composition[element]
+            * mg.periodic_table.elements[element]["atomic_volume"]
+        )
 
     ideal_entropy = 0
     for element in alloy.composition:
         ideal_entropy += alloy.composition[element] * np.log(
-            (alloy.composition[element] *
-             mg.periodic_table.elements[element]['atomic_volume']) / cube_sum)
+            (
+                alloy.composition[element]
+                * mg.periodic_table.elements[element]["atomic_volume"]
+            )
+            / cube_sum
+        )
 
     return -ideal_entropy
 
@@ -51,20 +58,18 @@ def mismatch_entropy(alloy):
 
     diameters = {}
     for element in alloy.composition:
-        if mg.periodic_table.elements[element]['radius'] is None:
+        if mg.periodic_table.elements[element]["radius"] is None:
             return None
 
-        diameters[element] = mg.periodic_table.elements[element]['radius'] * 2
+        diameters[element] = mg.periodic_table.elements[element]["radius"] * 2
 
     sigma_2 = 0
     for element in alloy.composition:
-        sigma_2 += alloy.composition[element] * \
-            (diameters[element]**2)
+        sigma_2 += alloy.composition[element] * (diameters[element] ** 2)
 
     sigma_3 = 0
     for element in alloy.composition:
-        sigma_3 += alloy.composition[element] * \
-            (diameters[element]**3)
+        sigma_3 += alloy.composition[element] * (diameters[element] ** 3)
 
     y_3 = (sigma_2**3) / (sigma_3**2)
 
@@ -76,24 +81,33 @@ def mismatch_entropy(alloy):
             element = alloy.elements[i]
             otherElement = alloy.elements[j]
 
-            y_1 += (diameters[element] + diameters[otherElement]) * (
-                (diameters[element] - diameters[otherElement])**2) \
-                * alloy.composition[element] * alloy.composition[otherElement]
+            y_1 += (
+                (diameters[element] + diameters[otherElement])
+                * ((diameters[element] - diameters[otherElement]) ** 2)
+                * alloy.composition[element]
+                * alloy.composition[otherElement]
+            )
 
-            y_2 += diameters[element] * diameters[otherElement] * (
-                (diameters[element] - diameters[otherElement])**2) \
-                * alloy.composition[element] * alloy.composition[otherElement]
+            y_2 += (
+                diameters[element]
+                * diameters[otherElement]
+                * ((diameters[element] - diameters[otherElement]) ** 2)
+                * alloy.composition[element]
+                * alloy.composition[otherElement]
+            )
 
     y_1 /= sigma_3
 
-    y_2 *= (sigma_2 / (sigma_3**2))
+    y_2 *= sigma_2 / (sigma_3**2)
 
     packing_fraction = 0.64
     zeta = 1.0 / (1 - packing_fraction)
 
-    return (((3.0 / 2.0) * ((zeta**2) - 1) * y_1) +
-            ((3.0 / 2.0) * ((zeta - 1)**2) * y_2) - (1 - y_3) *
-            (0.5 * (zeta - 1) * (zeta - 3) + np.log(zeta)))
+    return (
+        ((3.0 / 2.0) * ((zeta**2) - 1) * y_1)
+        + ((3.0 / 2.0) * ((zeta - 1) ** 2) * y_2)
+        - (1 - y_3) * (0.5 * (zeta - 1) * (zeta - 3) + np.log(zeta))
+    )
 
 
 def mixing_entropy(alloy):

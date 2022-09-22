@@ -11,14 +11,19 @@ def price(alloy):
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
-    total_weight = linear_mixture(alloy, 'mass')
+    total_weight = linear_mixture(alloy, "mass")
 
     total_price = 0
     for element in alloy.elements:
-        if mg.periodic_table.elements[element]['price'] is not None:
-            weight_percent = mg.periodic_table.elements[element]['mass'] * \
-                alloy.composition[element] / total_weight
-            total_price += weight_percent * mg.periodic_table.elements[element]['price']
+        if mg.periodic_table.elements[element]["price"] is not None:
+            weight_percent = (
+                mg.periodic_table.elements[element]["mass"]
+                * alloy.composition[element]
+                / total_weight
+            )
+            total_price += (
+                weight_percent * mg.periodic_table.elements[element]["price"]
+            )
         else:
             return None
 

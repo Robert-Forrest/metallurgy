@@ -8,7 +8,7 @@ import numpy as np
 import elementy
 
 
-class Alloy():
+class Alloy:
     """An alloy, a mixture of chemical elements with specific percentages.
 
     Attributes:
@@ -44,7 +44,12 @@ class Alloy():
                     super().__delitem__(element)
             self.on_change()
 
-    def __init__(self, composition: Union[str, dict, Alloy], constraints: Optional[dict] = None, rescale: bool = True):
+    def __init__(
+        self,
+        composition: Union[str, dict, Alloy],
+        constraints: Optional[dict] = None,
+        rescale: bool = True,
+    ):
 
         self.composition = parse_composition(composition)
 
@@ -103,35 +108,62 @@ class Alloy():
             constraints_applied = True
 
             precedence = {}
-            for element in self.constraints['local_percentages']:
-                if self.constraints['local_percentages'][element]['min'] > 0:
+            for element in self.constraints["local_percentages"]:
+                if self.constraints["local_percentages"][element]["min"] > 0:
                     if element not in self.composition:
                         self.composition[element] = 0.01
 
-                precedence[element] = self.constraints['local_percentages'][element]['precedence']
+                precedence[element] = self.constraints["local_percentages"][
+                    element
+                ]["precedence"]
 
-            precedence_order = sorted(precedence, key=precedence.get, reverse=True)
+            precedence_order = sorted(
+                precedence, key=precedence.get, reverse=True
+            )
             reverse_precedence_order = sorted(precedence, key=precedence.get)
 
             for element in precedence_order:
                 if element not in self.composition:
-                    if self.constraints['local_percentages'][element]['min'] > 0:
-                        self.composition[element] = self.constraints['local_percentages'][element]['min']
+                    if (
+                        self.constraints["local_percentages"][element]["min"]
+                        > 0
+                    ):
+                        self.composition[element] = self.constraints[
+                            "local_percentages"
+                        ][element]["min"]
                     else:
                         continue
 
-                if self.composition[element] < self.constraints['local_percentages'][element]['min']:
+                if (
+                    self.composition[element]
+                    < self.constraints["local_percentages"][element]["min"]
+                ):
                     for other_element in reverse_precedence_order:
-                        if element != other_element and other_element in self.composition:
+                        if (
+                            element != other_element
+                            and other_element in self.composition
+                        ):
 
-                            if self.composition[other_element] > \
-                               self.constraints['local_percentages'][other_element]['max']:
+                            if (
+                                self.composition[other_element]
+                                > self.constraints["local_percentages"][
+                                    other_element
+                                ]["max"]
+                            ):
 
-                                element_deficit = self.constraints['local_percentages'][element]['min'] - \
-                                    self.composition[element]
+                                element_deficit = (
+                                    self.constraints["local_percentages"][
+                                        element
+                                    ]["min"]
+                                    - self.composition[element]
+                                )
 
-                                other_element_surplus = self.composition[other_element] - \
-                                    self.constraints['local_percentages'][other_element]['max']
+                                other_element_surplus = (
+                                    self.composition[other_element]
+                                    - self.constraints["local_percentages"][
+                                        other_element
+                                    ]["max"]
+                                )
 
                                 # print("A")
                                 # print(self.composition)
@@ -139,46 +171,98 @@ class Alloy():
                                 # print(other_element, other_element_surplus)
                                 # print()
 
-                                if element_deficit >= other_element_surplus and other_element_surplus > 0:
-                                    self.composition[element] += other_element_surplus
-                                    self.composition[other_element] -= other_element_surplus
+                                if (
+                                    element_deficit >= other_element_surplus
+                                    and other_element_surplus > 0
+                                ):
+                                    self.composition[
+                                        element
+                                    ] += other_element_surplus
+                                    self.composition[
+                                        other_element
+                                    ] -= other_element_surplus
                                 else:
-                                    self.composition[element] += element_deficit
-                                    self.composition[other_element] -= element_deficit
+                                    self.composition[
+                                        element
+                                    ] += element_deficit
+                                    self.composition[
+                                        other_element
+                                    ] -= element_deficit
 
                                 if element not in self.composition:
-                                    self.composition[element] = self.constraints['local_percentages'][element]['min']
-                                if self.composition[element] >= \
-                                   self.constraints['local_percentages'][element]['min']:
+                                    self.composition[
+                                        element
+                                    ] = self.constraints["local_percentages"][
+                                        element
+                                    ][
+                                        "min"
+                                    ]
+                                if (
+                                    self.composition[element]
+                                    >= self.constraints["local_percentages"][
+                                        element
+                                    ]["min"]
+                                ):
                                     break
 
                 if element not in self.composition:
-                    if self.constraints['local_percentages'][element]['min'] > 0:
-                        self.composition[element] = \
-                            self.constraints['local_percentages'][element]['min']
+                    if (
+                        self.constraints["local_percentages"][element]["min"]
+                        > 0
+                    ):
+                        self.composition[element] = self.constraints[
+                            "local_percentages"
+                        ][element]["min"]
                     else:
                         continue
 
-                if self.composition[element] < \
-                   self.constraints['local_percentages'][element]['min']:
+                if (
+                    self.composition[element]
+                    < self.constraints["local_percentages"][element]["min"]
+                ):
 
                     for other_element in sorted(
-                            self.composition.keys(), key=lambda k: np.random.random()):
+                        self.composition.keys(),
+                        key=lambda k: np.random.random(),
+                    ):
 
                         if other_element != element:
 
-                            other_element_surplus = self.composition[other_element]
-                            if other_element in self.constraints['local_percentages']:
-                                if (self.constraints['local_percentages'][element]['precedence'] <
-                                        self.constraints['local_percentages'][other_element]['precedence']):
+                            other_element_surplus = self.composition[
+                                other_element
+                            ]
+                            if (
+                                other_element
+                                in self.constraints["local_percentages"]
+                            ):
+                                if (
+                                    self.constraints["local_percentages"][
+                                        element
+                                    ]["precedence"]
+                                    < self.constraints["local_percentages"][
+                                        other_element
+                                    ]["precedence"]
+                                ):
                                     continue
 
-                                other_element_surplus -= self.constraints['local_percentages'][other_element]['min']
+                                other_element_surplus -= self.constraints[
+                                    "local_percentages"
+                                ][other_element]["min"]
 
-                            if normal_round(other_element_surplus, self.constraints['sigfigs']+1) > 0:
+                            if (
+                                normal_round(
+                                    other_element_surplus,
+                                    self.constraints["sigfigs"] + 1,
+                                )
+                                > 0
+                            ):
 
-                                element_deficit = self.constraints['local_percentages'][element]['min'] - \
-                                    self.composition[element]
+                                element_deficit = (
+                                    self.constraints["local_percentages"][
+                                        element
+                                    ]["min"]
+                                    - self.composition[element]
+                                )
 
                                 # print("B")
                                 # print(self.composition)
@@ -186,36 +270,80 @@ class Alloy():
                                 # print(other_element, other_element_surplus)
                                 # print()
 
-                                if element_deficit >= self.composition[other_element]:
-                                    self.composition[element] += other_element_surplus
-                                    self.composition[other_element] -= other_element_surplus
+                                if (
+                                    element_deficit
+                                    >= self.composition[other_element]
+                                ):
+                                    self.composition[
+                                        element
+                                    ] += other_element_surplus
+                                    self.composition[
+                                        other_element
+                                    ] -= other_element_surplus
                                 else:
-                                    self.composition[element] += element_deficit
-                                    self.composition[other_element] -= element_deficit
+                                    self.composition[
+                                        element
+                                    ] += element_deficit
+                                    self.composition[
+                                        other_element
+                                    ] -= element_deficit
 
                                 if element not in self.composition:
-                                    self.composition[element] = self.constraints['local_percentages'][element]['min']
-                                if self.composition[element] >= self.constraints['local_percentages'][element]['min']:
+                                    self.composition[
+                                        element
+                                    ] = self.constraints["local_percentages"][
+                                        element
+                                    ][
+                                        "min"
+                                    ]
+                                if (
+                                    self.composition[element]
+                                    >= self.constraints["local_percentages"][
+                                        element
+                                    ]["min"]
+                                ):
                                     break
 
                 if element not in self.composition:
-                    if self.constraints['local_percentages'][element]['min'] > 0:
-                        self.composition[element] = self.constraints['local_percentages'][element]['min']
+                    if (
+                        self.constraints["local_percentages"][element]["min"]
+                        > 0
+                    ):
+                        self.composition[element] = self.constraints[
+                            "local_percentages"
+                        ][element]["min"]
                     else:
                         continue
 
-                if self.composition[element] > self.constraints['local_percentages'][element]['max']:
+                if (
+                    self.composition[element]
+                    > self.constraints["local_percentages"][element]["max"]
+                ):
                     for other_element in reverse_precedence_order:
-                        if element != other_element and other_element in self.composition:
+                        if (
+                            element != other_element
+                            and other_element in self.composition
+                        ):
 
-                            if self.composition[other_element] < \
-                               self.constraints['local_percentages'][other_element]['min']:
-                                element_surplus = self.composition[element] - \
-                                    self.constraints['local_percentages'][element]['max']
+                            if (
+                                self.composition[other_element]
+                                < self.constraints["local_percentages"][
+                                    other_element
+                                ]["min"]
+                            ):
+                                element_surplus = (
+                                    self.composition[element]
+                                    - self.constraints["local_percentages"][
+                                        element
+                                    ]["max"]
+                                )
 
-                                other_element_deficit = \
-                                    self.constraints['local_percentages'][other_element]['min'] - \
-                                    self.composition[other_element]
+                                other_element_deficit = (
+                                    self.constraints["local_percentages"][
+                                        other_element
+                                    ]["min"]
+                                    - self.composition[other_element]
+                                )
 
                                 # print("C")
                                 # print(self.composition)
@@ -224,42 +352,91 @@ class Alloy():
                                 # print()
 
                                 if element_surplus >= other_element_deficit:
-                                    self.composition[element] -= other_element_deficit
-                                    self.composition[other_element] += element_surplus
+                                    self.composition[
+                                        element
+                                    ] -= other_element_deficit
+                                    self.composition[
+                                        other_element
+                                    ] += element_surplus
                                 else:
-                                    self.composition[element] -= element_surplus
-                                    self.composition[other_element] += element_surplus
+                                    self.composition[
+                                        element
+                                    ] -= element_surplus
+                                    self.composition[
+                                        other_element
+                                    ] += element_surplus
 
                                 if element not in self.composition:
-                                    self.composition[element] = self.constraints['local_percentages'][element]['max']
-                                if self.composition[element] <= \
-                                   self.constraints['local_percentages'][element]['max']:
+                                    self.composition[
+                                        element
+                                    ] = self.constraints["local_percentages"][
+                                        element
+                                    ][
+                                        "max"
+                                    ]
+                                if (
+                                    self.composition[element]
+                                    <= self.constraints["local_percentages"][
+                                        element
+                                    ]["max"]
+                                ):
                                     break
 
                 if element not in self.composition:
-                    if self.constraints['local_percentages'][element]['min'] > 0:
-                        self.composition[element] = self.constraints['local_percentages'][element]['min']
+                    if (
+                        self.constraints["local_percentages"][element]["min"]
+                        > 0
+                    ):
+                        self.composition[element] = self.constraints[
+                            "local_percentages"
+                        ][element]["min"]
                     else:
                         continue
 
-                if self.composition[element] > self.constraints['local_percentages'][element]['max']:
-                    for other_element in sorted(self.composition.keys(), key=lambda k: np.random.random()):
+                if (
+                    self.composition[element]
+                    > self.constraints["local_percentages"][element]["max"]
+                ):
+                    for other_element in sorted(
+                        self.composition.keys(),
+                        key=lambda k: np.random.random(),
+                    ):
                         if other_element != element:
 
-                            if other_element in self.constraints['local_percentages']:
-                                other_element_deficit = self.constraints['local_percentages'][other_element]['max'] - \
-                                    self.composition[other_element]
+                            if (
+                                other_element
+                                in self.constraints["local_percentages"]
+                            ):
+                                other_element_deficit = (
+                                    self.constraints["local_percentages"][
+                                        other_element
+                                    ]["max"]
+                                    - self.composition[other_element]
+                                )
                             else:
-                                other_element_deficit = 1.0 - \
-                                    self.composition[other_element]
+                                other_element_deficit = (
+                                    1.0 - self.composition[other_element]
+                                )
 
-                            element_surplus = self.composition[element] - \
-                                self.constraints['local_percentages'][element]['max']
+                            element_surplus = (
+                                self.composition[element]
+                                - self.constraints["local_percentages"][
+                                    element
+                                ]["max"]
+                            )
 
                             element_surplus = np.max(
-                                [element_surplus, self.constraints['percentage_step']])
+                                [
+                                    element_surplus,
+                                    self.constraints["percentage_step"],
+                                ]
+                            )
                             other_element_deficit = np.max(
-                                [other_element_deficit, self.constraints['percentage_step']])
+                                [
+                                    other_element_deficit,
+                                    self.constraints["percentage_step"],
+                                ]
+                            )
 
                             # print("D")
                             # print(self.composition)
@@ -267,27 +444,52 @@ class Alloy():
                             # print(other_element, other_element_deficit)
                             # print()
 
-                            if element_surplus >= other_element_deficit and other_element_deficit > 0:
-                                self.composition[element] -= other_element_deficit
-                                self.composition[other_element] += other_element_deficit
+                            if (
+                                element_surplus >= other_element_deficit
+                                and other_element_deficit > 0
+                            ):
+                                self.composition[
+                                    element
+                                ] -= other_element_deficit
+                                self.composition[
+                                    other_element
+                                ] += other_element_deficit
                             else:
                                 self.composition[element] -= element_surplus
-                                self.composition[other_element] += element_surplus
+                                self.composition[
+                                    other_element
+                                ] += element_surplus
 
                             if element not in self.composition:
-                                self.composition[element] = self.constraints['local_percentages'][element]['max']
-                            if self.composition[element] <= self.constraints['local_percentages'][element]['max']:
+                                self.composition[element] = self.constraints[
+                                    "local_percentages"
+                                ][element]["max"]
+                            if (
+                                self.composition[element]
+                                <= self.constraints["local_percentages"][
+                                    element
+                                ]["max"]
+                            ):
                                 break
 
-            if (len(self.composition) > self.constraints['max_elements']):
+            if len(self.composition) > self.constraints["max_elements"]:
 
-                excess = len(self.composition) - self.constraints['max_elements']
+                excess = (
+                    len(self.composition) - self.constraints["max_elements"]
+                )
 
                 toDelete = []
-                ordered_elements = sorted(self.composition, key=self.composition.get)
+                ordered_elements = sorted(
+                    self.composition, key=self.composition.get
+                )
                 for element in ordered_elements:
-                    if element in self.constraints['local_percentages']:
-                        if self.constraints['local_percentages'][element]['min'] == 0:
+                    if element in self.constraints["local_percentages"]:
+                        if (
+                            self.constraints["local_percentages"][element][
+                                "min"
+                            ]
+                            == 0
+                        ):
                             toDelete.append(element)
                     else:
                         toDelete.append(element)
@@ -298,12 +500,13 @@ class Alloy():
                 for element in toDelete:
                     del self.composition[element]
 
-            elif (len(self.composition) < self.constraints['min_elements']):
+            elif len(self.composition) < self.constraints["min_elements"]:
 
-                while len(self.composition) < self.constraints['min_elements']:
+                while len(self.composition) < self.constraints["min_elements"]:
 
                     element_to_add = np.random.choice(
-                        self.constraints['allowed_elements'], 1)[0]
+                        self.constraints["allowed_elements"], 1
+                    )[0]
                     if element_to_add not in self.composition:
                         self.composition[element_to_add] = np.random.uniform()
 
@@ -320,31 +523,49 @@ class Alloy():
         if self.constraints is not None:
 
             discrepancy = np.abs(
-                1-multiple_round(sum(self.composition.values()), self.constraints['percentage_step']))
-            if discrepancy > self.constraints['percentage_step']:
+                1
+                - multiple_round(
+                    sum(self.composition.values()),
+                    self.constraints["percentage_step"],
+                )
+            )
+            if discrepancy > self.constraints["percentage_step"]:
                 # print("Sum != 1", sum(self.composition.values()), discrepancy)
                 # print(self.composition)
                 # print()
                 satisfied = False
 
             if satisfied:
-                for element in self.constraints['local_percentages']:
+                for element in self.constraints["local_percentages"]:
                     if element in self.composition:
-                        if self.composition[element] < self.constraints['local_percentages'][element]['min']:
+                        if (
+                            self.composition[element]
+                            < self.constraints["local_percentages"][element][
+                                "min"
+                            ]
+                        ):
                             # print("element below min", element,
                             #       self.composition[element], self.constraints['local_percentages'][element]['min'])
                             # print(self.composition)
                             # print()
                             satisfied = False
                             break
-                        elif self.composition[element] > self.constraints['local_percentages'][element]['max']:
+                        elif (
+                            self.composition[element]
+                            > self.constraints["local_percentages"][element][
+                                "max"
+                            ]
+                        ):
                             # print("element above max", element,
                             #       self.composition[element], self.constraints['local_percentages'][element]['max'])
                             # print(self.composition)
                             # print()
                             satisfied = False
                             break
-                    elif self.constraints['local_percentages'][element]['min'] > 0.0:
+                    elif (
+                        self.constraints["local_percentages"][element]["min"]
+                        > 0.0
+                    ):
                         # print("element missing", element,
                         #       self.constraints['local_percentages'][element]['min'])
                         # print(self.composition)
@@ -353,12 +574,12 @@ class Alloy():
                         break
 
             if satisfied:
-                if len(self.composition) > self.constraints['max_elements']:
+                if len(self.composition) > self.constraints["max_elements"]:
                     satisfied = False
                     # print("too many elements")
                     # print(self.composition)
                     # print()
-                elif len(self.composition) < self.constraints['min_elements']:
+                elif len(self.composition) < self.constraints["min_elements"]:
                     satisfied = False
                     # print("too few elements")
                     # print(self.composition)
@@ -374,8 +595,11 @@ class Alloy():
         for element in self.elements:
             clamped_value = self.composition[element] / total_percentage
             if self.constraints is not None:
-                if element in self.constraints['percentages']:
-                    self.composition[element] = max(clamped_value, self.constraints['percentages'][element]['min'])
+                if element in self.constraints["percentages"]:
+                    self.composition[element] = max(
+                        clamped_value,
+                        self.constraints["percentages"][element]["min"],
+                    )
                 else:
                     self.composition[element] = clamped_value
             else:
@@ -392,49 +616,72 @@ class Alloy():
         if self.constraints is None:
             return
 
-        tmp_percentages = copy.deepcopy(self.constraints['percentages'])
+        tmp_percentages = copy.deepcopy(self.constraints["percentages"])
 
-        lowest_precedence = {'element': None, 'precedence': np.Inf, 'percentage': np.Inf}
-        for element in self.constraints['percentages']:
+        lowest_precedence = {
+            "element": None,
+            "precedence": np.Inf,
+            "percentage": np.Inf,
+        }
+        for element in self.constraints["percentages"]:
             if element in self.composition:
-                if (self.constraints['percentages'][element]['precedence'] <= lowest_precedence['precedence']
-                    and self.constraints['percentages'][element]['precedence'] > 0
-                        and self.composition[element] < lowest_precedence['percentage']):
+                if (
+                    self.constraints["percentages"][element]["precedence"]
+                    <= lowest_precedence["precedence"]
+                    and self.constraints["percentages"][element]["precedence"]
+                    > 0
+                    and self.composition[element]
+                    < lowest_precedence["percentage"]
+                ):
 
-                    lowest_precedence['precedence'] = self.constraints['percentages'][element]['precedence']
-                    lowest_precedence['element'] = element
-                    lowest_precedence['percentage'] = self.composition[element]
+                    lowest_precedence["precedence"] = self.constraints[
+                        "percentages"
+                    ][element]["precedence"]
+                    lowest_precedence["element"] = element
+                    lowest_precedence["percentage"] = self.composition[element]
 
-            if len(self.constraints['percentages'][element]['superior_elements']) > 0:
+            if (
+                len(
+                    self.constraints["percentages"][element][
+                        "superior_elements"
+                    ]
+                )
+                > 0
+            ):
                 superior_elements = []
-                for e in self.constraints['percentages'][element]['superior_elements']:
+                for e in self.constraints["percentages"][element][
+                    "superior_elements"
+                ]:
                     if e in self.composition:
                         superior_elements.append(self.composition[e])
                 if len(superior_elements) > 0:
-                    tmp_percentages[element]['max'] = min(superior_elements)
+                    tmp_percentages[element]["max"] = min(superior_elements)
                 else:
-                    tmp_percentages[element]['max'] = 0
+                    tmp_percentages[element]["max"] = 0
 
-        if lowest_precedence['element'] is not None:
+        if lowest_precedence["element"] is not None:
             for element in self.composition:
                 if element not in tmp_percentages:
-                    maxPercent = lowest_precedence['percentage']
+                    maxPercent = lowest_precedence["percentage"]
 
                     tmp_percentages[element] = {
-                        'max': maxPercent,
-                        'min': 0,
-                        'precedence': 0,
-                        'superior_elements': []
+                        "max": maxPercent,
+                        "min": 0,
+                        "precedence": 0,
+                        "superior_elements": [],
                     }
 
                     for other_element in tmp_percentages:
                         if element != other_element:
-                            if (tmp_percentages[element]['precedence']
-                                    < tmp_percentages[other_element]['precedence']):
-                                tmp_percentages[element]['superior_elements'].append(
-                                    other_element)
+                            if (
+                                tmp_percentages[element]["precedence"]
+                                < tmp_percentages[other_element]["precedence"]
+                            ):
+                                tmp_percentages[element][
+                                    "superior_elements"
+                                ].append(other_element)
 
-        self.constraints['local_percentages'] = tmp_percentages
+        self.constraints["local_percentages"] = tmp_percentages
 
     def to_string(self) -> str:
         """Convert the alloy composition dict to a string"""
@@ -443,17 +690,21 @@ class Alloy():
         for element in self.elements:
             percentage_str = str(self.composition[element] * 100.0)
 
-            split_str = percentage_str.split('.')
+            split_str = percentage_str.split(".")
             decimal = split_str[1]
-            if decimal == '0':
+            if decimal == "0":
                 percentage_str = split_str[0]
             else:
-                decimal_places = len(str(self.composition[element]).split('.')[1])
-                percentage_str = str(round(float(percentage_str), decimal_places))
+                decimal_places = len(
+                    str(self.composition[element]).split(".")[1]
+                )
+                percentage_str = str(
+                    round(float(percentage_str), decimal_places)
+                )
 
-                split_str = percentage_str.split('.')
+                split_str = percentage_str.split(".")
                 decimal = split_str[1]
-                if decimal == '0':
+                if decimal == "0":
                     percentage_str = split_str[0]
 
             composition_str += element + percentage_str
@@ -462,19 +713,19 @@ class Alloy():
 
     def to_pretty_string(self) -> str:
         """Convert alloy composition to string with LaTeX formatting of subscripts"""
-        numbers = re.compile(r'(\d+)')
-        return numbers.sub(r'$_{\1}$', self.to_string())
+        numbers = re.compile(r"(\d+)")
+        return numbers.sub(r"$_{\1}$", self.to_string())
 
     def round_composition(self):
         """Round elemental percentages in composition while maintaining sum"""
 
-        if(len(self.composition) == 0):
+        if len(self.composition) == 0:
             return
-        elif(len(self.composition) == 1):
+        elif len(self.composition) == 1:
             self.composition[self.elements[0]] = 1.0
 
         if self.constraints is not None:
-            sigfigs = self.constraints['sigfigs']
+            sigfigs = self.constraints["sigfigs"]
         else:
             sigfigs = 3
 
@@ -485,33 +736,39 @@ class Alloy():
         for element in elements:
 
             rounded_percentage = normal_round(
-                self.composition[element], sigfigs)
+                self.composition[element], sigfigs
+            )
 
             if rounded_percentage > 0:
 
-                percentage = str(self.composition[element] *
-                                 (10**sigfigs))
-                split_percentage = percentage.split('.')
+                percentage = str(self.composition[element] * (10**sigfigs))
+                split_percentage = percentage.split(".")
 
                 integer_parts.append(int(split_percentage[0]))
 
-                if(len(split_percentage) > 1):
-                    decimal_parts.append(float(percentage)-float(split_percentage[0]))
+                if len(split_percentage) > 1:
+                    decimal_parts.append(
+                        float(percentage) - float(split_percentage[0])
+                    )
                 else:
                     decimal_parts.append(0.0)
 
-        undershoot = (10**sigfigs)-sum(integer_parts)
+        undershoot = (10**sigfigs) - sum(integer_parts)
 
-        if(undershoot > 0):
+        if undershoot > 0:
             if self.constraints is not None:
 
                 precedence = {}
                 for element in elements:
-                    if element in self.constraints['local_percentages']:
-                        precedence[element] = self.constraints['local_percentages'][element]['precedence']
+                    if element in self.constraints["local_percentages"]:
+                        precedence[element] = self.constraints[
+                            "local_percentages"
+                        ][element]["precedence"]
                     else:
                         precedence[element] = 0
-                precedence_order = sorted(precedence, key=precedence.get, reverse=True)
+                precedence_order = sorted(
+                    precedence, key=precedence.get, reverse=True
+                )
 
                 filtered_precedence_order = []
                 for element in precedence_order:
@@ -521,15 +778,24 @@ class Alloy():
                 filtered_precedence_order = list(self.composition.keys())
 
             i = 0
-            while(undershoot > 0):
-                decimal_part_index = list(
-                    self.composition.keys()).index(filtered_precedence_order[i])
+            while undershoot > 0:
+                decimal_part_index = list(self.composition.keys()).index(
+                    filtered_precedence_order[i]
+                )
 
                 constraints_violated = False
                 if self.constraints is not None:
-                    if filtered_precedence_order[i] in self.constraints['local_percentages']:
-                        if ((integer_parts[decimal_part_index] + 1)/(10**sigfigs)
-                                > self.constraints['local_percentages'][filtered_precedence_order[i]]['max']):
+                    if (
+                        filtered_precedence_order[i]
+                        in self.constraints["local_percentages"]
+                    ):
+                        if (integer_parts[decimal_part_index] + 1) / (
+                            10**sigfigs
+                        ) > self.constraints["local_percentages"][
+                            filtered_precedence_order[i]
+                        ][
+                            "max"
+                        ]:
                             constraints_violated = True
 
                 if not constraints_violated:
@@ -545,7 +811,8 @@ class Alloy():
             i = 0
             for element in elements:
                 self.composition[element] = normal_round(
-                    integer_parts[i] / (10**sigfigs), sigfigs)
+                    integer_parts[i] / (10**sigfigs), sigfigs
+                )
                 i += 1
 
         else:
@@ -554,12 +821,16 @@ class Alloy():
             i = 0
             for element in elements:
 
-                rounded_value = integer_parts[i]/(10**sigfigs)
+                rounded_value = integer_parts[i] / (10**sigfigs)
 
                 if self.constraints is not None:
-                    if element in self.constraints['local_percentages']:
+                    if element in self.constraints["local_percentages"]:
                         self.composition[element] = max(
-                            self.constraints['local_percentages'][element]['min'], rounded_value)
+                            self.constraints["local_percentages"][element][
+                                "min"
+                            ],
+                            rounded_value,
+                        )
                     else:
                         self.composition[element] = rounded_value
                 else:
@@ -582,58 +853,74 @@ def parse_composition_string(composition_string: str) -> dict:
     """Parse elemental percentages of an alloy from a string"""
 
     composition = {}
-    if('(' in composition_string):
-        major_composition = composition_string.split(')')[0].split('(')[1]
+    if "(" in composition_string:
+        major_composition = composition_string.split(")")[0].split("(")[1]
 
-        major_composition_percentage = float(re.split(
-            r'(\d+(?:\.\d+)?)', composition_string.split(')')[1])[1]) / 100.0
+        major_composition_percentage = (
+            float(
+                re.split(r"(\d+(?:\.\d+)?)", composition_string.split(")")[1])[
+                    1
+                ]
+            )
+            / 100.0
+        )
 
         split_major_composition = re.findall(
-            r'[A-Z][^A-Z]*', major_composition)
+            r"[A-Z][^A-Z]*", major_composition
+        )
 
         for element_percentage in split_major_composition:
             split_element_percentage = re.split(
-                r'(\d+(?:\.\d+)?)', element_percentage)
-            composition[split_element_percentage[0]] = (float(
-                split_element_percentage[1]) / 100.0) * \
-                major_composition_percentage
+                r"(\d+(?:\.\d+)?)", element_percentage
+            )
+            composition[split_element_percentage[0]] = (
+                float(split_element_percentage[1]) / 100.0
+            ) * major_composition_percentage
 
-        minor_composition = composition_string.split(
-            ')')[1][len(str(int(major_composition_percentage * 100))):]
+        minor_composition = composition_string.split(")")[1][
+            len(str(int(major_composition_percentage * 100))) :
+        ]
         split_minor_composition = re.findall(
-            r'[A-Z][^A-Z]*', minor_composition)
+            r"[A-Z][^A-Z]*", minor_composition
+        )
         for element_percentage in split_minor_composition:
             split_element_percentage = re.split(
-                r'(\d+(?:\.\d+)?)', element_percentage)
+                r"(\d+(?:\.\d+)?)", element_percentage
+            )
 
             decimal_places = 2
-            if '.' in str(split_element_percentage[1]):
+            if "." in str(split_element_percentage[1]):
                 decimal_places += len(
-                    str(split_element_percentage[1]).split('.')[1])
+                    str(split_element_percentage[1]).split(".")[1]
+                )
 
             composition[split_element_percentage[0]] = round(
-                float(split_element_percentage[1]) / 100.0, decimal_places)
+                float(split_element_percentage[1]) / 100.0, decimal_places
+            )
 
     else:
 
-        split_composition = re.findall(
-            r'[A-Z][^A-Z]*', composition_string)
+        split_composition = re.findall(r"[A-Z][^A-Z]*", composition_string)
 
         for element_percentage in split_composition:
             split_element_percentage = re.split(
-                r'(\d+(?:\.\d+)?)', element_percentage)
+                r"(\d+(?:\.\d+)?)", element_percentage
+            )
 
-            if(len(split_element_percentage) > 1):
+            if len(split_element_percentage) > 1:
                 decimal_places = 2
-                if '.' in str(split_element_percentage[1]):
+                if "." in str(split_element_percentage[1]):
                     decimal_places += len(
-                        str(split_element_percentage[1]).split('.')[1])
+                        str(split_element_percentage[1]).split(".")[1]
+                    )
 
                 composition[split_element_percentage[0]] = round(
-                    float(split_element_percentage[1]) / 100.0, decimal_places)
+                    float(split_element_percentage[1]) / 100.0, decimal_places
+                )
             else:
-                composition[split_element_percentage[0]] = 1.0 / \
-                    len(split_composition)
+                composition[split_element_percentage[0]] = 1.0 / len(
+                    split_composition
+                )
 
     return filter_order_composition(composition)
 
@@ -666,24 +953,27 @@ def filter_order_composition(composition: dict) -> OrderedDict:
 
     filtered_composition = {}
     for element in composition:
-        if(composition[element] > 0):
+        if composition[element] > 0:
             filtered_composition[element] = composition[element]
 
     ordered_composition = OrderedDict()
-    for element in sorted(filtered_composition, key=filtered_composition.get, reverse=True):
+    for element in sorted(
+        filtered_composition, key=filtered_composition.get, reverse=True
+    ):
         ordered_composition[element] = filtered_composition[element]
 
     return ordered_composition
 
 
 def parse_constraints(
-        min_elements: int = 1,
-        max_elements: int = 10,
-        percentages: dict = {},
-        allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
-        disallowed_elements: list = [],
-        sigfigs: int = 3,
-        percentage_step: float = 0.01) -> dict:
+    min_elements: int = 1,
+    max_elements: int = 10,
+    percentages: dict = {},
+    allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
+    disallowed_elements: list = [],
+    sigfigs: int = 3,
+    percentage_step: float = 0.01,
+) -> dict:
     """Parse constraint rules from input
 
     Args:
@@ -707,45 +997,49 @@ def parse_constraints(
             percentages = tmp_percentages
 
     for element in percentages:
-        if 'min' not in percentages[element]:
-            percentages[element]['min'] = 0.0
+        if "min" not in percentages[element]:
+            percentages[element]["min"] = 0.0
         else:
-            percentages[element]['min'] = max(
-                percentages[element]['min'], 0.0)
+            percentages[element]["min"] = max(percentages[element]["min"], 0.0)
 
-        if 'max' not in percentages[element]:
-            percentages[element]['max'] = 1.0
+        if "max" not in percentages[element]:
+            percentages[element]["max"] = 1.0
         else:
-            percentages[element]['max'] = min(
-                percentages[element]['max'], 1.0)
+            percentages[element]["max"] = min(percentages[element]["max"], 1.0)
 
-        if 'precedence' not in percentages[element]:
-            percentages[element]['precedence'] = 0
+        if "precedence" not in percentages[element]:
+            percentages[element]["precedence"] = 0
 
     for element in percentages:
-        percentages[element]['superior_elements'] = []
+        percentages[element]["superior_elements"] = []
         for other_element in percentages:
             if element != other_element:
-                if percentages[element]['precedence'] < percentages[other_element]['precedence']:
-                    percentages[element]['superior_elements'].append(
-                        other_element)
+                if (
+                    percentages[element]["precedence"]
+                    < percentages[other_element]["precedence"]
+                ):
+                    percentages[element]["superior_elements"].append(
+                        other_element
+                    )
 
-    min_sum = sum([percentages[e]['min'] for e in percentages])
+    min_sum = sum([percentages[e]["min"] for e in percentages])
     if min_sum > 1:
-        print("Impossible constraints, mins for each element sum greater than 1")
+        print(
+            "Impossible constraints, mins for each element sum greater than 1"
+        )
 
     for element in disallowed_elements:
         if element in allowed_elements:
             allowed_elements.remove(element)
 
     return {
-        'percentages': percentages,
-        'local_percentages': percentages,
-        'allowed_elements': allowed_elements,
-        'min_elements': min_elements,
-        'max_elements': max_elements,
-        'sigfigs': sigfigs,
-        'percentage_step': percentage_step
+        "percentages": percentages,
+        "local_percentages": percentages,
+        "allowed_elements": allowed_elements,
+        "min_elements": min_elements,
+        "max_elements": max_elements,
+        "sigfigs": sigfigs,
+        "percentage_step": percentage_step,
     }
 
 
@@ -759,15 +1053,17 @@ def normal_round(num: float, ndigits: int = 0) -> float:
     if ndigits == 0:
         return int(num + 0.5)
     else:
-        digit_value = 10 ** ndigits
+        digit_value = 10**ndigits
         return int(num * digit_value + 0.5) / digit_value
 
 
-def multiple_round(num: float, multiple: Union[float, int]) -> Union[float, int]:
+def multiple_round(
+    num: float, multiple: Union[float, int]
+) -> Union[float, int]:
     """Round a number to the nearest multiple of another number.
 
     Args:
         num: Value to round
         multiple: Multiple-of to round towards
     """
-    return multiple * round(num/multiple)
+    return multiple * round(num / multiple)

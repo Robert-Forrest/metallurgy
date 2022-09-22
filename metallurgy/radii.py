@@ -17,18 +17,20 @@ def radius_gamma(alloy):
 
     meanR = 0
     for element in alloy.elements:
-        meanR += alloy.composition[element] * \
-            mg.periodic_table.elements[element]['radius']
+        meanR += (
+            alloy.composition[element]
+            * mg.periodic_table.elements[element]["radius"]
+        )
 
     for element in alloy.elements:
-        r = mg.periodic_table.elements[element]['radius']
+        r = mg.periodic_table.elements[element]["radius"]
         if r > maxR:
             maxR = r
         if r < minR:
             minR = r
 
-    rMinAvSq = (minR + meanR)**2
-    rMaxAvSq = (maxR + meanR)**2
+    rMinAvSq = (minR + meanR) ** 2
+    rMaxAvSq = (maxR + meanR) ** 2
     rAvSq = meanR**2
 
     numerator = 1.0 - np.sqrt((rMinAvSq - rAvSq) / (rMinAvSq))
@@ -45,8 +47,10 @@ def lattice_distortion(alloy):
 
     meanR = 0
     for element in alloy.elements:
-        meanR += alloy.composition[element] * \
-            mg.periodic_table.elements[element]['radius']
+        meanR += (
+            alloy.composition[element]
+            * mg.periodic_table.elements[element]["radius"]
+        )
 
     tmp_lattice_distortion = 0
     for i in range(len(alloy.elements) - 1):
@@ -54,12 +58,19 @@ def lattice_distortion(alloy):
             element = alloy.elements[i]
             otherElement = alloy.elements[j]
 
-            radiusA = alloy.composition[element] * \
-                mg.periodic_table.elements[element]['radius']
-            radiusB = alloy.composition[element] * \
-                mg.periodic_table.elements[otherElement]['radius']
+            radiusA = (
+                alloy.composition[element]
+                * mg.periodic_table.elements[element]["radius"]
+            )
+            radiusB = (
+                alloy.composition[element]
+                * mg.periodic_table.elements[otherElement]["radius"]
+            )
 
-            tmp_lattice_distortion += (alloy.composition[element] * alloy.composition[otherElement] * np.abs(
-                radiusA + radiusB - 2 * meanR)) / (2 * meanR)
+            tmp_lattice_distortion += (
+                alloy.composition[element]
+                * alloy.composition[otherElement]
+                * np.abs(radiusA + radiusB - 2 * meanR)
+            ) / (2 * meanR)
 
     return tmp_lattice_distortion

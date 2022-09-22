@@ -14,16 +14,19 @@ def theoretical_density(alloy):
     masses = {}
     totalMass = 0
     for element in alloy.elements:
-        masses[element] = mg.periodic_table.elements[element]['mass']
+        masses[element] = mg.periodic_table.elements[element]["mass"]
         totalMass += masses[element] * alloy.composition[element]
 
     for element in alloy.elements:
-        massFractions[element] = alloy.composition[element] * \
-            masses[element] / totalMass
+        massFractions[element] = (
+            alloy.composition[element] * masses[element] / totalMass
+        )
 
     total = 0
     for element in alloy.elements:
-        total += massFractions[element] / \
-            mg.periodic_table.elements[element]['density']
+        total += (
+            massFractions[element]
+            / mg.periodic_table.elements[element]["density"]
+        )
 
     return 1 / total
