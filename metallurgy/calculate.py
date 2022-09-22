@@ -37,3 +37,5 @@ def calculate(alloys, feature_name):
             for func in list_functions(module[1]):
                 if func == feature_name:
                     return getattr(module[1], func)(alloys)
+
+        return mg.linear_mixture(alloys, feature_name)
