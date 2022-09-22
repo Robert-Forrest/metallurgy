@@ -13,9 +13,11 @@ from . import viscosity
 from . import price
 from . import generate
 from . import ratios
+from . import rdf
 from .calculate import calculate
 from . import plots
 from . import analyse
+
 
 periodic_table = PeriodicTable()
 model = None
@@ -43,12 +45,13 @@ __all__ = [
     "price",
     "viscosity",
     "ratios",
+    "rdf",
     "plots",
     "generate",
     "calculate",
     "features",
     "analyse",
-    'model',
-    'set_model',
-    'get_model'
+    "model",
+    "set_model",
+    "get_model",
 ]
