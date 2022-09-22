@@ -31,4 +31,6 @@ def shell_mendeleev_number_ratio(alloy, period=None, mendeleev=None):
     if mendeleev is None:
         mendeleev = linear_mixture(alloy, "mendeleev_universal_sequence")
 
+    if period is None or mendeleev is None:
+        return None
     return period / mendeleev
