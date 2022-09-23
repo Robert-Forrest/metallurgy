@@ -74,7 +74,7 @@ class Alloy:
         return self.to_string() == other.to_string()
 
     def __hash__(self):
-        return hash(self.composition)
+        return hash(self.to_string())
 
     @property
     def composition(self) -> Composition:
