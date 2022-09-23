@@ -42,17 +42,20 @@ class Alloy:
             else:
                 if element in self.keys():
                     super().__delitem__(element)
-            self.on_change()
+            self.on_change(change_type="set")
+
+        def __delitem__(self, element):
+            super().__delitem__(element)
+            self.on_change(change_type="del")
 
     def __init__(
         self,
         composition: Union[str, dict, Alloy],
-        constraints: Optional[dict] = None,
+        constraints: Union[dict, None] = None,
         rescale: bool = True,
     ):
 
         self.composition = parse_composition(composition)
-
         self.constraints = None
 
         if rescale:
@@ -64,9 +67,6 @@ class Alloy:
             if rescale:
                 self.rescale()
 
-        else:
-            self.constraints = None
-
     def __repr__(self):
         return self.to_string()
 
@@ -74,7 +74,7 @@ class Alloy:
         return self.to_string() == other.to_string()
 
     def __hash__(self):
-        return hash(self.to_string())
+        return hash(self.composition)
 
     @property
     def composition(self) -> Composition:
@@ -87,9 +87,13 @@ class Alloy:
             value = self.Composition(value, self.on_composition_change)
         self._composition = value
 
-    def on_composition_change(self):
+    def on_composition_change(self, change_type=None):
         """Called when composition property changes."""
         self.determine_percentage_constraints()
+
+        if change_type == "del":
+            self.clamp_composition()
+            self.round_composition()
 
     @property
     def elements(self) -> list:
