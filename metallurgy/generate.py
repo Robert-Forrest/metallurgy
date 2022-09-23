@@ -32,8 +32,13 @@ def random_alloy(
         for element in percentage_constraints:
             if element in other_elements:
                 other_elements.remove(element)
+
         elements = list(percentage_constraints.keys()) + list(
-            np.random.choice(other_elements, num_extra_elements, replace=False)
+            np.random.choice(
+                other_elements,
+                min(num_extra_elements, len(other_elements)),
+                replace=False,
+            )
         )
 
     else:
