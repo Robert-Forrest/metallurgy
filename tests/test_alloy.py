@@ -13,3 +13,15 @@ def test_alloy_creation():
 def test_alloy_to_string():
     alloy = mg.Alloy({"Fe": 20, "Ag": 80})
     assert alloy.to_string() == "Ag80Fe20"
+
+
+def test_alloy_element_deletion():
+
+    num_alloys = 100
+    random_alloys = mg.generate.random_alloys(
+        num_alloys, min_elements=2, max_elements=2
+    )
+
+    for alloy in random_alloys:
+        del alloy.composition[alloy.elements[0]]
+        assert alloy.to_string() == alloy.elements[0] + "100"
