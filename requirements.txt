@@ -1,4 +1,0 @@
-elementy
-cerebral
-matplotlib
-python-ternary
