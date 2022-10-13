@@ -165,10 +165,10 @@ def ternary_heatmap(
 
     tax.set_title(title, pad=15)
 
-    jet_cmap = mpl.cm.get_cmap("jet")
+    viridis_cmap = mpl.cm.get_cmap("viridis")
     tax.heatmap(
         heatmap_data,
-        cmap=jet_cmap,
+        cmap=viridis_cmap,
         vmax=vmax,
         vmin=vmin,
         cbarlabel=label,
@@ -205,7 +205,7 @@ def colorline(
     y,
     ax,
     z=None,
-    cmap="jet",
+    cmap="viridis",
     norm=plt.Normalize(0.0, 100.0),
     linewidth=2,
     alpha=1.0,
