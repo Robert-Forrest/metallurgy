@@ -56,6 +56,9 @@ class Alloy:
     ):
 
         self.composition = parse_composition(composition)
+        if self.composition is None:
+            raise Exception("Invalid composition:", composition)
+
         self.constraints = None
 
         if rescale:
