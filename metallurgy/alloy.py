@@ -148,96 +148,64 @@ class Alloy:
                 else:
                     no_precedence.append(element)
 
-            # np.random.shuffle(no_precedence)
             precedence_order = (
                 sorted(precedence, key=precedence.get, reverse=True)
                 + no_precedence
             )
-            reverse_precedence_order = (
-                sorted(precedence, key=precedence.get) + no_precedence
+            reverse_precedence_order = no_precedence + sorted(
+                precedence, key=precedence.get
             )
 
             for element in precedence_order:
                 if element not in self.constraints["local_percentages"]:
                     continue
 
-                if (
-                    self.composition[element]
-                    < self.constraints["local_percentages"][element]["min"]
-                ):
-                    for other_element in reverse_precedence_order:
-                        if (
-                            element != other_element
-                            and other_element in self.composition
-                        ):
-                            if (
-                                other_element
-                                in self.constraints["local_percentages"]
-                            ):
-                                if (
-                                    normal_round(
-                                        self.composition[other_element],
-                                        self.constraints["sigfigs"] + 1,
-                                    )
-                                    <= self.constraints["local_percentages"][
-                                        other_element
-                                    ]["min"]
-                                ):
-                                    continue
+                for direction in ["min", "max"]:
+                    if element_is_in_range(
+                        element,
+                        self.composition,
+                        self.constraints,
+                        direction,
+                        inclusive=False,
+                    ):
+                        continue
 
-                            donate_percentage(
-                                self.composition,
-                                self.constraints,
-                                other_element,
-                                element,
-                            )
-
-                            self.ensure_constrained_elements_present()
-
-                            if (
-                                self.composition[element]
-                                >= self.constraints["local_percentages"][
-                                    element
-                                ]["min"]
-                            ):
-                                break
-
-                if (
-                    self.composition[element]
-                    > self.constraints["local_percentages"][element]["max"]
-                ):
                     for other_element in reverse_precedence_order:
                         if (
                             element != other_element
                             and other_element in self.composition
                         ):
 
-                            if (
-                                other_element
-                                in self.constraints["local_percentages"]
-                            ):
-                                if (
-                                    self.composition[other_element]
-                                    >= self.constraints["local_percentages"][
-                                        other_element
-                                    ]["max"]
-                                ):
-                                    continue
-
-                            donate_percentage(
+                            if not element_is_in_range(
+                                other_element,
                                 self.composition,
                                 self.constraints,
-                                element,
-                                other_element,
-                            )
+                                direction,
+                            ):
+                                continue
+
+                            if direction == "min":
+                                donate_percentage(
+                                    self.composition,
+                                    self.constraints,
+                                    other_element,
+                                    element,
+                                )
+                            else:
+                                donate_percentage(
+                                    self.composition,
+                                    self.constraints,
+                                    element,
+                                    other_element,
+                                )
 
                             self.ensure_constrained_elements_present()
 
-                            if (
-                                self.composition[element]
-                                <= self.constraints["local_percentages"][
-                                    element
-                                ]["max"]
+                            if element_is_in_range(
+                                element,
+                                self.composition,
+                                self.constraints,
+                                direction,
                             ):
                                 break
 
@@ -850,15 +818,15 @@ def donate_percentage(composition, constraints, donor, recipient):
             - composition[recipient]
         )
     else:
-        return
+        recipient_deficit = 0
 
     if donor in constraints["local_percentages"]:
 
-        if (
-            constraints["local_percentages"][recipient]["precedence"]
-            < constraints["local_percentages"][donor]["precedence"]
-        ):
-            return
+        # if (
+        #     constraints["local_percentages"][recipient]["precedence"]
+        #     < constraints["local_percentages"][donor]["precedence"]
+        # ):
+        #     return
 
         if composition[donor] > constraints["local_percentages"][donor]["max"]:
             donor_surplus = (
@@ -880,9 +848,47 @@ def donate_percentage(composition, constraints, donor, recipient):
             donation = min([0.1, donor_surplus])
         else:
             donation = min([0.1, recipient_deficit])
-
         composition[recipient] += donation
         composition[donor] -= donation
+
+
+def element_is_in_range(
+    element, composition, constraints, direction, inclusive=True
+):
+    if element not in constraints["local_percentages"]:
+        return True
+
+    sigfigs = 3
+    if constraints is not None:
+        if "sigfigs" in constraints:
+            sigfigs = constraints["sigfigs"]
+
+    rounded_percentage = normal_round(composition[element], sigfigs)
+
+    if direction == "min":
+        if inclusive:
+            return (
+                rounded_percentage
+                >= constraints["local_percentages"][element][direction]
+            )
+        else:
+            return (
+                rounded_percentage
+                > constraints["local_percentages"][element][direction]
+            )
+    elif direction == "max":
+        if inclusive:
+            return (
+                rounded_percentage
+                <= constraints["local_percentages"][element][direction]
+            )
+        else:
+            return (
+                rounded_percentage
+                < constraints["local_percentages"][element][direction]
+            )
+
+    return False
 
 
 def normal_round(num: float, ndigits: int = 0) -> float:
