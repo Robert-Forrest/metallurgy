@@ -614,20 +614,23 @@ class Alloy:
             i = 0
             for element in self.elements:
 
-                rounded_value = integer_parts[i] / (10**sigfigs)
+                if i < len(integer_parts):
+                    rounded_value = integer_parts[i] / (10**sigfigs)
 
-                if self.constraints is not None:
-                    if element in self.constraints["local_percentages"]:
-                        self.composition[element] = max(
-                            self.constraints["local_percentages"][element][
-                                "min"
-                            ],
-                            rounded_value,
-                        )
+                    if self.constraints is not None:
+                        if element in self.constraints["local_percentages"]:
+                            self.composition[element] = max(
+                                self.constraints["local_percentages"][element][
+                                    "min"
+                                ],
+                                rounded_value,
+                            )
+                        else:
+                            self.composition[element] = rounded_value
                     else:
                         self.composition[element] = rounded_value
                 else:
-                    self.composition[element] = rounded_value
+                    self.composition[element] = 0
 
                 i += 1
 
