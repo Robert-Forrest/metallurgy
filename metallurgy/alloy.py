@@ -674,11 +674,9 @@ def parse_composition(composition: Union[str, dict, Alloy]) -> dict:
 def parse_composition_string(composition_string: str) -> dict:
     """Parse elemental percentages of an alloy from a string"""
 
-    composition = {}
     if "(" in composition_string:
-        major_composition = composition_string.split(")")[0].split("(")[1]
 
-        major_composition_percentage = (
+        sub_composition_percentage = (
             float(
                 re.split(r"(\d+(?:\.\d+)?)", composition_string.split(")")[1])[
                     1
@@ -687,29 +685,40 @@ def parse_composition_string(composition_string: str) -> dict:
             / 100.0
         )
 
-        split_major_composition = re.findall(
-            r"[A-Z][^A-Z]*", major_composition
+        sub_composition_string = composition_string.split(")")[0].split("(")[1]
+
+        sub_composition = parse_composition_string_block(
+            sub_composition_string
         )
+        for element in sub_composition:
+            sub_composition[element] *= sub_composition_percentage
 
-        for element_percentage in split_major_composition:
-            split_element_percentage = re.split(
-                r"(\d+(?:\.\d+)?)", element_percentage
-            )
-            composition[split_element_percentage[0]] = (
-                float(split_element_percentage[1]) / 100.0
-            ) * major_composition_percentage
-
-        minor_composition = composition_string.split(")")[1][
-            len(str(int(major_composition_percentage * 100))) :
+        remaining_composition_string = composition_string.split(")")[1][
+            len(str(int(sub_composition_percentage * 100))) :
         ]
-        split_minor_composition = re.findall(
-            r"[A-Z][^A-Z]*", minor_composition
+        remaining_composition = parse_composition_string_block(
+            remaining_composition_string
         )
-        for element_percentage in split_minor_composition:
-            split_element_percentage = re.split(
-                r"(\d+(?:\.\d+)?)", element_percentage
-            )
 
+        composition = {**sub_composition, **remaining_composition}
+
+    else:
+        composition = parse_composition_string_block(composition_string)
+
+    return filter_order_composition(composition)
+
+
+def parse_composition_string_block(composition_string):
+    composition = {}
+
+    split_composition = re.findall(r"[A-Z][^A-Z]*", composition_string)
+
+    for element_percentage in split_composition:
+        split_element_percentage = re.split(
+            r"(\d+(?:\.\d+)?)", element_percentage
+        )
+
+        if len(split_element_percentage) > 1:
             decimal_places = 2
             if "." in str(split_element_percentage[1]):
                 decimal_places += len(
@@ -719,32 +728,12 @@ def parse_composition_string(composition_string: str) -> dict:
             composition[split_element_percentage[0]] = round(
                 float(split_element_percentage[1]) / 100.0, decimal_places
             )
-
-    else:
-
-        split_composition = re.findall(r"[A-Z][^A-Z]*", composition_string)
-
-        for element_percentage in split_composition:
-            split_element_percentage = re.split(
-                r"(\d+(?:\.\d+)?)", element_percentage
+        else:
+            composition[split_element_percentage[0]] = 1.0 / len(
+                split_composition
             )
 
-            if len(split_element_percentage) > 1:
-                decimal_places = 2
-                if "." in str(split_element_percentage[1]):
-                    decimal_places += len(
-                        str(split_element_percentage[1]).split(".")[1]
-                    )
-
-                composition[split_element_percentage[0]] = round(
-                    float(split_element_percentage[1]) / 100.0, decimal_places
-                )
-            else:
-                composition[split_element_percentage[0]] = 1.0 / len(
-                    split_composition
-                )
-
-    return filter_order_composition(composition)
+    return composition
 
 
 def parse_composition_dict(composition: dict) -> dict:
