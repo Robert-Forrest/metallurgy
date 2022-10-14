@@ -104,6 +104,10 @@ class Alloy:
         return list(self.composition.keys())
 
     @property
+    def num_elements(self) -> int:
+        return len(self.elements)
+
+    @property
     def total_percentage(self) -> float:
         return sum(self.composition.values())
 
