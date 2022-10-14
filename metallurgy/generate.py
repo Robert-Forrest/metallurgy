@@ -22,7 +22,7 @@ def random_alloy(
         percentage_constraints = parsed_percentage_constraints
 
     if min_elements < max_elements:
-        num_extra_elements = np.random.randint(min_elements, max_elements)
+        num_extra_elements = np.random.randint(min_elements, max_elements + 1)
     else:
         num_extra_elements = max_elements
     num_extra_elements -= len(percentage_constraints)
