@@ -809,6 +809,9 @@ def parse_constraints(
                 tmp_percentages[element] = {}
             percentages = tmp_percentages
 
+    if len(percentages) == 1:
+        return None
+
     for element in percentages:
         if "min" not in percentages[element]:
             percentages[element]["min"] = 0.0
