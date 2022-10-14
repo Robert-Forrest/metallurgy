@@ -67,7 +67,7 @@ def test_requirements():
     percentage_constraints = {
         "Cu": {"min": 0.2, "max": 0.6},
         "Fe": {"min": 0.0, "max": 1.0},
-        "Ni": {"min": 0.01, "max": 0.99},
+        "Ni": {"min": 0.01, "max": 0.99, "precedence": 1},
     }
     random_alloys = mg.generate.random_alloys(
         num_alloys, percentage_constraints=percentage_constraints
@@ -87,6 +87,34 @@ def test_requirements():
                     random_alloy.composition[element]
                     <= percentage_constraints[element]["max"]
                 )
+
+                if "precedence" in percentage_constraints[element]:
+                    for other_element in percentage_constraints:
+                        if element == other_element:
+                            continue
+
+                        if other_element in random_alloy.composition:
+                            if (
+                                "precedence"
+                                in percentage_constraints[other_element]
+                            ):
+                                if (
+                                    percentage_constraints[element][
+                                        "precedence"
+                                    ]
+                                    > percentage_constraints[other_element][
+                                        "precedence"
+                                    ]
+                                ):
+                                    assert (
+                                        random_alloy.composition[element]
+                                        >= random_alloy.composition[
+                                            other_element
+                                        ]
+                                    )
+
+            else:
+                assert percentage_constraints[element]["min"] == 0
 
 
 def test_mixture():
