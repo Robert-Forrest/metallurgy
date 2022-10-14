@@ -51,6 +51,24 @@ While formally, an alloy is defined as ["a mixture of chemical elements of which
 at least one is a metal"](https://en.wikipedia.org/wiki/Alloy), no such
 limitation is enforced in this package -- you can create any mixture you want.
 
+An Alloy object has access to properties containing the percentage values of the
+composition, the elements in the composition, and has helper functions which can
+convert the composition to a simple string or even a LaTeX formatted string:
+
+```python
+>>> Bronze.composition
+{'Cu': 0.88, 'Sn': 0.12}
+
+>>> Bronze.elements
+['Cu', 'Sn']
+
+>>> Bronze.to_string()
+'Cu88Sn12'
+
+>>> Bronze.to_pretty_string()
+'Cu$_{88}$Sn$_{12}$'
+```
+
 ### Calculating alloy properties
 
 Properties of alloys may be approximated from the properties of their
