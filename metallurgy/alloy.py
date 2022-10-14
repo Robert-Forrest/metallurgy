@@ -66,10 +66,14 @@ class Alloy:
             self.round_composition()
 
         if constraints is not None:
-            if self.num_elements > 1:
-                self.constraints = parse_constraints(**constraints)
-                if rescale:
-                    self.rescale()
+            self.constraints = parse_constraints(**constraints)
+            if self.num_elements == 1:
+                if self.elements[0] in self.constraints["percentages"]:
+                    self.constraints["percentages"][self.elements[0]][
+                        "max"
+                    ] = 1
+            if rescale:
+                self.rescale()
 
     def __repr__(self):
         return self.to_string()
