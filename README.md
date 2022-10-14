@@ -35,7 +35,7 @@ Cu50Zr50
 Cu50Zr50
 
 >>> mg.Alloy("CuZrFeCo")
-    Cu25Zr25Fe25Co25
+Cu25Zr25Fe25Co25
 
 >>> mg.Alloy("(Fe70Co30)50Ni50")
 Ni50Fe35Co15
@@ -63,12 +63,12 @@ that contains $N$ elements with percentages $c_i$. Similarly, the deviation of
 these elemental property values for the elements present in an alloy can be
 calculated:
 
-$$\delta A = \sqrt{\sum_{i=1}^{N} c_i \left(1 - \frac{A_i}{\SigmaA}\right)^2} $$
+$$\delta A = \sqrt{\sum_{i=1}^{N} c_i \left(1 - \frac{A_i}{\Sigma A}\right)^2} $$
 
 The metallurgy package can be used to calculate a variety of approximate alloy
 properties:
 
-```
+```python
 Bronze = mg.Alloy("Cu88Sn12")
 
 >>> mg.linear_mixture(Bronze, "mass")
@@ -96,7 +96,7 @@ Elemental data is provided by the
 calculate a variety of other alloy properties that are more complex than simple
 linear mixture or deviations of elemental properties:
 
-```
+```python
 >>> mg.enthalpy.mixing_Gibbs_free_energy(Bronze)
 -2039.0961905675026
 
@@ -118,7 +118,7 @@ for definitions of these alloy properties.
 
 Metallurgy can also be used to generate random alloys:
 
-```
+```python
 >>> mg.generate.random_alloy()
 Cs28.9Db25.4Hs12Ce11.9La10.6Cu9.6Kr1.6
 
@@ -131,7 +131,7 @@ maximum and minimum number of constituent elements, requirements on the
 percentage range that particular elements must be within, and whitelists of
 allowed elements:
 
-```
+```python
 >>> mg.generate.random_alloy(min_elements=2,max_elements=3)
 Au50.7Hf36.3Ru13
 
@@ -145,7 +145,7 @@ Yb64.8Cu30Ni5.2
 The process of generating random alloys can be performed in bulk to create
 datasets of random alloys:
 
-```
+```python
 >>> mg.generate.random_alloys(10, min_elements=2,max_elements=3)
 [Fl94.6Xe5.4, Po64.2Tl23.3Np12.5, Tb61.6Ta38.4, Lu50.8Ho38.1In11.1, Rn69Es31, S70.4Ts29.6, Pr79.3He13.4Cm7.3, As84.3V15.7, Ge45.3Xe41.2Na13.5, Ra70.4He29.6]
 ```
@@ -155,7 +155,8 @@ datasets of random alloys:
 Once you have created a dataset of alloys, you may wish to view graphically a
 particular material property on a population level:
 
-```
+```python
+>>> import matplotlib.pyplot as plt
 >>> alloys = mg.generate.random_alloys(10000)
 >>> plt.hist([mg.linear_mixture(alloy, "density") for alloy in alloys])
 ```
