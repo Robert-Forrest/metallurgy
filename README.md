@@ -134,9 +134,16 @@ for definitions of these alloy properties.
 
 ### Generating alloy datasets
 
-Metallurgy can also be used to generate random alloys:
+Metallurgy can also be used to generate collections of alloys, either randomly
+or across a composition-space.
 
 ```python
+>>> mg.generate.binary(["Fe", "Co"], step=10)
+[Fe100, Fe90Co10, Fe80Co20, Fe70Co30, Fe60Co40, Fe50Co50, Co60Fe40, Co70Fe30, Co80Fe20, Co90Fe10, Co100]
+
+>>> mg.generate.ternary(["Fe", "Co", "Al"], step=20)
+[Fe100, Fe80Co20, Fe80Al20, Fe60Co40, Fe60Co20Al20, Fe60Al40, Co60Fe40, Fe40Co40Al20, Fe40Al40Co20, Al60Fe40, Co80Fe20, Co60Fe20Al20, Co40Al40Fe20, Al60Fe20Co20, Al80Fe20, Co100, Co80Al20, Co60Al40, Al60Co40, Al80Co20, Al100]
+
 >>> mg.generate.random_alloy()
 Cs28.9Db25.4Hs12Ce11.9La10.6Cu9.6Kr1.6
 
@@ -150,13 +157,13 @@ percentage range that particular elements must be within, and whitelists of
 allowed elements:
 
 ```python
->>> mg.generate.random_alloy(min_elements=2,max_elements=3)
+>>> mg.generate.random_alloy(min_elements=2, max_elements=3)
 Au50.7Hf36.3Ru13
 
->>> mg.generate.random_alloy(min_elements=2,max_elements=3, percentage_constraints={"Cu":{"min":0.3, "max":0.8}})
+>>> mg.generate.random_alloy(min_elements=2, max_elements=3, percentage_constraints={"Cu":{"min":0.3, "max":0.8}})
 Cu63.9Sr23.9Be12.2
 
->>> mg.generate.random_alloy(min_elements=2,max_elements=3, percentage_constraints={"Cu":{"min":0.3, "max":0.8}}, allowed_elements=["Fe", "Cu", "Co", "Ni", "Yb"])
+>>> mg.generate.random_alloy(min_elements=2, max_elements=3, percentage_constraints={"Cu":{"min":0.3, "max":0.8}}, allowed_elements=["Fe", "Cu", "Co", "Ni", "Yb"])
 Yb64.8Cu30Ni5.2
 ```
 
@@ -164,7 +171,7 @@ The process of generating random alloys can be performed in bulk to create
 datasets of random alloys:
 
 ```python
->>> mg.generate.random_alloys(10, min_elements=2,max_elements=3)
+>>> mg.generate.random_alloys(10, min_elements=2, max_elements=3)
 [Fl94.6Xe5.4, Po64.2Tl23.3Np12.5, Tb61.6Ta38.4, Lu50.8Ho38.1In11.1, Rn69Es31, S70.4Ts29.6, Pr79.3He13.4Cm7.3, As84.3V15.7, Ge45.3Xe41.2Na13.5, Ra70.4He29.6]
 ```
 
@@ -174,9 +181,28 @@ Once you have created a dataset of alloys, you may wish to view graphically a
 particular material property on a population level:
 
 ```python
+>>> binary, percentages = mg.generate.binary(["Cu", "Zr"])
+>>> mixing_enthalpies = mg.enthalpy.mixing_enthalpy(binary)
+>>> mg.plots.binary(binary, mixing_enthalpies, ylabel="Mixing enthalpy (kJ/mol)")
+```
+
+![CuZr binary mixing enthalpy](images/CuZr_enthalpy.png "Mixing enthalpy across
+the Cu-Zr composition")
+
+```python
+>>> ternary, percentages = mg.generate.ternary(["Cu", "Zr", "Al"])
+>>> mixing_enthalpies = mg.enthalpy.mixing_enthalpy(ternary)
+>>> mg.plots.ternary(ternary, mixing_enthalpies, label="Mixing enthalpy (kJ/mol)")
+```
+
+![CuZrAl ternary mixing enthalpy](images/CuZrAl_enthalpy.png "Mixing enthalpy across
+the Cu-Zr-Al composition")
+
+
+```python
 >>> import matplotlib.pyplot as plt
 >>> alloys = mg.generate.random_alloys(10000)
->>> plt.hist([mg.linear_mixture(alloy, "density") for alloy in alloys])
+>>> plt.hist(mg.linear_mixture(alloys, "density"))
 ```
 
 ![Histogram of densities](images/AlloyDensities.png "Histogram of the density of 10,000
