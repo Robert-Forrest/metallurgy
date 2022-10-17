@@ -1,3 +1,11 @@
+"""``metallurgy.radii``
+=============================
+
+Module enabling calculation of radius related alloy properties.
+
+"""
+
+from typing import Union, List
 from collections.abc import Iterable
 
 import numpy as np
@@ -6,9 +14,24 @@ import metallurgy as mg
 from .alloy import Alloy
 
 
-def radius_gamma(alloy):
+def radius_gamma(
+    alloy: Union[Alloy, str, dict]
+) -> Union[float, None, List[Union[float, None]]]:
+    """Returns the radius gamma property for an alloy.
+
+    Parameters
+    ----------
+
+    alloy : Alloy, str, dict
+        The alloy for which to calculate the linear mixture.
+
+    """
+
+    # If a list of alloys is given, return a list of data
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [radius_gamma(a) for a in alloy]
+
+    # Convert input alloy to an Alloy instance if not already
     elif not isinstance(alloy, Alloy):
         alloy = Alloy(alloy)
 
@@ -39,7 +62,19 @@ def radius_gamma(alloy):
     return numerator / denominator
 
 
-def lattice_distortion(alloy):
+def lattice_distortion(
+    alloy: Union[Alloy, str, dict]
+) -> Union[float, None, List[Union[float, None]]]:
+    """Returns the lattice distortion of an alloy.
+
+    Parameters
+    ----------
+
+    alloy : Alloy, str, dict
+        The alloy for which to calculate the linear mixture.
+
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [lattice_distortion(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
