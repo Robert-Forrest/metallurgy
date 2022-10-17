@@ -33,7 +33,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
-    "autoapi.extension",
     "sphinx.ext.intersphinx",
 ]
 autoapi_dirs = ["../../metallurgy"]
