@@ -4,12 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to Metallurgy's documentation!
-====================================
-
-.. automodule:: metallurgy
-    :members:
-    :undoc-members:
-    :show-inheritance:
+======================================
 
 .. toctree::
    :maxdepth: 2
