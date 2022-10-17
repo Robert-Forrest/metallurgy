@@ -128,9 +128,11 @@ linear mixture or deviations of elemental properties:
 0.8661417322834646
 ```
 
-
-See our [July 2022 paper](https://pubs.rsc.org/en/content/articlelanding/2022/dd/d2dd00026a) that used code which later became the metallurgy package
-for definitions of these alloy properties. 
+See our June 2022 paper ["Machine-learning improves understanding of glass
+formation in metallic
+systems"](https://pubs.rsc.org/en/content/articlelanding/2022/dd/d2dd00026a)
+that used code which later became the metallurgy package for definitions of
+these alloy properties.
 
 ### Generating alloy datasets
 
