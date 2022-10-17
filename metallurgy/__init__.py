@@ -1,3 +1,9 @@
+"""Metallurgy
+
+A tool for manipulating alloy compositions, and calculation of their approximate
+characteristics based on the linear mixture of elemental properties.
+"""
+
 from elementy.periodictable import PeriodicTable
 
 from .linear_mixture import linear_mixture
@@ -24,11 +30,22 @@ model = None
 
 
 def set_model(model_in):
+    """
+    Sets a model to be used by metallurgy to provide predictions of alloy
+    properties. Optional.
+
+    Parameters
+    ----------
+    model_in : Cerebral model
+        A model which takes alloy compositions as input, and produces
+        material property predicitions as output.
+    """
     global model
     model = model_in
 
 
 def get_model():
+    """Returns the model set for use in predicting material properties."""
     return model
 
 
