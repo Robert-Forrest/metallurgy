@@ -5,17 +5,16 @@ Module providing enthalpy related calculations.
 
 """
 
-from typing import Union, Tuple
 from collections.abc import Iterable
 from numbers import Number
+from typing import Tuple, Union
 
 import numpy as np
 
 import metallurgy as mg
+
+from . import constants, entropy, linear_mixture
 from .alloy import Alloy
-from . import linear_mixture
-from . import constants
-from . import entropy
 
 
 def Gamma(elementA: str, elementB: str) -> Union[Number, None]:
@@ -146,7 +145,22 @@ def calculate_WS_enthalpy_component(
     )
 
 
-def wigner_seitz_electron_density_discontinuity_delta(elementA, elementB):
+def wigner_seitz_electron_density_discontinuity_delta(
+    elementA: str, elementB: str
+) -> Number:
+    """Calculates the Wigner-Seitz radius discontinuity contribution to the
+    gamma factor in the Miedema model of mixing enthalpy.  See equation 1 of:
+    http://dx.doi.org/10.1016/j.cpc.2016.08.013
+
+    Parameters
+    ----------
+
+    elementA : str
+        The periodic table symbol of element A
+    elementA : str
+        The periodic table symbol of element B
+    """
+
     densityA = mg.periodic_table.elements[elementA][
         "wigner_seitz_electron_density"
     ]
@@ -156,7 +170,22 @@ def wigner_seitz_electron_density_discontinuity_delta(elementA, elementB):
     return (densityA ** (1.0 / 3.0)) - (densityB ** (1.0 / 3.0))
 
 
-def calculate_surface_concentration(elements, volumes, composition):
+def calculate_surface_concentration(
+    elements: List[str], volumes: List[Number], composition: dict
+) -> Number:
+    """Calculates the surface concentration in the Miedema model of mixing
+    enthalpy.  See equation 2 of: http://dx.doi.org/10.1016/j.cpc.2016.08.013
+
+    Parameters
+    ----------
+
+    elements : List[str]
+        The elements being used to calculate the surface concentration.
+    volumes : List[Number]
+        The atomic volumes of the elements.
+    compositiom : dict
+       Dictionary containing the percentage of each element in the surface composition.
+    """
 
     reduced_vol_A = composition[elements[0]] * (volumes[0] ** (2.0 / 3.0))
     reduced_vol_B = composition[elements[1]] * (volumes[1] ** (2.0 / 3.0))
