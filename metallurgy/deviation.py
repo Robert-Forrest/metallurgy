@@ -36,7 +36,7 @@ def deviation(
 
     """
 
-    # If a list of alloys is given, return a list of linear mixture data
+    # If a list of alloys is given, return a list of deviation data
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [deviation(a, property_name) for a in list(alloy)]
 
