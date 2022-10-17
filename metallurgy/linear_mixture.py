@@ -1,10 +1,9 @@
-"""
-``metallurgy.linear_mixture``
+"""``metallurgy.linear_mixture``
 =============================
 
-Module enabling calculation of linear mixtures of
-elemental properties, as an approximation to the
-properties of an alloy.
+Module enabling calculation of linear mixtures of elemental properties, as an
+approximation to the properties of an alloy.
+
 """
 
 from typing import Union, List
