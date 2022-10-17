@@ -14,7 +14,7 @@ from .alloy import Alloy
 
 
 def price(
-    alloy: Union[Alloy, str, dict], property_name: str
+    alloy: Union[Alloy, str, dict]
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the approximate price per kilogramme of an alloy.
 
