@@ -88,3 +88,5 @@ target/
 
 Session.vim
 *.hdf5
+
+*flycheck*
