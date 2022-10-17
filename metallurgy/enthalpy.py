@@ -1,4 +1,13 @@
+"""``metallurgy.enthalpy``
+=============================
+
+Module providing enthalpy related calculations.
+
+"""
+
+from typing import Union, Tuple
 from collections.abc import Iterable
+from numbers import Number
 
 import numpy as np
 
@@ -9,7 +18,19 @@ from . import constants
 from . import entropy
 
 
-def Gamma(elementA, elementB):
+def Gamma(elementA: str, elementB: str) -> Union[Number, None]:
+    """Calculates the gamma term of the Miedema model.
+    See equation 1 of: http://dx.doi.org/10.1016/j.cpc.2016.08.013
+
+    Parameters
+    ----------
+
+    elementA : str
+        The periodic table symbol of element A
+    elementA : str
+        The periodic table symbol of element B
+    """
+
     Q, P, R = calculate_QPR(elementA, elementB)
     if R is not None:
         return (
@@ -23,7 +44,20 @@ def Gamma(elementA, elementB):
         return None
 
 
-def calculate_QPR(elementA, elementB):
+def calculate_QPR(
+    elementA: str, elementB: str
+) -> Union[Tuple[Number, Number, Number], None]:
+    """Calculates the Q, P, and R factors of the Miedema model.
+    See equation 1 of: http://dx.doi.org/10.1016/j.cpc.2016.08.013
+
+    Parameters
+    ----------
+
+    elementA : str
+        The periodic table symbol of element A
+    elementA : str
+        The periodic table symbol of element B
+    """
 
     seriesA = mg.periodic_table.elements[elementA]["series"]
     if elementA == "Ca" or elementA == "Sr" or elementA == "Ba":
@@ -58,7 +92,26 @@ def calculate_QPR(elementA, elementB):
     return Q, P, R
 
 
-def calculate_electronegativity_enthalpy_component(elementA, elementB, P):
+def calculate_electronegativity_enthalpy_component(
+    elementA: str, elementB: str, P: Number
+) -> Number:
+    """Calculates the electronegativity contribution to the gamma factor in the
+    Miedema model of mixing enthalpy.  See equation 1 of:
+    http://dx.doi.org/10.1016/j.cpc.2016.08.013
+
+    Parameters
+    ----------
+
+    elementA : str
+        The periodic table symbol of element A
+    elementA : str
+        The periodic table symbol of element B
+    P : Number
+        An empirical factor dependent on the kinds of elements being
+        mixed. P=14.1 for two transition metals, P=10.7 for two non-transition
+        metals, and P=12.35 for one of each kind.
+    """
+
     electronegativityDiff = (
         mg.periodic_table.elements[elementA]["electronegativity_miedema"]
         - mg.periodic_table.elements[elementB]["electronegativity_miedema"]
@@ -66,7 +119,27 @@ def calculate_electronegativity_enthalpy_component(elementA, elementB, P):
     return -P * (electronegativityDiff**2)
 
 
-def calculate_WS_enthalpy_component(elementA, elementB, Q):
+def calculate_WS_enthalpy_component(
+    elementA: str, elementB: str, Q: Number
+) -> Number:
+    """Calculates the Wigner-Seitz radius discontinuity contribution to the
+    gamma factor in the Miedema model of mixing enthalpy.  See equation 1 of:
+    http://dx.doi.org/10.1016/j.cpc.2016.08.013
+
+    Parameters
+    ----------
+
+    elementA : str
+        The periodic table symbol of element A
+    elementA : str
+        The periodic table symbol of element B
+    Q : Number
+        An empirical factor dependent on the kinds of elements being
+        mixed. Dependent on the P factor discussed, Q = 9.4*P, discussed in
+        documentation of
+        :func:`~metallurgy.enthalpy.calculate_electronegativity_enthalpy_component`.
+    """
+
     return Q * (
         wigner_seitz_electron_density_discontinuity_delta(elementA, elementB)
         ** 2
