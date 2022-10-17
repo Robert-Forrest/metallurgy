@@ -1,15 +1,27 @@
+"""``metallurgy.analyse``
+=============================
+
+Module enabling analysis of alloy data
+
+"""
+
 import re
+from typing import Tuple, Union
+from numbers import Number
 
 import numpy as np
 
 from . import generate
+from .alloy import Alloy
 
 
-def find_max(elements, feature_name):
+def find_max(
+    elements: list[str], property_name: str
+) -> Union[Tuple[Alloy, Number], None]:
     if isinstance(elements, str):
         elements = re.findall("[A-Z][^A-Z]*", elements)
 
-    system = generate.system(elements, feature_name=feature_name)
+    system = generate.system(elements, property_name=property_name)
     if system is not None:
 
         alloys, percentages, values = system
@@ -19,11 +31,13 @@ def find_max(elements, feature_name):
         return alloys[max_index], values[max_index]
 
 
-def find_min(elements, feature_name):
+def find_min(
+    elements: list[str], property_name: str
+) -> Union[Tuple[Alloy, Number], None]:
     if isinstance(elements, str):
         elements = re.findall("[A-Z][^A-Z]*", elements)
 
-    system = generate.system(elements, feature_name=feature_name)
+    system = generate.system(elements, property_name=property_name)
     if system is not None:
 
         alloys, percentages, values = system
