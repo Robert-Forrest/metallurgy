@@ -6,14 +6,14 @@
 Welcome to Metallurgy's documentation!
 ====================================
 
-Metallurgy is a Python package for creating alloys of chemical
-elements, and investigating their properties.
+.. automodule:: metallurgy
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-   installation
 
 Indices and tables
 ==================
