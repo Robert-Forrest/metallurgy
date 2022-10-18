@@ -9,6 +9,7 @@ from elementy.periodictable import PeriodicTable
 from .linear_mixture import linear_mixture
 from .deviation import deviation
 from .alloy import Alloy
+from .calculate import calculate
 from . import features
 from . import density
 from . import valence
@@ -19,7 +20,6 @@ from . import viscosity
 from . import price
 from . import generate
 from . import ratios
-from .calculate import calculate
 from . import plots
 from . import analyse
 
