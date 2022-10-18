@@ -11,8 +11,8 @@ Welcome to Metallurgy's documentation!
 
    api.rst
 
-.. toctree::
-   :caption: Index
-   :hidden:
+Indices and tables
+==================
 
-   genindex
+* :ref:`genindex`
+* :ref:`modindex`
