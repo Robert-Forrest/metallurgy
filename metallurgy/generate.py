@@ -200,7 +200,7 @@ def system(
     step: Union[int, float] = 1,
     min_percent: Union[int, float] = 0,
     max_percent: Union[int, float] = 100,
-    feature_name: Optional[str] = None,
+    property_name: Optional[str] = None,
     quaternary: Optional[dict] = None,
 ):
     """Generate a set of alloys in a particular elemental composition-space.
@@ -216,17 +216,17 @@ def system(
         elements = re.findall("[A-Z][^A-Z]*", elements)
 
     if len(elements) == 2:
-        return binary(elements, step, feature_name)
+        return binary(elements, step, property_name)
     elif len(elements) == 3:
         return ternary(
-            elements, step, min_percent, max_percent, feature_name, quaternary
+            elements, step, min_percent, max_percent, property_name, quaternary
         )
 
 
 def binary(
     elements: Union[list, str],
     step: Union[int, float] = 0.5,
-    feature_name: Optional[str] = None,
+    property_name: Optional[str] = None,
 ):
 
     if isinstance(elements, str):
@@ -245,8 +245,8 @@ def binary(
         percentages.append(x)
         x -= step
 
-    if feature_name is not None:
-        values = calculate(alloys, feature_name)
+    if property_name is not None:
+        values = calculate(alloys, property_name)
         return alloys, percentages, values
 
     return alloys, percentages
@@ -257,7 +257,7 @@ def ternary(
     step: Union[int, float] = 1,
     min_percent: Union[int, float] = 0,
     max_percent: Union[int, float] = 100,
-    feature_name: Optional[str] = None,
+    property_name: Optional[str] = None,
     quaternary: Optional[dict] = None,
 ):
     """Generate a set of ternary alloys.
@@ -312,8 +312,8 @@ def ternary(
                     alloys.append(alloy)
                     percentages.append(list(alloy.composition.values()))
 
-    if feature_name is not None:
-        values = calculate(alloys, feature_name)
+    if property_name is not None:
+        values = calculate(alloys, property_name)
         return alloys, percentages, values
 
     return alloys, percentages
