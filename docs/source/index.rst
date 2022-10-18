@@ -11,8 +11,8 @@ Welcome to Metallurgy's documentation!
 
    api.rst
 
-Indices and tables
-==================
+Index
+=====
 
 * :ref:`genindex`
 * :ref:`modindex`
