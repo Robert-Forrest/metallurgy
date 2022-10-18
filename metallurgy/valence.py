@@ -6,6 +6,19 @@ from .alloy import Alloy
 
 
 def valence_proportion(alloy, orbital):
+    """Returns the proportion of the valence electrons which are in a particular
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the valence proportion.
+
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [valence_proportion(a, orbital) for a in alloy]
     elif not isinstance(alloy, Alloy):
@@ -41,16 +54,64 @@ def valence_proportion(alloy, orbital):
 
 
 def s_valence(alloy):
+    """Returns the proportion of the valence electrons which are in the s
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the s-valence proportion.
+
+    """
     return valence_proportion(alloy, "s")
 
 
 def p_valence(alloy):
+    """Returns the proportion of the valence electrons which are in the p
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the p-valence proportion.
+
+    """
     return valence_proportion(alloy, "p")
 
 
 def d_valence(alloy):
+    """Returns the proportion of the valence electrons which are in the d
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the d-valence proportion.
+
+    """
     return valence_proportion(alloy, "d")
 
 
 def f_valence(alloy):
+    """Returns the proportion of the valence electrons which are in the f
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the f-valence proportion.
+
+    """
     return valence_proportion(alloy, "f")

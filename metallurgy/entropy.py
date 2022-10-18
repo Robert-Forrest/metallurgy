@@ -7,6 +7,17 @@ from .alloy import Alloy
 
 
 def ideal_entropy(alloy):
+    """Returns the ideal entropy of an alloy.
+
+    :group: calculations.entropy
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the ideal entropy.
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [ideal_entropy(a) for a in list(alloy)]
     elif not isinstance(alloy, Alloy):
@@ -22,6 +33,17 @@ def ideal_entropy(alloy):
 
 
 def ideal_entropy_xia(alloy):
+    """Returns Xia's ideal entropy of an alloy.
+
+    :group: calculations.entropy
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate Xia's ideal entropy.
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [ideal_entropy_xia(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
@@ -48,6 +70,17 @@ def ideal_entropy_xia(alloy):
 
 
 def mismatch_entropy(alloy):
+    """Returns the mismatch entropy of an alloy.
+
+    :group: calculations.entropy
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the mismatch entropy.
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mismatch_entropy(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
@@ -111,6 +144,17 @@ def mismatch_entropy(alloy):
 
 
 def mixing_entropy(alloy):
+    """Returns the mixing entropy of an alloy.
+
+    :group: calculations.entropy
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the mixing entropy.
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_entropy(a) for a in alloy]
     elif not isinstance(alloy, Alloy):

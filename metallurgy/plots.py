@@ -18,6 +18,17 @@ def binary(
     use_colorline=False,
     save_path=None,
 ):
+    """Plots an alloy property across a binary alloy composition.
+
+    :group: plots
+
+    Parameters
+    ----------
+
+    alloys : List[mg.Alloy, str, dict]
+        The alloys across the binary composition
+    """
+
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
 
@@ -104,6 +115,16 @@ def ternary_heatmap(
     ax=None,
     showColorbar=True,
 ):
+    """Plots an alloy property across a ternary alloy composition.
+
+    :group: plots
+
+    Parameters
+    ----------
+
+    alloys : List[mg.Alloy, str, dict]
+        The alloys across the ternary composition
+    """
 
     scale = 1 / step
     multiple = 0.1 / step

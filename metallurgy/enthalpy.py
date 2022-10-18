@@ -18,14 +18,14 @@ def Gamma(element_a: str, element_b: str) -> Union[Number, None]:
     """Calculates the gamma term of the Miedema model.
     See equation 1 of: http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
-    :group: calculations
+    :group: calculations.enthalpy
 
     Parameters
     ----------
 
     element_a : str
         The periodic table symbol of element A
-    element_a : str
+    element_b : str
         The periodic table symbol of element B
     """
 
@@ -48,7 +48,7 @@ def calculate_QPR(
     """Calculates the Q, P, and R factors of the Miedema model.
     See equation 1 of: http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
-    :group: calculations
+    :group: calculations.enthalpy
 
     Parameters
     ----------
@@ -99,7 +99,7 @@ def calculate_electronegativity_enthalpy_component(
     Miedema model of mixing enthalpy.  See equation 1 of:
     http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
-    :group: calculations
+    :group: calculations.enthalpy
 
     Parameters
     ----------
@@ -128,7 +128,7 @@ def calculate_WS_enthalpy_component(
     gamma factor in the Miedema model of mixing enthalpy.  See equation 1 of:
     http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
-    :group: calculations
+    :group: calculations.enthalpy
 
     Parameters
     ----------
@@ -217,39 +217,56 @@ def calculate_corrected_volume(
         :func:`~metallurgy.enthalpy.calculate_surface_concentration`.
     """
 
-    pureV = mg.periodic_table.elements[element_a]["volume_miedema"]
+    pure_volume_a = mg.periodic_table.elements[element_a]["volume_miedema"]
 
-    electronegativityDiff = (
+    electronegativity_difference = (
         mg.periodic_table.elements[element_a]["electronegativity_miedema"]
         - mg.periodic_table.elements[element_b]["electronegativity_miedema"]
     )
 
-    a = None
+    valence_factor = None
     if element_a in ["Ca", "Sr", "Ba"]:
-        a = 0.04
+        valence_factor = 0.04
     elif element_a in ["Ru", "Rh", "Pd", "Os", "Ir", "Pt", "Au"]:
-        a = 0.07
+        valence_factor = 0.07
 
-    if a is None:
+    if valence_factor is None:
         if mg.periodic_table.elements[element_a]["series"] == "alkaliMetal":
-            a = 0.14
+            valence_factor = 0.14
         elif mg.periodic_table.elements[element_a]["valence_electrons"] == 2:
-            a = 0.1
+            valence_factor = 0.1
         elif mg.periodic_table.elements[element_a]["valence_electrons"] == 3:
-            a = 0.07
+            valence_factor = 0.07
         else:
-            a = 0.04
+            valence_factor = 0.04
 
     f_AB = 1 - surface_concentration_a
 
-    correctedV = (pureV ** (2.0 / 3.0)) * (
-        1 + a * f_AB * electronegativityDiff
+    corrected_volume_a = (pure_volume_a ** (2.0 / 3.0)) * (
+        1 + valence_factor * f_AB * electronegativity_difference
     )
 
-    return correctedV
+    return corrected_volume_a
 
 
-def calculate_interface_enthalpy(element_a, element_b, volumeA):
+def calculate_interface_enthalpy(
+    element_a: str, element_b: str, volume_a: Number
+) -> Number:
+    """Calculates the interfacial enthalpy term of the Miedema model.  See
+    equation 1 of: http://dx.doi.org/10.1016/j.cpc.2016.08.013
+
+    :group: calculations.enthalpy
+
+    Parameters
+    ----------
+
+    element_a : str
+        The periodic table symbol of element A.
+    element_b : str
+        The periodic table symbol of element B.
+    volume_a : Number
+        The atomic volume of element A.
+    """
 
     density_a = mg.periodic_table.elements[element_a][
         "wigner_seitz_electron_density"
@@ -262,30 +279,32 @@ def calculate_interface_enthalpy(element_a, element_b, volumeA):
     if gamma is not None:
         return (
             2
-            * volumeA
+            * volume_a
             * gamma
             / (density_a ** (-1.0 / 3.0) + density_b ** (-1.0 / 3.0))
         )
 
 
-def calculate_topological_enthalpy(composition):
-    topological_enthalpy = 0
-    for element in composition:
-        topological_enthalpy += (
-            mg.periodic_table.elements[element]["fusion_enthalpy"]
-            * composition[element]
-        )
+def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
+    """Calculates the Miedema model mixing enthalpy.  See equation 15a of:
+    http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
-    return topological_enthalpy
+    :group: calculations.enthalpy
 
+    Parameters
+    ----------
 
-def mixing_enthalpy(alloy):
+    alloy : Alloy, str, dict
+        Alloy to calculate the mixing enthalpy of.
+
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_enthalpy(a) for a in list(alloy)]
     elif not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    if len(alloy.elements) > 1:
+    if alloy.num_elements > 1:
 
         elementPairs = [
             (a, b)
@@ -295,13 +314,13 @@ def mixing_enthalpy(alloy):
 
         total_mixing_enthalpy = 0
         for pair in elementPairs:
-            tmpComposition = {}
-            subComposition = 0
+            tmp_composition = {}
+            sub_composition = 0
             for element in pair:
-                subComposition += alloy.composition[element]
+                sub_composition += alloy.composition[element]
             for element in pair:
-                tmpComposition[element] = (
-                    alloy.composition[element] / subComposition
+                tmp_composition[element] = (
+                    alloy.composition[element] / sub_composition
                 )
 
             surface_concentration_a = None
@@ -314,7 +333,7 @@ def mixing_enthalpy(alloy):
             for _ in range(10):
 
                 surface_concentration_a = calculate_surface_concentration(
-                    pair, [V_A_alloy, V_B_alloy], tmpComposition
+                    pair, [V_A_alloy, V_B_alloy], tmp_composition
                 )
 
                 V_A_alloy = calculate_corrected_volume(

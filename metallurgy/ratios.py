@@ -7,6 +7,19 @@ from .alloy import Alloy
 def shell_valence_electron_concentration_ratio(
     alloy, period=None, valence_electrons=None
 ):
+    """Returns the ratio between shell number and valence electron concentration
+    of an alloy.
+
+    :group: calculations.ratios
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the ratio.
+
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [shell_valence_electron_concentration_ratio(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
@@ -21,6 +34,18 @@ def shell_valence_electron_concentration_ratio(
 
 
 def shell_mendeleev_number_ratio(alloy, period=None, mendeleev=None):
+    """Returns the ratio between shell number and Mendeleev number of an alloy.
+
+    :group: calculations.ratios
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the ratio.
+
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [shell_mendeleev_number_ratio(a) for a in alloy]
     elif not isinstance(alloy, Alloy):

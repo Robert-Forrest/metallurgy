@@ -19,6 +19,8 @@ def radius_gamma(
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the radius gamma property for an alloy.
 
+    :group: calculations.radii
+
     Parameters
     ----------
 
@@ -66,6 +68,8 @@ def lattice_distortion(
     alloy: Union[Alloy, str, dict]
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the lattice distortion of an alloy.
+
+    :group: calculations.radii
 
     Parameters
     ----------

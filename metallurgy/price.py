@@ -18,6 +18,8 @@ def price(
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the approximate price per kilogramme of an alloy.
 
+    :group: calculations.price
+
     Parameters
     ----------
 

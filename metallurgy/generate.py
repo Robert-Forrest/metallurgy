@@ -14,6 +14,16 @@ def random_alloy(
     percentage_constraints={},
     allowed_elements=[e for e in elementy.PeriodicTable().elements],
 ):
+    """Generate a random alloy.
+
+    :group: alloy.generate
+
+    Parameters
+    ----------
+
+    min_elements : int
+        Minimum number of elements in the random alloy.
+    """
 
     if isinstance(percentage_constraints, (list)):
         parsed_percentage_constraints = {}
@@ -75,6 +85,16 @@ def random_alloys(
     percentage_constraints: dict = {},
     allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
 ):
+    """Generate multiple random alloys.
+
+    :group: alloy.generate
+
+    Parameters
+    ----------
+
+    min_elements : int
+        Minimum number of elements in the random alloy.
+    """
 
     return [
         random_alloy(
@@ -88,6 +108,15 @@ def random_alloys(
 
 
 def mixture(alloys, weights: Optional[list] = None):
+    """Mix some alloys.
+
+    :group: alloy.generate
+
+    Parameters
+    ----------
+
+
+    """
 
     shared_composition_space = []
     for alloy in alloys:
@@ -174,6 +203,14 @@ def system(
     feature_name: Optional[str] = None,
     quaternary: Optional[dict] = None,
 ):
+    """Generate a set of alloys in a particular elemental composition-space.
+
+    :group: alloy.generate
+
+    Parameters
+    ----------
+
+    """
 
     if isinstance(elements, str):
         elements = re.findall("[A-Z][^A-Z]*", elements)
@@ -223,6 +260,14 @@ def ternary(
     feature_name: Optional[str] = None,
     quaternary: Optional[dict] = None,
 ):
+    """Generate a set of ternary alloys.
+
+    :group: alloy.generate
+
+    Parameters
+    ----------
+
+    """
 
     if isinstance(elements, str):
         elements = re.findall("[A-Z][^A-Z]*", elements)

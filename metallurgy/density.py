@@ -9,26 +9,28 @@ from typing import Union, List
 from collections.abc import Iterable
 
 import metallurgy as mg
-from .alloy import Alloy
 
 
 def theoretical_density(
-    alloy: Union[Alloy, str, dict]
+    alloy: Union[mg.Alloy, str, dict]
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the theoretical density of an alloy.
+
+    :group: calculations.density
 
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy : mg.Alloy, str, dict
         The alloy for which to calculate the theoretcial density.
 
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [theoretical_density(a) for a in list(alloy)]
-    elif not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
+
+    if not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
 
     massFractions = {}
     masses = {}

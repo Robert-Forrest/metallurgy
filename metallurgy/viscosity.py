@@ -10,6 +10,17 @@ from .alloy import Alloy
 
 
 def viscosity(alloy):
+    """Returns the approximate viscosity of an alloy.
+
+    :group: calculations.viscosity
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the viscosity.
+
+    """
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [viscosity(a) for a in alloy]
     elif not isinstance(alloy, Alloy):
