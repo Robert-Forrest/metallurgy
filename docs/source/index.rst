@@ -7,12 +7,12 @@ Welcome to Metallurgy's documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :caption: API Reference
 
-Indices and tables
-==================
+   api.rst
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :caption: Index
+   :hidden:
+
+   genindex
