@@ -38,7 +38,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_immaterial",
     "sphinx_immaterial.apidoc.python.apigen",
-    "sphinx_search.extension",
+    # "sphinx_search.extension",
 ]
 autoapi_dirs = ["../../metallurgy"]
 
