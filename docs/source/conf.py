@@ -12,8 +12,10 @@
 #
 # import os
 # import sys
-# sys.path.insert(0, os.path.abspath('.'))
+# sys.path.insert(0, os.path.abspath("."))
 
+import inspect
+import metallurgy as mg
 
 # -- Project information -----------------------------------------------------
 
@@ -148,7 +150,10 @@ epub_show_urls = "footnote"
 
 
 # Python apigen configuration
-python_apigen_modules = {
-    "metallurgy": "api/metallurgy.",
-    "metallurgy.enthalpy": "api/metallurgy.enthalpy.",
-}
+python_apigen_modules = {"metallurgy": "api/metallurgy."}
+
+modules = inspect.getmembers(mg, inspect.ismodule)
+for module in modules:
+    python_apigen_modules["metallurgy." + module[0]] = (
+        "api/metallurgy." + module[0] + "."
+    )
