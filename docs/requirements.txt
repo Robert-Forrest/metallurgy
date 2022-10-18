@@ -1,3 +1,4 @@
 sphinx
 sphinx-autoapi
 git+https://github.com/jbms/sphinx-immaterial.git
+readthedocs-sphinx-search
