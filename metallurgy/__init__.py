@@ -10,7 +10,7 @@ from .linear_mixture import linear_mixture
 from .deviation import deviation
 from .alloy import Alloy
 from .calculate import calculate
-from . import features
+from . import properties
 from . import density
 from . import valence
 from . import entropy
@@ -66,7 +66,7 @@ __all__ = [
     "plots",
     "generate",
     "calculate",
-    "features",
+    "properties",
     "analyse",
     "model",
     "set_model",
