@@ -1,13 +1,19 @@
+"""Entropy related calculations"""
+
+from typing import Union, List
 from collections.abc import Iterable
+from numbers import Number
 
 import numpy as np
 
 import metallurgy as mg
-from .alloy import Alloy
 
 
-def ideal_entropy(alloy):
-    """Returns the ideal entropy of an alloy.
+def ideal_entropy(
+    alloy: Union[mg.Alloy, str, dict]
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the ideal entropy of an alloy. See equation 4 of
+    https://doi.org/10.1016/j.chemphys.2020.110898.
 
     :group: calculations.entropy
 
@@ -20,8 +26,9 @@ def ideal_entropy(alloy):
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [ideal_entropy(a) for a in list(alloy)]
-    elif not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
+
+    if not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
 
     total_ideal_entropy = 0
     for element in alloy.elements:
@@ -32,8 +39,11 @@ def ideal_entropy(alloy):
     return -total_ideal_entropy
 
 
-def ideal_entropy_xia(alloy):
-    """Returns Xia's ideal entropy of an alloy.
+def ideal_entropy_xia(
+    alloy: Union[mg.Alloy, str, dict]
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns Xia's ideal entropy of an alloy. See equation 8 of
+    http://dx.doi.org/10.1063/1.2345259.
 
     :group: calculations.entropy
 
@@ -46,8 +56,9 @@ def ideal_entropy_xia(alloy):
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [ideal_entropy_xia(a) for a in alloy]
-    elif not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
+
+    if not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
 
     cube_sum = 0
     for element in alloy.elements:
@@ -56,9 +67,9 @@ def ideal_entropy_xia(alloy):
             * mg.periodic_table.elements[element]["atomic_volume"]
         )
 
-    ideal_entropy = 0
+    ideal_entropy_x = 0
     for element in alloy.composition:
-        ideal_entropy += alloy.composition[element] * np.log(
+        ideal_entropy_x += alloy.composition[element] * np.log(
             (
                 alloy.composition[element]
                 * mg.periodic_table.elements[element]["atomic_volume"]
@@ -66,11 +77,14 @@ def ideal_entropy_xia(alloy):
             / cube_sum
         )
 
-    return -ideal_entropy
+    return -ideal_entropy_x
 
 
-def mismatch_entropy(alloy):
-    """Returns the mismatch entropy of an alloy.
+def mismatch_entropy(
+    alloy: Union[mg.Alloy, str, dict]
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the mismatch entropy of an alloy. See equation 2 of
+    https://doi.org/10.2320/matertrans1989.41.1372.
 
     :group: calculations.entropy
 
@@ -83,10 +97,11 @@ def mismatch_entropy(alloy):
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mismatch_entropy(a) for a in alloy]
-    elif not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
 
-    if len(alloy.elements) == 1:
+    if not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
+
+    if alloy.num_elements == 1:
         return 0.0
 
     diameters = {}
@@ -112,21 +127,21 @@ def mismatch_entropy(alloy):
     for i in range(len(alloy.elements) - 1):
         for j in range(i + 1, len(alloy.elements)):
             element = alloy.elements[i]
-            otherElement = alloy.elements[j]
+            other_element = alloy.elements[j]
 
             y_1 += (
-                (diameters[element] + diameters[otherElement])
-                * ((diameters[element] - diameters[otherElement]) ** 2)
+                (diameters[element] + diameters[other_element])
+                * ((diameters[element] - diameters[other_element]) ** 2)
                 * alloy.composition[element]
-                * alloy.composition[otherElement]
+                * alloy.composition[other_element]
             )
 
             y_2 += (
                 diameters[element]
-                * diameters[otherElement]
-                * ((diameters[element] - diameters[otherElement]) ** 2)
+                * diameters[other_element]
+                * ((diameters[element] - diameters[other_element]) ** 2)
                 * alloy.composition[element]
-                * alloy.composition[otherElement]
+                * alloy.composition[other_element]
             )
 
     y_1 /= sigma_3
@@ -143,8 +158,12 @@ def mismatch_entropy(alloy):
     )
 
 
-def mixing_entropy(alloy):
-    """Returns the mixing entropy of an alloy.
+def mixing_entropy(
+    alloy: Union[mg.Alloy, str, dict]
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the mixing entropy of an alloy, combining the
+    :func:`~metallurgy.entropy.ideal_entropy` and
+    :func:`~metallurgy.entropy.mismatch_entropy`.
 
     :group: calculations.entropy
 
@@ -157,13 +176,14 @@ def mixing_entropy(alloy):
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_entropy(a) for a in alloy]
-    elif not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
+
+    if not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
 
     ideal = ideal_entropy(alloy)
     mismatch = mismatch_entropy(alloy)
 
     if ideal is not None and mismatch is not None:
         return ideal + mismatch
-    else:
-        return None
+
+    return None

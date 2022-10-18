@@ -7,14 +7,16 @@ Module providing density related calculations.
 
 from typing import Union, List
 from collections.abc import Iterable
+from numbers import Number
 
 import metallurgy as mg
 
 
 def theoretical_density(
     alloy: Union[mg.Alloy, str, dict]
-) -> Union[float, None, List[Union[float, None]]]:
-    """Returns the theoretical density of an alloy.
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the theoretical density of an alloy.  See equation 8 of
+    https://doi.org/10.1016/j.jnoncrysol.2019.03.001.
 
     :group: calculations.density
 
@@ -32,22 +34,22 @@ def theoretical_density(
     if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    massFractions = {}
+    mass_fractions = {}
     masses = {}
-    totalMass = 0
+    total_mass = 0
     for element in alloy.elements:
         masses[element] = mg.periodic_table.elements[element]["mass"]
-        totalMass += masses[element] * alloy.composition[element]
+        total_mass += masses[element] * alloy.composition[element]
 
     for element in alloy.elements:
-        massFractions[element] = (
-            alloy.composition[element] * masses[element] / totalMass
+        mass_fractions[element] = (
+            alloy.composition[element] * masses[element] / total_mass
         )
 
     total = 0
     for element in alloy.elements:
         total += (
-            massFractions[element]
+            mass_fractions[element]
             / mg.periodic_table.elements[element]["density"]
         )
 

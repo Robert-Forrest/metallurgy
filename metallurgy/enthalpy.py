@@ -14,7 +14,7 @@ import numpy as np
 import metallurgy as mg
 
 
-def Gamma(element_a: str, element_b: str) -> Union[Number, None]:
+def gamma(element_a: str, element_b: str) -> Union[Number, None]:
     """Calculates the gamma term of the Miedema model.
     See equation 1 of: http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
@@ -38,8 +38,8 @@ def Gamma(element_a: str, element_b: str) -> Union[Number, None]:
             + calculate_WS_enthalpy_component(element_a, element_b, Q)
             - R
         )
-    else:
-        return None
+
+    return None
 
 
 def calculate_QPR(
@@ -114,11 +114,11 @@ def calculate_electronegativity_enthalpy_component(
         metals, and P=12.35 for one of each kind.
     """
 
-    electronegativityDiff = (
+    electronegativity_difference = (
         mg.periodic_table.elements[element_a]["electronegativity_miedema"]
         - mg.periodic_table.elements[element_b]["electronegativity_miedema"]
     )
-    return -P * (electronegativityDiff**2)
+    return -P * (electronegativity_difference**2)
 
 
 def calculate_WS_enthalpy_component(
@@ -192,10 +192,10 @@ def calculate_surface_concentration(
        Dictionary containing the percentage of each element in the surface composition.
     """
 
-    reduced_vol_A = composition[elements[0]] * (volumes[0] ** (2.0 / 3.0))
-    reduced_vol_B = composition[elements[1]] * (volumes[1] ** (2.0 / 3.0))
+    reduced_vol_a = composition[elements[0]] * (volumes[0] ** (2.0 / 3.0))
+    reduced_vol_b = composition[elements[1]] * (volumes[1] ** (2.0 / 3.0))
 
-    return reduced_vol_A / (reduced_vol_A + reduced_vol_B)
+    return reduced_vol_a / (reduced_vol_a + reduced_vol_b)
 
 
 def calculate_corrected_volume(
@@ -275,14 +275,16 @@ def calculate_interface_enthalpy(
         "wigner_seitz_electron_density"
     ]
 
-    gamma = Gamma(element_a, element_b)
-    if gamma is not None:
-        return (
+    _gamma = gamma(element_a, element_b)
+    if _gamma is not None:
+        interface_enthalpy = (
             2
             * volume_a
-            * gamma
+            * _gamma
             / (density_a ** (-1.0 / 3.0) + density_b ** (-1.0 / 3.0))
         )
+
+        return interface_enthalpy
 
 
 def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
@@ -296,24 +298,24 @@ def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
 
     alloy : Alloy, str, dict
         Alloy to calculate the mixing enthalpy of.
-
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_enthalpy(a) for a in list(alloy)]
-    elif not isinstance(alloy, mg.Alloy):
+
+    if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
     if alloy.num_elements > 1:
 
-        elementPairs = [
+        element_pairs = [
             (a, b)
             for idx, a in enumerate(alloy.elements)
             for b in alloy.elements[idx + 1 :]
         ]
 
         total_mixing_enthalpy = 0
-        for pair in elementPairs:
+        for pair in element_pairs:
             tmp_composition = {}
             sub_composition = 0
             for element in pair:
@@ -324,41 +326,41 @@ def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
                 )
 
             surface_concentration_a = None
-            V_A_alloy = mg.periodic_table.elements[pair[0]]["volume_miedema"]
-            V_B_alloy = mg.periodic_table.elements[pair[1]]["volume_miedema"]
+            volume_a = mg.periodic_table.elements[pair[0]]["volume_miedema"]
+            volume_b = mg.periodic_table.elements[pair[1]]["volume_miedema"]
 
-            if V_A_alloy is None or V_B_alloy is None:
+            if volume_a is None or volume_b is None:
                 return None
 
             for _ in range(10):
 
                 surface_concentration_a = calculate_surface_concentration(
-                    pair, [V_A_alloy, V_B_alloy], tmp_composition
+                    pair, [volume_a, volume_b], tmp_composition
                 )
 
-                V_A_alloy = calculate_corrected_volume(
+                volume_a = calculate_corrected_volume(
                     pair[0], pair[1], surface_concentration_a
                 )
 
-                V_B_alloy = calculate_corrected_volume(
+                volume_b = calculate_corrected_volume(
                     pair[1], pair[0], 1 - surface_concentration_a
                 )
 
-            interface_AB = calculate_interface_enthalpy(
-                pair[0], pair[1], V_A_alloy
+            interface_ab = calculate_interface_enthalpy(
+                pair[0], pair[1], volume_a
             )
-            interface_BA = calculate_interface_enthalpy(
-                pair[1], pair[0], V_B_alloy
+            interface_ba = calculate_interface_enthalpy(
+                pair[1], pair[0], volume_b
             )
 
-            if interface_AB is not None and interface_BA is not None:
+            if interface_ab is not None and interface_ba is not None:
 
                 chemical_enthalpy = (
                     alloy.composition[pair[0]]
                     * alloy.composition[pair[1]]
                     * (
-                        (1 - surface_concentration_a) * interface_AB
-                        + surface_concentration_a * interface_BA
+                        (1 - surface_concentration_a) * interface_ab
+                        + surface_concentration_a * interface_ba
                     )
                 )
                 total_mixing_enthalpy += chemical_enthalpy
@@ -372,81 +374,160 @@ def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
     return total_mixing_enthalpy
 
 
-def mixing_Gibbs_free_energy(alloy):
+def mixing_Gibbs_free_energy(alloy: Union[mg.Alloy, str, dict]) -> Number:
+    """Calculates the Gibbs free energy of mixing.
+
+    :group: calculations.enthalpy
+
+    Parameters
+    ----------
+
+    alloy : Alloy, str, dict
+        Alloy to calculate the Gibbs free energy of mixing of.
+
+    """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_Gibbs_free_energy(a) for a in list(alloy)]
-    elif not isinstance(alloy, mg.Alloy):
+
+    if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    H = mixing_enthalpy(alloy)
-    Tm = mg.linear_mixture(alloy, "melting_temperature")
-    S = mg.entropy.mixing_entropy(alloy)
+    mix_enthalpy = mixing_enthalpy(alloy)
+    melting_temperature = mg.linear_mixture(alloy, "melting_temperature")
+    mixing_entropy = mg.entropy.mixing_entropy(alloy)
 
-    if H is None or Tm is None or S is None:
+    if (
+        mix_enthalpy is None
+        or melting_temperature is None
+        or mixing_entropy is None
+    ):
         return None
-    return (H * 1e3) - Tm * S * mg.constants.idealGasConstant
+
+    return (
+        (mix_enthalpy * 1e3)
+        - melting_temperature * mixing_entropy * mg.constants.idealGasConstant
+    )
 
 
-def mismatch_PHS(alloy):
+def mismatch_PHS(alloy: Union[mg.Alloy, str, dict]) -> Number:
+    """Calculates the mismatch PHS factor. See
+    https://doi.org/10.1016/j.intermet.2012.11.020.
+
+    :group: calculations.enthalpy
+
+    Parameters
+    ----------
+
+    alloy : Alloy, str, dict
+        Alloy to calculate the PHS factor of.
+    """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mismatch_PHS(a) for a in list(alloy)]
-    elif not isinstance(alloy, mg.Alloy):
+
+    if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    H = mixing_enthalpy(alloy)
-    S = mg.entropy.mismatch_entropy(alloy)
+    mix_enthalpy = mixing_enthalpy(alloy)
+    mismatch_entropy = mg.entropy.mismatch_entropy(alloy)
 
-    if H is not None and S is not None:
-        return H * S
-    else:
-        return None
+    if mix_enthalpy is not None and mismatch_entropy is not None:
+        return mix_enthalpy * mismatch_entropy
+
+    return None
 
 
 def mixing_PHS(alloy):
+    """Calculates the mixing PHS factor. See
+    https://doi.org/10.1016/j.intermet.2012.11.020.
+
+    :group: calculations.enthalpy
+
+    Parameters
+    ----------
+
+    alloy : Alloy, str, dict
+        Alloy to calculate the PHS factor of.
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_PHS(a) for a in list(alloy)]
-    elif not isinstance(alloy, mg.Alloy):
+
+    if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    H = mixing_enthalpy(alloy)
-    S = mg.entropy.mixing_entropy(alloy)
+    mix_enthalpy = mixing_enthalpy(alloy)
+    mixing_entropy = mg.entropy.mixing_entropy(alloy)
 
-    if H is not None and S is not None:
-        return H * S
-    else:
-        return None
+    if mix_enthalpy is not None and mixing_entropy is not None:
+        return mix_enthalpy * mixing_entropy
+
+    return None
 
 
-def mixing_PHSS(alloy):
+def mixing_PHSS(alloy: Union[mg.Alloy, str, dict]) -> Number:
+    """Calculates the mismatch PHS factor. See
+    https://doi.org/10.1016/j.intermet.2012.11.020.
+
+    :group: calculations.enthalpy
+
+    Parameters
+    ----------
+
+    alloy : Alloy, str, dict
+        Alloy to calculate the PHSS factor of.
+    """
+
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [mixing_PHSS(a) for a in list(alloy)]
-    elif not isinstance(alloy, mg.Alloy):
+
+    if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    H = mixing_enthalpy(alloy)
-    Smix = mg.entropy.mixing_entropy(alloy)
-    Smismatch = mg.entropy.mismatch_entropy(alloy)
+    mix_enthalpy = mixing_enthalpy(alloy)
+    mixing_entropy = mg.entropy.mixing_entropy(alloy)
+    mismatch_entropy = mg.entropy.mismatch_entropy(alloy)
 
-    if H is None or Smix is None or Smismatch is None:
+    if (
+        mix_enthalpy is None
+        or mixing_entropy is None
+        or mismatch_entropy is None
+    ):
         return None
-    else:
-        return H * Smix * Smismatch
+
+    return mix_enthalpy * mixing_entropy * mismatch_entropy
 
 
-def thermodynamic_factor(alloy):
+def thermodynamic_factor(alloy: Union[mg.Alloy, str, dict]) -> Number:
+    """Calculates the thermodynamic factor.
+
+    :group: calculations.enthalpy
+
+    Parameters
+    ----------
+
+    alloy : Alloy, str, dict
+        Alloy to calculate the thermodynamic factor of mixing of.
+    """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [thermodynamic_factor(a) for a in list(alloy)]
-    elif not isinstance(alloy, mg.Alloy):
+
+    if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    Tm = mg.linear_mixture(alloy, "melting_temperature")
-    H = mixing_enthalpy(alloy)
-    S = mg.entropy.mixing_entropy(alloy)
+    melting_temperature = mg.linear_mixture(alloy, "melting_temperature")
+    mix_enthalpy = mixing_enthalpy(alloy)
+    mixing_entropy = mg.entropy.mixing_entropy(alloy)
 
-    if Tm is None or H is None or S is None:
+    if (
+        melting_temperature is None
+        or mix_enthalpy is None
+        or mixing_entropy is None
+    ):
         return None
 
-    return (Tm * S) / (np.abs(H * 1e3) + 1e-10)
+    return (melting_temperature * mixing_entropy) / (
+        np.abs(mix_enthalpy * 1e3) + 1e-10
+    )
