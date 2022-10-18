@@ -35,6 +35,8 @@ def calculate(
     function name in a metallurgy module, or be suffixed with _linearmix or
     _deviation to denote linear mixture or deviation of an elemental property.
 
+    :group: calculations
+
     Parameters
     ----------
 

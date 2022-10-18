@@ -26,6 +26,8 @@ def deviation(
     glass formation in metallic systems" for definition of the linear mixture:
     https://pubs.rsc.org/en/content/articlelanding/2022/dd/d2dd00026a
 
+    :group: calculations
+
     Parameters
     ----------
 

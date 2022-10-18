@@ -11,16 +11,19 @@ import elementy
 class Alloy:
     """An alloy, a mixture of chemical elements with specific percentages.
 
+    :group: alloy
+
     Attributes:
         composition: Dictionary matching element symbols to atomic
                             percentages.
         constraints: Dictionary of constraints to follow when adjusting
                             atomic percentages.
-
     """
 
     class Composition(dict):
         """Atomic percentages of elements in an alloy.
+
+        :group: alloy
 
         Attributes:
             on_change (Callable): Callback function enabling parent
