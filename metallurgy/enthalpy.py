@@ -530,7 +530,8 @@ def mixing_PHSS(alloy: Union[mg.Alloy, str, dict]) -> Number:
 
 
 def thermodynamic_factor(alloy: Union[mg.Alloy, str, dict]) -> Number:
-    """Calculates the thermodynamic factor.
+    """Calculates the thermodynamic factor. See equation 11 of
+    https://doi.org/10.1016/j.matdes.2020.108835.
 
     :group: calculations.enthalpy
 
@@ -539,6 +540,7 @@ def thermodynamic_factor(alloy: Union[mg.Alloy, str, dict]) -> Number:
 
     alloy : Alloy, str, dict
         Alloy to calculate the thermodynamic factor of mixing of.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
