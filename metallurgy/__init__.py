@@ -6,9 +6,9 @@ characteristics based on the linear mixture of elemental properties.
 
 from elementy.periodictable import PeriodicTable
 
+from .alloy import Alloy
 from .linear_mixture import linear_mixture
 from .deviation import deviation
-from .alloy import Alloy
 from .calculate import calculate
 from . import properties
 from . import density
