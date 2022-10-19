@@ -1,6 +1,7 @@
 # Metallurgy
 
 ![Tests](https://github.com/Robert-Forrest/metallurgy/actions/workflows/tests.yml/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/metallurgy/badge/?version=latest)](https://metallurgy.readthedocs.io/en/latest/?badge=latest)
 
 The Metallurgy package enables calculation of approximate properties of alloy
 mixtures, based on the linear mixture of elemental properties. 
@@ -192,8 +193,9 @@ particular material property on a population level:
 >>> mg.plots.binary(binary, mixing_enthalpies, ylabel="Mixing enthalpy (kJ/mol)")
 ```
 
-![CuZr binary mixing enthalpy](https://raw.githubusercontent.com/Robert-Forrest/metallurgy/main/images/CuZr_enthalpy.png "Mixing enthalpy across
-the Cu-Zr composition")
+![CuZr binary mixing
+enthalpy](https://raw.githubusercontent.com/Robert-Forrest/metallurgy/main/images/CuZr_enthalpy.png
+"Mixing enthalpy across the Cu-Zr composition")
 
 ```python
 >>> ternary, percentages = mg.generate.ternary(["Cu", "Zr", "Al"])
