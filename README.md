@@ -192,7 +192,7 @@ particular material property on a population level:
 >>> mg.plots.binary(binary, mixing_enthalpies, ylabel="Mixing enthalpy (kJ/mol)")
 ```
 
-![CuZr binary mixing enthalpy](images/CuZr_enthalpy.png "Mixing enthalpy across
+![CuZr binary mixing enthalpy](https://raw.githubusercontent.com/Robert-Forrest/metallurgy/main/images/CuZr_enthalpy.png "Mixing enthalpy across
 the Cu-Zr composition")
 
 ```python
@@ -201,7 +201,7 @@ the Cu-Zr composition")
 >>> mg.plots.ternary(ternary, mixing_enthalpies, label="Mixing enthalpy (kJ/mol)")
 ```
 
-![CuZrAl ternary mixing enthalpy](images/CuZrAl_enthalpy.png "Mixing enthalpy across
+![CuZrAl ternary mixing enthalpy](https://raw.githubusercontent.com/Robert-Forrest/metallurgy/main/images/CuZrAl_enthalpy.png "Mixing enthalpy across
 the Cu-Zr-Al composition")
 
 
@@ -211,7 +211,7 @@ the Cu-Zr-Al composition")
 >>> plt.hist(mg.linear_mixture(alloys, "density"))
 ```
 
-![Histogram of densities](images/AlloyDensities.png "Histogram of the density of 10,000
+![Histogram of densities](https://raw.githubusercontent.com/Robert-Forrest/metallurgy/main/images/AlloyDensities.png "Histogram of the density of 10,000
 random alloys")
 
 ## Documentation

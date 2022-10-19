@@ -5,9 +5,6 @@ build:
   tools:
     python: "3.10"
     nodejs: "16"
-  jobs:
-    post_build:
-      - cp -r images docs/build/html/
 
 sphinx:
   fail_on_warning: false
