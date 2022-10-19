@@ -7,7 +7,7 @@ build:
     nodejs: "16"
   jobs:
     post_build:
-      - bash cp -r images docs/build/html/
+      - cp -r images docs/build/html/
 
 sphinx:
   fail_on_warning: false
