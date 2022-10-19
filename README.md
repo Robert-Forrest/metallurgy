@@ -74,7 +74,7 @@ convert the composition to a simple string or even a LaTeX formatted string:
 Properties of alloys may be approximated from the properties of their
 constituent elements via the linear mixture rule:
 
-$$ \Sigma A = \sum_{i=1}^{N} c_i A_i \quad $$
+$$\Sigma A = \sum_{i=1}^{N} c_i A_i $$
 
 where $\Sigma A$ is the approximate mixed value of a property $A$ for an alloy
 that contains $N$ elements with percentages $c_i$. Similarly, the deviation of
@@ -141,10 +141,14 @@ or across a composition-space.
 
 ```python
 >>> mg.generate.binary(["Fe", "Co"], step=10)
-[Fe100, Fe90Co10, Fe80Co20, Fe70Co30, Fe60Co40, Fe50Co50, Co60Fe40, Co70Fe30, Co80Fe20, Co90Fe10, Co100]
+[Fe100, Fe90Co10, Fe80Co20, Fe70Co30, Fe60Co40, 
+Fe50Co50, Co60Fe40, Co70Fe30, Co80Fe20, Co90Fe10, Co100]
 
 >>> mg.generate.ternary(["Fe", "Co", "Al"], step=20)
-[Fe100, Fe80Co20, Fe80Al20, Fe60Co40, Fe60Co20Al20, Fe60Al40, Co60Fe40, Fe40Co40Al20, Fe40Al40Co20, Al60Fe40, Co80Fe20, Co60Fe20Al20, Co40Al40Fe20, Al60Fe20Co20, Al80Fe20, Co100, Co80Al20, Co60Al40, Al60Co40, Al80Co20, Al100]
+[Fe100, Fe80Co20, Fe80Al20, Fe60Co40, Fe60Co20Al20, 
+Fe60Al40, Co60Fe40, Fe40Co40Al20, Fe40Al40Co20, Al60Fe40, 
+Co80Fe20, Co60Fe20Al20, Co40Al40Fe20, Al60Fe20Co20, 
+Al80Fe20, Co100, Co80Al20, Co60Al40, Al60Co40, Al80Co20, Al100]
 
 >>> mg.generate.random_alloy()
 Cs28.9Db25.4Hs12Ce11.9La10.6Cu9.6Kr1.6
@@ -209,3 +213,7 @@ the Cu-Zr-Al composition")
 
 ![Histogram of densities](images/AlloyDensities.png "Histogram of the density of 10,000
 random alloys")
+
+## Documentation
+
+Documentation is available [here.](https://metallurgy.readthedocs.io/en/latest/api.html)

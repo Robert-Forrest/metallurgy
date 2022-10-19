@@ -1,3 +1,4 @@
 sphinx
 sphinx-autoapi
+sphinx_mdinclude
 git+https://github.com/jbms/sphinx-immaterial.git

@@ -36,8 +36,11 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
+    "sphinx_mdinclude",
     "sphinx_immaterial",
     "sphinx_immaterial.apidoc.python.apigen",
+    "sphinx_math_dollar",
+    "sphinx.ext.mathjax"
     # "sphinx_search.extension",
 ]
 autoapi_dirs = ["../../metallurgy"]
@@ -52,6 +55,18 @@ autodoc_default_options = {
 autodoc_typehints = "signature"
 autodoc_typehints_description_target = "documented"
 autodoc_typehints_format = "short"
+
+mathjax3_config = {
+    "tex2jax": {
+        "inlineMath": [["\\(", "\\)"]],
+        "displayMath": [["\\[", "\\]"]],
+    },
+    "tex": {
+        "inlineMath": [["\\(", "\\)"]],
+        "displayMath": [["\\[", "\\]"]],
+    },
+}
+
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
