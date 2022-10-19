@@ -22,6 +22,7 @@ from . import generate
 from . import ratios
 from . import plots
 from . import analyse
+from . import constants
 
 # from . import rdf
 
@@ -68,6 +69,7 @@ __all__ = [
     "calculate",
     "properties",
     "analyse",
+    "constants",
     "model",
     "set_model",
     "get_model",
