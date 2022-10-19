@@ -40,8 +40,8 @@ def test_thermodynamic_factor():
     )
 
 
-def test_Gamma():
-    assert mg.enthalpy.Gamma("Cu", "Zr") == pytest.approx(-13.605582368214959)
+def test_gamma():
+    assert mg.enthalpy.gamma("Cu", "Zr") == pytest.approx(-13.605582368214959)
 
 
 def test_calculate_QPR():

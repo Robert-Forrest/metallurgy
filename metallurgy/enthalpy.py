@@ -410,6 +410,36 @@ def mixing_Gibbs_free_energy(alloy: Union[mg.Alloy, str, dict]) -> Number:
     )
 
 
+def calculate_topological_enthalpy(alloy):
+    """Calculates the topological enthalpy. See equation 16b of
+    http://dx.doi.org/10.1016/j.cpc.2016.08.013
+
+    :group: calculations.enthalpy
+
+    Parameters
+    ----------
+
+    alloy : Alloy, str, dict
+        Alloy to calculate the topological enthalpy of.
+
+    """
+
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
+        return [mismatch_PHS(a) for a in list(alloy)]
+
+    if not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
+
+    topological_enthalpy = 0
+    for element in alloy.composition:
+        topological_enthalpy += (
+            mg.periodic_table.elements[element]["fusion_enthalpy"]
+            * alloy.composition[element]
+        )
+
+    return topological_enthalpy
+
+
 def mismatch_PHS(alloy: Union[mg.Alloy, str, dict]) -> Number:
     """Calculates the mismatch PHS factor. See
     https://doi.org/10.1016/j.intermet.2012.11.020.
