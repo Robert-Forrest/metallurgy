@@ -1,8 +1,5 @@
-"""``metallurgy.calculate``
-=============================
-
-Module providing an interface to all other calculation functions provided by metallurgy.
-
+"""Module providing an interface to all other calculation functions provided by
+metallurgy.
 """
 
 
@@ -10,7 +7,6 @@ import inspect
 from typing import Union, List
 
 import metallurgy as mg
-from .alloy import Alloy
 
 
 def is_mod_function(mod, func):
@@ -28,7 +24,7 @@ def list_functions(mod):
 
 
 def calculate(
-    alloy: Union[Alloy, str, dict], property_name: str
+    alloy: Union[mg.Alloy, str, dict], property_name: str
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the a particular property calculated for an alloy, using other
     calculation functions provided by metallurgy. The property_name must match a
@@ -40,9 +36,9 @@ def calculate(
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         The alloy for which to calculate a property.
-    property_name: str
+    property_name
         The property to calculate for the alloy.
     """
 

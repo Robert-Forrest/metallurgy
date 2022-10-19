@@ -1,11 +1,10 @@
 import re
-from typing import Union, Optional
+from typing import Union, Optional, List
 
 import numpy as np
 import elementy
 
-from .alloy import Alloy
-from .calculate import calculate
+import metallurgy as mg
 
 
 def random_alloy(
@@ -21,8 +20,9 @@ def random_alloy(
     Parameters
     ----------
 
-    min_elements : int
+    min_elements
         Minimum number of elements in the random alloy.
+
     """
 
     if isinstance(percentage_constraints, (list)):
@@ -66,7 +66,7 @@ def random_alloy(
     for j in range(len(elements)):
         composition[elements[j]] = percentages[j]
 
-    alloy = Alloy(
+    alloy = mg.Alloy(
         composition,
         constraints={
             "percentages": percentage_constraints,
@@ -92,8 +92,9 @@ def random_alloys(
     Parameters
     ----------
 
-    min_elements : int
+    min_elements
         Minimum number of elements in the random alloy.
+
     """
 
     return [
@@ -107,7 +108,7 @@ def random_alloys(
     ]
 
 
-def mixture(alloys, weights: Optional[list] = None):
+def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
     """Mix some alloys.
 
     :group: alloy.generate
@@ -115,6 +116,10 @@ def mixture(alloys, weights: Optional[list] = None):
     Parameters
     ----------
 
+    alloys
+        The alloys to be mixed.
+    weights
+        The weighting applied to the mixing of alloys.
 
     """
 
@@ -192,7 +197,7 @@ def mixture(alloys, weights: Optional[list] = None):
                     alloys[i].composition[element] * weights[i]
                 )
 
-    return Alloy(mixed_composition, constraints=constraints)
+    return mg.Alloy(mixed_composition, constraints=constraints)
 
 
 def system(
@@ -201,7 +206,6 @@ def system(
     min_percent: Union[int, float] = 0,
     max_percent: Union[int, float] = 100,
     property_name: Optional[str] = None,
-    quaternary: Optional[dict] = None,
 ):
     """Generate a set of alloys in a particular elemental composition-space.
 
@@ -209,6 +213,18 @@ def system(
 
     Parameters
     ----------
+
+    elements
+        The elements of the composition-space.
+    step
+        The percentage step between alloys in the composition-space.
+    min_percent
+        The minimum percentage of each element in alloys in the composition-space.
+    max_percent
+        The maximum percentage of each element in alloys in the
+        composition-space.
+    property_name
+        A property to calculate for all alloys in the set generated.
 
     """
 
@@ -228,6 +244,21 @@ def binary(
     step: Union[int, float] = 0.5,
     property_name: Optional[str] = None,
 ):
+    """Generate a set of binary alloys in a particular elemental composition-space.
+
+    :group: alloy.generate
+
+    Parameters
+    ----------
+
+    elements
+        The elements of the composition-space.
+    step
+        The percentage step between alloys in the composition-space.
+    property_name
+        A property to calculate for all alloys in the set generated.
+
+    """
 
     if isinstance(elements, str):
         elements = re.findall("[A-Z][^A-Z]*", elements)
@@ -237,7 +268,7 @@ def binary(
     percentages = []
     while x >= 0:
         alloys.append(
-            Alloy(
+            mg.Alloy(
                 elements[0] + str(x) + elements[1] + str(100 - x),
                 rescale=False,
             )
@@ -246,7 +277,7 @@ def binary(
         x -= step
 
     if property_name is not None:
-        values = calculate(alloys, property_name)
+        values = mg.calculate(alloys, property_name)
         return alloys, percentages, values
 
     return alloys, percentages
@@ -266,6 +297,20 @@ def ternary(
 
     Parameters
     ----------
+
+    elements
+        The elements of the composition-space.
+    step
+        The percentage step between alloys in the composition-space.
+    min_percent
+        The minimum percentage of each element in alloys in the composition-space.
+    max_percent
+        The maximum percentage of each element in alloys in the
+        composition-space.
+    property_name
+        A property to calculate for all alloys in the set generated.
+    quaternary
+        True if this ternary system is a member of an encompassing quaternary system.
 
     """
 
@@ -307,13 +352,13 @@ def ternary(
                             + str(quaternary[1])
                         )
 
-                    alloy = Alloy(composition_str, rescale=False)
+                    alloy = mg.Alloy(composition_str, rescale=False)
 
                     alloys.append(alloy)
                     percentages.append(list(alloy.composition.values()))
 
     if property_name is not None:
-        values = calculate(alloys, property_name)
+        values = mg.calculate(alloys, property_name)
         return alloys, percentages, values
 
     return alloys, percentages

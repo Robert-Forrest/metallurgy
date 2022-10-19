@@ -1,9 +1,4 @@
-"""``metallurgy.enthalpy``
-=============================
-
-Module providing enthalpy related calculations.
-
-"""
+"""Module providing enthalpy related calculations."""
 
 from collections.abc import Iterable
 from numbers import Number
@@ -23,9 +18,9 @@ def gamma(element_a: str, element_b: str) -> Union[Number, None]:
     Parameters
     ----------
 
-    element_a : str
+    element_a
         The periodic table symbol of element A
-    element_b : str
+    element_b
         The periodic table symbol of element B
     """
 
@@ -53,9 +48,9 @@ def calculate_QPR(
     Parameters
     ----------
 
-    element_a : str
+    element_a
         The periodic table symbol of element A
-    element_a : str
+    element_b
         The periodic table symbol of element B
     """
 
@@ -104,11 +99,11 @@ def calculate_electronegativity_enthalpy_component(
     Parameters
     ----------
 
-    element_a : str
+    element_a
         The periodic table symbol of element A
-    element_a : str
+    element_b
         The periodic table symbol of element B
-    P : Number
+    P
         An empirical factor dependent on the kinds of elements being
         mixed. P=14.1 for two transition metals, P=10.7 for two non-transition
         metals, and P=12.35 for one of each kind.
@@ -133,11 +128,11 @@ def calculate_WS_enthalpy_component(
     Parameters
     ----------
 
-    element_a : str
+    element_a
         The periodic table symbol of element A
-    element_b : str
+    element_b
         The periodic table symbol of element B
-    Q : Number
+    Q
         An empirical factor dependent on the kinds of elements being
         mixed. Dependent on the P factor discussed, Q = 9.4*P, discussed in
         documentation of
@@ -157,12 +152,14 @@ def wigner_seitz_electron_density_discontinuity_delta(
     gamma factor in the Miedema model of mixing enthalpy.  See equation 1 of:
     http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
+    :group: calculations.enthalpy
+
     Parameters
     ----------
 
-    element_a : str
+    element_a
         The periodic table symbol of element A
-    element_a : str
+    element_b
         The periodic table symbol of element B
     """
 
@@ -181,15 +178,18 @@ def calculate_surface_concentration(
     """Calculates the surface concentration in the Miedema model of mixing
     enthalpy.  See equation 2 of: http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
+    :group: calculations.enthalpy
+
     Parameters
     ----------
 
-    elements : List[str]
+    elements
         The elements being used to calculate the surface concentration.
-    volumes : List[Number]
+    volumes
         The atomic volumes of the elements.
-    composition : dict
-       Dictionary containing the percentage of each element in the surface composition.
+    composition
+        Dictionary containing the percentage of each element in the surface
+        composition.
     """
 
     reduced_vol_a = composition[elements[0]] * (volumes[0] ** (2.0 / 3.0))
@@ -205,16 +205,19 @@ def calculate_corrected_volume(
     as defined by the Meidema model.  See equation 2 of:
     http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
+    :group: calculations.enthalpy
+
     Parameters
     ----------
 
-    element_a : str
+    element_a
         The element for which to correct the volume.
-    element_b : str
+    element_b
         The other element in the alloy.
-    surface_concentration_a : Number
+    surface_concentration_a
         The surface concentration of element_a, as calculated by:
         :func:`~metallurgy.enthalpy.calculate_surface_concentration`.
+
     """
 
     pure_volume_a = mg.periodic_table.elements[element_a]["volume_miedema"]
@@ -260,12 +263,13 @@ def calculate_interface_enthalpy(
     Parameters
     ----------
 
-    element_a : str
+    element_a
         The periodic table symbol of element A.
-    element_b : str
+    element_b
         The periodic table symbol of element B.
-    volume_a : Number
+    volume_a
         The atomic volume of element A.
+
     """
 
     density_a = mg.periodic_table.elements[element_a][
@@ -296,8 +300,9 @@ def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         Alloy to calculate the mixing enthalpy of.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
@@ -382,7 +387,7 @@ def mixing_Gibbs_free_energy(alloy: Union[mg.Alloy, str, dict]) -> Number:
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         Alloy to calculate the Gibbs free energy of mixing of.
 
     """
@@ -419,7 +424,7 @@ def calculate_topological_enthalpy(alloy):
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         Alloy to calculate the topological enthalpy of.
 
     """
@@ -449,8 +454,9 @@ def mismatch_PHS(alloy: Union[mg.Alloy, str, dict]) -> Number:
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         Alloy to calculate the PHS factor of.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
@@ -477,8 +483,9 @@ def mixing_PHS(alloy):
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         Alloy to calculate the PHS factor of.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
@@ -505,8 +512,9 @@ def mixing_PHSS(alloy: Union[mg.Alloy, str, dict]) -> Number:
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         Alloy to calculate the PHSS factor of.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
@@ -538,7 +546,7 @@ def thermodynamic_factor(alloy: Union[mg.Alloy, str, dict]) -> Number:
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         Alloy to calculate the thermodynamic factor of mixing of.
 
     """

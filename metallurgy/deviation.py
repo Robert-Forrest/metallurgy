@@ -1,9 +1,4 @@
-"""``metallurgy.deviation``
-=============================
-
-Module enabling calculation of deviations of elemental properties in alloys.
-
-"""
+"""Module enabling calculation of deviations of elemental properties in alloys."""
 
 
 from typing import Union, List
@@ -13,17 +8,15 @@ from collections.abc import Iterable
 import numpy as np
 import metallurgy as mg
 
-from .alloy import Alloy
-
 
 def deviation(
-    alloy: Union[Alloy, str, dict], property_name: str
+    alloy: Union[mg.Alloy, str, dict], property_name: str
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the deviation of a particular elemental property in an
     alloy.
 
     See equation 6 of the paper "Machine-learning improves understanding of
-    glass formation in metallic systems" for definition of the linear mixture:
+    glass formation in metallic systems" for definition of the deviation:
     https://pubs.rsc.org/en/content/articlelanding/2022/dd/d2dd00026a
 
     :group: calculations
@@ -31,9 +24,9 @@ def deviation(
     Parameters
     ----------
 
-    alloy : Alloy, str, dict
+    alloy
         The alloy for which to calculate the linear mixture.
-    property_name : str
+    property_name
         The elemental property to calcualate the linear mixture of.
 
     """
@@ -43,8 +36,8 @@ def deviation(
         return [deviation(a, property_name) for a in list(alloy)]
 
     # Convert input alloy to an Alloy instance if not already
-    elif not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
+    elif not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
 
     # Deviation only makes sense for multi-element alloys
     if len(alloy.elements) > 1:

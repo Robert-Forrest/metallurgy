@@ -1,9 +1,4 @@
-"""``metallurgy.density``
-=============================
-
-Module providing density related calculations.
-
-"""
+"""Module providing density related calculations."""
 
 from typing import Union, List
 from collections.abc import Iterable
@@ -23,7 +18,7 @@ def theoretical_density(
     Parameters
     ----------
 
-    alloy : mg.Alloy, str, dict
+    alloy
         The alloy for which to calculate the theoretcial density.
 
     """

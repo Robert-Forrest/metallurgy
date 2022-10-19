@@ -20,8 +20,9 @@ def ideal_entropy(
     Parameters
     ----------
 
-    alloy : mg.Alloy, str, dict
+    alloy
         The alloy for which to calculate the ideal entropy.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
@@ -50,8 +51,9 @@ def ideal_entropy_xia(
     Parameters
     ----------
 
-    alloy : mg.Alloy, str, dict
+    alloy
         The alloy for which to calculate Xia's ideal entropy.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
@@ -91,8 +93,9 @@ def mismatch_entropy(
     Parameters
     ----------
 
-    alloy : mg.Alloy, str, dict
+    alloy
         The alloy for which to calculate the mismatch entropy.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
@@ -170,8 +173,9 @@ def mixing_entropy(
     Parameters
     ----------
 
-    alloy : mg.Alloy, str, dict
+    alloy
         The alloy for which to calculate the mixing entropy.
+
     """
 
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):

@@ -1,15 +1,15 @@
+from typing import Union, List
+from numbers import Number
 from collections.abc import Iterable
 
 import numpy as np
 
 import metallurgy as mg
-from . import enthalpy
-from . import linear_mixture
-from . import constants
-from .alloy import Alloy
 
 
-def viscosity(alloy):
+def viscosity(
+    alloy: Union[mg.Alloy, str, dict],
+) -> Union[Number, None, List[Union[Number, None]]]:
     """Returns the approximate viscosity of an alloy.
 
     :group: calculations.viscosity
@@ -17,14 +17,14 @@ def viscosity(alloy):
     Parameters
     ----------
 
-    alloy : mg.Alloy, str, dict
+    alloy : Alloy, str, dict
         The alloy for which to calculate the viscosity.
 
     """
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
         return [viscosity(a) for a in alloy]
-    elif not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
+    elif not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
 
     const = 3.077e-3
     elementalViscosity = {}
@@ -53,15 +53,15 @@ def viscosity(alloy):
             * np.log(
                 (elementalViscosity[element] * (mass / 1000))
                 / (
-                    constants.plankConstant
-                    * constants.avogadroNumber
+                    mg.constants.plankConstant
+                    * mg.constants.avogadroNumber
                     * (density)
                     * 1000
                 )
             )
         )
 
-    sum_aG *= constants.idealGasConstant
+    sum_aG *= mg.constants.idealGasConstant
 
     averageMolarVolume = 0
     for element in alloy.elements:
@@ -69,17 +69,17 @@ def viscosity(alloy):
             mg.periodic_table.elements[element]["molar_volume"] * 1.0e-6
         )
 
-    H = enthalpy.mixing_enthalpy(alloy)
+    H = mg.enthalpy.mixing_enthalpy(alloy)
     if H is None:
         return None
 
     return (
-        (constants.plankConstant * constants.avogadroNumber)
+        (mg.constants.plankConstant * mg.constants.avogadroNumber)
         / (averageMolarVolume)
     ) * np.exp(
         (sum_aG - 0.155 * H)
         / (
-            constants.idealGasConstant
-            * linear_mixture(alloy, "melting_temperature")
+            mg.constants.idealGasConstant
+            * mg.linear_mixture(alloy, "melting_temperature")
         )
     )

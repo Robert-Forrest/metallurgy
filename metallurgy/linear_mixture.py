@@ -11,12 +11,11 @@ from numbers import Number
 from collections.abc import Iterable
 
 import metallurgy as mg
-from .alloy import Alloy
 
 
 def linear_mixture(
-    alloy: Union[Alloy, str, dict], property_name: str
-) -> Union[float, None, List[Union[float, None]]]:
+    alloy: Union[mg.Alloy, str, dict], property_name: str
+) -> Union[Number, None, List[Union[Number, None]]]:
     """Returns the linear mixture of a particular elemental property of an
     alloy.
 
@@ -41,8 +40,8 @@ def linear_mixture(
         return [linear_mixture(a, property_name) for a in list(alloy)]
 
     # Convert input alloy to an Alloy instance if not already
-    elif not isinstance(alloy, Alloy):
-        alloy = Alloy(alloy)
+    elif not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
 
     # Calculate the linear mixture
     mixed_property = 0.0
