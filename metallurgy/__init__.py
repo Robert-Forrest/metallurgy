@@ -4,7 +4,7 @@ A tool for manipulating alloy compositions, and calculation of their approximate
 characteristics based on the linear mixture of elemental properties.
 """
 
-from elementy.periodictable import PeriodicTable
+from elementy import PeriodicTable
 
 from .alloy import Alloy
 from .linear_mixture import linear_mixture
