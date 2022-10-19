@@ -9,7 +9,10 @@ write_to = "metallurgy/_version.py"
 line-length = 79
 
 [tool.pytest.ini_options]
-addopts = "--cov=metallurgy"
+addopts = [
+    "--cov=metallurgy",
+    "--cov-report=term-missing"
+]
 testpaths = [
     "tests",
 ]
