@@ -11,6 +11,10 @@ Generation
 ^^^^^^^^^^
 .. python-apigen-group:: alloy.generate
 
+Utilities
+^^^^^^^^^
+.. python-apigen-group:: alloy.utils
+
 
 Calculations
 ------------
