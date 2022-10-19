@@ -1,7 +1,7 @@
 """Module enabling analysis of alloy data"""
 
 import re
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 from numbers import Number
 
 import numpy as np
@@ -10,7 +10,7 @@ import metallurgy as mg
 
 
 def find_max(
-    elements: list[str], property_name: str
+    elements: List[str], property_name: str
 ) -> Union[Tuple[mg.Alloy, Number], None]:
     """Finds the maximum value of a property in an alloy system.
 
@@ -40,7 +40,7 @@ def find_max(
 
 
 def find_min(
-    elements: list[str], property_name: str
+    elements: List[str], property_name: str
 ) -> Union[Tuple[mg.Alloy, Number], None]:
     """Finds the minimum value of a property in an alloy system.
 
