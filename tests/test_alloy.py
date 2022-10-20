@@ -19,7 +19,19 @@ def test_alloy_element_deletion():
 
     num_alloys = 100
     random_alloys = mg.generate.random_alloys(
-        num_alloys, min_elements=2, max_elements=2
+        num_alloys,
+        min_elements=2,
+        max_elements=2,
+    )
+
+    for alloy in random_alloys:
+        alloy.remove_element(alloy.elements[0])
+        assert alloy.to_string() == alloy.elements[0] + "100"
+
+    random_alloys = mg.generate.random_alloys(
+        num_alloys,
+        min_elements=2,
+        max_elements=2,
     )
 
     for alloy in random_alloys:
