@@ -12,6 +12,7 @@ def random_alloy(
     max_elements: int = 10,
     percentage_constraints={},
     allowed_elements=[e for e in elementy.PeriodicTable().elements],
+    constrain_alloy=False,
 ):
     """Generate a random alloy.
 
@@ -75,6 +76,9 @@ def random_alloy(
         },
     )
 
+    if not constrain_alloy:
+        alloy.constraints = None
+
     return alloy
 
 
@@ -84,6 +88,7 @@ def random_alloys(
     max_elements: int = 10,
     percentage_constraints: dict = {},
     allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
+    constrain_alloys=False,
 ):
     """Generate multiple random alloys.
 
@@ -103,6 +108,7 @@ def random_alloys(
             max_elements,
             percentage_constraints,
             allowed_elements,
+            constrain_alloy=constrain_alloys,
         )
         for _ in range(num_alloys)
     ]
@@ -122,6 +128,9 @@ def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
         The weighting applied to the mixing of alloys.
 
     """
+
+    if len(alloys) == 1:
+        return alloys[0]
 
     shared_composition_space = []
     for alloy in alloys:
