@@ -50,11 +50,11 @@ class Alloy:
             else:
                 if element in self.keys():
                     super().__delitem__(element)
-            self.on_change(change_type="set")
+            self.on_change()
 
         def __delitem__(self, element):
             super().__delitem__(element)
-            self.on_change(change_type="del")
+            self.on_change()
 
     def __init__(
         self,
@@ -106,16 +106,15 @@ class Alloy:
             value = self.Composition(value, self.on_composition_change)
         self._composition = value
 
-    def on_composition_change(self, change_type=None):
+    def on_composition_change(self):
         """Called when composition property changes.
 
         :group: alloy.utils
         """
         self.determine_percentage_constraints()
 
-        if change_type == "del":
-            self.clamp_composition()
-            self.round_composition()
+        if not hasattr(self, "rescaling"):
+            self.rescale()
 
     @property
     def elements(self) -> list:
@@ -140,6 +139,42 @@ class Alloy:
         :group: alloy
         """
         return sum(self.composition.values())
+
+    def add_element(self, element: str, percentage: Optional[float] = 0.0):
+        """Adds an element to the alloy composition.
+
+        :group: alloy
+
+        Parameters
+        ----------
+
+        element
+            Element to be added.
+        percentage
+            Percentage of the new element. If zero or not set, is given the
+            value of 1.0/(number of elements +1).
+
+        """
+        if element not in self.elements:
+            if percentage == 0.0:
+                percentage = 1.0 / (self.num_elements + 1)
+
+            self.composition[element] = percentage
+
+    def remove_element(self, element: str):
+        """Removes an element from the alloy composition.
+
+        :group: alloy
+
+        Parameters
+        ----------
+
+        element
+            Element to be removed.
+
+        """
+        if element in self.elements:
+            del self.composition[element]
 
     def ensure_constrained_elements_present(self):
         """Adds to the composition any elements with minimum percentage
@@ -167,6 +202,8 @@ class Alloy:
 
         :group: alloy.utils
         """
+
+        self.rescaling = True
 
         constraints_applied = False
         while not self.constraints_satisfied():
@@ -283,7 +320,9 @@ class Alloy:
 
         if not constraints_applied:
             self.clamp_composition()
-        self.round_composition()
+            self.round_composition()
+
+        delattr(self, "rescaling")
 
     def constrain_max_elements(self):
         """Removes elements from an alloy if there are more elements than
@@ -451,8 +490,13 @@ class Alloy:
 
         while np.abs(1 - self.total_percentage) > 10 ** (-sigfigs):
             current_total = self.total_percentage
+
             for element in self.elements:
+                if element not in self.composition:
+                    continue
+
                 clamped_value = self.composition[element] / current_total
+
                 if self.constraints is not None:
                     if element in self.constraints["percentages"]:
                         self.composition[element] = max(
