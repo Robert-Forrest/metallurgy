@@ -70,8 +70,7 @@ class Alloy:
         self.constraints = None
 
         if rescale:
-            self.clamp_composition()
-            self.round_composition()
+            self.rescale()
 
         if constraints is not None:
             self.constraints = parse_constraints(**constraints)
@@ -491,22 +490,22 @@ class Alloy:
         while np.abs(1 - self.total_percentage) > 10 ** (-sigfigs):
             current_total = self.total_percentage
 
-            for element in self.elements:
-                if element not in self.composition:
-                    continue
-
+            tmp_composition = copy.deepcopy(self.composition)
+            for element in self.composition:
                 clamped_value = self.composition[element] / current_total
 
                 if self.constraints is not None:
                     if element in self.constraints["percentages"]:
-                        self.composition[element] = max(
+                        tmp_composition[element] = max(
                             clamped_value,
                             self.constraints["percentages"][element]["min"],
                         )
                     else:
-                        self.composition[element] = clamped_value
+                        tmp_composition[element] = clamped_value
                 else:
-                    self.composition[element] = clamped_value
+                    tmp_composition[element] = clamped_value
+
+            self.composition = tmp_composition
 
     def determine_percentage_constraints(self):
         """Determine the current constraints on an alloy composition.
