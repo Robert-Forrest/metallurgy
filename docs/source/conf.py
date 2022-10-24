@@ -82,6 +82,8 @@ def linkcode_resolve(domain, info):
     if not info["module"]:
         return None
     filename = info["module"].replace(".", "/")
+    if filename == "metallurgy":
+        filename += "/__init__"
     return (
         "https://github.com/Robert-Forrest/metallurgy/blob/main/%s.py"
         % filename
