@@ -40,7 +40,8 @@ extensions = [
     "sphinx_immaterial",
     "sphinx_immaterial.apidoc.python.apigen",
     "sphinx_math_dollar",
-    "sphinx.ext.mathjax"
+    "sphinx.ext.mathjax",
+    "sphinx.ext.linkcode"
     # "sphinx_search.extension",
 ]
 autoapi_dirs = ["../../metallurgy"]
@@ -73,6 +74,19 @@ intersphinx_mapping = {
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
 }
 intersphinx_disabled_domains = ["std"]
+
+
+def linkcode_resolve(domain, info):
+    if domain != "py":
+        return None
+    if not info["module"]:
+        return None
+    filename = info["module"].replace(".", "/")
+    return (
+        "https://github.com/Robert-Forrest/metallurgy/blob/main/%s.py"
+        % filename
+    )
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
