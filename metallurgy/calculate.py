@@ -4,7 +4,7 @@ metallurgy.
 
 
 import inspect
-from typing import Union, List
+from typing import Union, List, Callable
 
 import metallurgy as mg
 
@@ -21,6 +21,29 @@ def list_functions(mod):
         for func in mod.__dict__.values()
         if is_mod_function(mod, func)
     ]
+
+
+def get_property_function(property_name: str) -> Union[Callable, None]:
+    """Get the function responsible for calculating a particular property, if it
+    exists in metallurgy.
+
+    :group: utils
+
+    Parameters
+    ----------
+
+    property_name
+        Name of the property to get the function for.
+
+    """
+
+    # Get all modules in metallurgy
+    modules = inspect.getmembers(mg, inspect.ismodule)
+    for module in modules:
+        # For each function in the module, check if the name matches the property
+        for func in list_functions(module[1]):
+            if func == property_name:
+                return getattr(module[1], func)
 
 
 def calculate(
@@ -61,13 +84,9 @@ def calculate(
         return mg.deviation(alloy, property_name.split("_deviation")[0])
     # Otherwise, check all function names to find a match to the property
     else:
-        # Get all modules in metallurgy
-        modules = inspect.getmembers(mg, inspect.ismodule)
-        for module in modules:
-            # For each function in the module, check if the name matches the property
-            for func in list_functions(module[1]):
-                if func == property_name:
-                    return getattr(module[1], func)(alloy)
+        property_function = get_property_function(property_name)
+        if property_function is not None:
+            return property_function(alloy)
 
         # If all else fails, try a simple linear mixture again
         return mg.linear_mixture(alloy, property_name)
