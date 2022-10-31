@@ -86,7 +86,12 @@ class Alloy:
         return self.to_string()
 
     def __eq__(self, other):
-        return self.to_string() == other.to_string()
+        if isinstance(other, Alloy):
+            return self.to_string() == other.to_string()
+        elif isinstance(other, str):
+            return self.to_string() == other
+        else:
+            raise NotImplementedError
 
     def __hash__(self):
         return hash(self.to_string())
@@ -594,7 +599,10 @@ class Alloy:
         self.constraints["local_percentages"] = tmp_percentages
 
     def to_string(self) -> str:
-        """Convert the alloy composition dict to a string"""
+        """Convert the alloy composition to a string
+
+        :group: alloy.utils
+        """
 
         composition_str = ""
         for element in self.elements:
