@@ -4,7 +4,10 @@ metallurgy.
 
 
 import inspect
-from typing import Union, List, Callable
+from dataclasses import fields
+from typing import Callable, List, Optional, Union
+
+import elementy
 
 import metallurgy as mg
 
@@ -46,6 +49,38 @@ def get_property_function(property_name: str) -> Union[Callable, None]:
                 return getattr(module[1], func)
 
 
+def get_all_properties() -> List[str]:
+    """Returns every calculatable property for alloy compositions.
+
+    :group: utils
+    """
+
+    properties = []
+
+    for p in fields(elementy.element.Element):
+        if p.name in ["name", "symbol"]:
+            continue
+        if (
+            p.type in [int, float, Optional[float]]
+            and p.name not in properties
+        ):
+            properties.append(p.name)
+
+    # Get all modules in metallurgy
+    modules = inspect.getmembers(mg, inspect.ismodule)
+    for module in modules:
+        for func in list_functions(module[1]):
+            argspec = inspect.getfullargspec(getattr(module[1], func))
+            if (
+                "alloy" in argspec.args
+                and len(argspec.args) == 1
+                and func not in properties
+            ):
+                properties.append(func)
+
+    return properties
+
+
 def calculate(
     alloy: Union[mg.Alloy, str, dict], property_name: str
 ) -> Union[float, None, List[Union[float, None]]]:
@@ -80,13 +115,13 @@ def calculate(
     # Check for simple linear mixture or deviations of elemental properties
     if "_linearmix" in property_name:
         return mg.linear_mixture(alloy, property_name.split("_linearmix")[0])
-    elif "_deviation" in property_name:
+    if "_deviation" in property_name:
         return mg.deviation(alloy, property_name.split("_deviation")[0])
-    # Otherwise, check all function names to find a match to the property
-    else:
-        property_function = get_property_function(property_name)
-        if property_function is not None:
-            return property_function(alloy)
 
-        # If all else fails, try a simple linear mixture again
-        return mg.linear_mixture(alloy, property_name)
+    # Otherwise, check all function names to find a match to the property
+    property_function = get_property_function(property_name)
+    if property_function is not None:
+        return property_function(alloy)
+
+    # If all else fails, try a simple linear mixture again
+    return mg.linear_mixture(alloy, property_name)

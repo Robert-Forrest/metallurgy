@@ -9,7 +9,7 @@ from elementy import PeriodicTable
 from .alloy import Alloy
 from .linear_mixture import linear_mixture
 from .deviation import deviation
-from .calculate import calculate, get_property_function
+from .calculate import calculate, get_property_function, get_all_properties
 from . import properties
 from . import density
 from . import valence
@@ -74,4 +74,5 @@ __all__ = [
     "set_model",
     "get_model",
     "get_property_function",
+    "get_all_properties",
 ]
