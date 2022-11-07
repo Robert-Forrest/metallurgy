@@ -45,7 +45,7 @@ class Alloy:
             Set the percentage value of an element in the composition.
             Remove elements from the composition if below minimum threshold.
             """
-            if percentage >= 0.01:
+            if percentage >= 0.0001:
                 super().__setitem__(element, percentage)
             else:
                 if element in self.keys():
