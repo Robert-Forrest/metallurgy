@@ -279,7 +279,6 @@ def binary(
         alloys.append(
             mg.Alloy(
                 elements[0] + str(x) + elements[1] + str(100 - x),
-                rescale=False,
             )
         )
         percentages.append(x)
@@ -361,7 +360,7 @@ def ternary(
                             + str(quaternary[1])
                         )
 
-                    alloy = mg.Alloy(composition_str, rescale=False)
+                    alloy = mg.Alloy(composition_str)
 
                     alloys.append(alloy)
                     percentages.append(list(alloy.composition.values()))
