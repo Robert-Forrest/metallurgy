@@ -88,8 +88,8 @@ class Alloy:
     def __eq__(self, other):
         if isinstance(other, Alloy):
             return self.to_string() == other.to_string()
-        elif isinstance(other, str):
-            return self.to_string() == other
+        elif isinstance(other, (str, dict)):
+            return self.to_string() == Alloy(other).to_string()
         else:
             raise NotImplementedError
 
