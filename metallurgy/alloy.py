@@ -638,6 +638,14 @@ class Alloy:
         numbers = re.compile(r"(\d+)")
         return numbers.sub(r"$_{\1}$", self.to_string())
 
+    def to_dict(self) -> dict:
+        """Convert the alloy composition to a dictionary
+
+        :group: alloy.utils
+        """
+        alloy_dict = {"composition": self.to_string()}
+        return alloy_dict
+
     def round_composition(self):
         """Round elemental percentages in composition while maintaining sum
 
