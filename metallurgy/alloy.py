@@ -1158,7 +1158,9 @@ def multiple_round(
 
     Parameters
     ----------
-        num: Value to round
-        multiple: Multiple-of to round towards
+    num
+        Value to round
+    multiple
+        Multiple-of to round towards
     """
     return multiple * round(num / multiple)
