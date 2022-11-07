@@ -67,3 +67,25 @@ def find_min(
         min_index = np.argmin(values)
 
         return alloys[min_index], values[min_index]
+
+
+def find_unique_elements(alloys: List[mg.Alloy]) -> List[str]:
+    """Finds the unique elements in a list of alloy composition.
+
+    :group: alloy.utils
+
+    Parameters
+    ----------
+
+    alloys
+        List of alloys in which to find the unique elements.
+
+    """
+
+    unique_elements = []
+    for alloy in alloys:
+        for element in alloy.elements:
+            if element not in unique_elements:
+                unique_elements.append(element)
+
+    return unique_elements
