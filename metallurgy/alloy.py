@@ -732,8 +732,9 @@ class Alloy:
                             constraints_violated = True
 
                 if not constraints_violated:
-                    integer_parts[decimal_part_index] += 1
-                    undershoot -= 1
+                    if decimal_part_index < len(integer_parts):
+                        integer_parts[decimal_part_index] += 1
+                        undershoot -= 1
                 i += 1
 
                 if i >= len(filtered_precedence_order):
