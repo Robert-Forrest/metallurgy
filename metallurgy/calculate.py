@@ -82,7 +82,9 @@ def get_all_properties() -> List[str]:
 
 
 def calculate(
-    alloy: Union[mg.Alloy, str, dict], property_name: str
+    alloy: Union[mg.Alloy, str, dict],
+    property_name: str,
+    uncertainty: bool = False,
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the a particular property calculated for an alloy, using other
     calculation functions provided by metallurgy. The property_name must match a
@@ -98,6 +100,9 @@ def calculate(
         The alloy for which to calculate a property.
     property_name
         The property to calculate for the alloy.
+    uncertainty
+        If using a cerebral model, activate dropout layers during inference and
+        gather uncertainty information.
     """
 
     # If we have a predictive model available to use
@@ -110,7 +115,9 @@ def calculate(
         if property_name in [
             f["name"] for f in cb.models.get_model_prediction_features(model)
         ]:
-            return cb.models.predict(model, alloy)[property_name]
+            return cb.models.predict(model, alloy, uncertainty=uncertainty)[
+                property_name
+            ]
 
     # Check for simple linear mixture or deviations of elemental properties
     if "_linearmix" in property_name:
