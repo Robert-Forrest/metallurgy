@@ -64,10 +64,11 @@ def ideal_entropy_xia(
 
     cube_sum = 0
     for element in alloy.elements:
-        cube_sum += (
-            alloy.composition[element]
-            * mg.periodic_table.elements[element]["atomic_volume"]
-        )
+        volume = mg.periodic_table.elements[element]["atomic_volume"]
+        if volume is None:
+            return None
+
+        cube_sum += alloy.composition[element] * volume
 
     ideal_entropy_x = 0
     for element in alloy.composition:

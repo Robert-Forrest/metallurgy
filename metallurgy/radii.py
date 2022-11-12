@@ -82,10 +82,11 @@ def lattice_distortion(
 
     mean_radius = 0
     for element in alloy.elements:
-        mean_radius += (
-            alloy.composition[element]
-            * mg.periodic_table.elements[element]["radius"]
-        )
+        radius = mg.periodic_table.elements[element]["radius"]
+        if radius is None:
+            return None
+
+        mean_radius += alloy.composition[element] * radius
 
     _lattice_distortion = 0
     for i in range(len(alloy.elements) - 1):
