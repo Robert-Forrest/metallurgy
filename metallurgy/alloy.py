@@ -661,7 +661,20 @@ class Alloy:
         if self.constraints is not None:
             sigfigs = self.constraints["sigfigs"]
         else:
-            sigfigs = 3
+            sigfigs = 4
+
+        needs_rounding = False
+        for element in self.elements:
+            percentage_str = str(self.composition[element])
+            length = len(percentage_str)
+            if "." in percentage_str:
+                length -= 2
+            if length > sigfigs:
+                needs_rounding = True
+                break
+
+        if not needs_rounding:
+            return
 
         integer_parts = []
         decimal_parts = []
