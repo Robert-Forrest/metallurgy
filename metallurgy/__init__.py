@@ -13,6 +13,7 @@ from .alloy import Alloy
 from .linear_mixture import linear_mixture
 from .deviation import deviation
 from .calculate import calculate, get_property_function, get_all_properties
+from .plots import plot
 from . import properties
 from . import density
 from . import valence
@@ -152,6 +153,7 @@ __all__ = [
     "viscosity",
     "ratios",
     # "rdf",
+    "plot",
     "plots",
     "generate",
     "calculate",

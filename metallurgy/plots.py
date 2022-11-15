@@ -4,8 +4,31 @@ import matplotlib.collections as mcoll
 import matplotlib as mpl
 import ternary as ternary_plt
 
-plt.style.use("ggplot")
-plt.rc("axes", axisbelow=True)
+import metallurgy as mg
+
+
+def plot(alloys, data, label=None):
+    if isinstance(alloys[0], mg.Alloy):
+        num_elements = len(mg.analyse.find_unique_elements(alloys))
+    elif isinstance(alloys[0], list) and isinstance(alloys[0][0], mg.Alloy):
+        num_elements = len(
+            mg.analyse.find_unique_elements(
+                [alloy for sublist in alloys for alloy in sublist]
+            )
+        )
+
+    if num_elements == 2:
+        return binary(alloys, data, ylabel=label)
+    elif num_elements == 3:
+        return ternary(alloys, data, label=label)
+    elif num_elements == 4:
+        return quaternary(alloys, data, label=label)
+    else:
+        raise NotImplementedError(
+            "No plotting available for "
+            + str(alloys[0].num_elements)
+            + " element alloys."
+        )
 
 
 def binary(
@@ -102,7 +125,7 @@ def binary(
     plt.close()
 
 
-def ternary_heatmap(
+def ternary(
     alloys,
     data,
     step=0.01,
@@ -221,6 +244,118 @@ def ternary_heatmap(
         figure.clf()
 
 
+def quaternary(quaternary_alloys, data, label):
+
+    unique_percentages = mg.analyse.find_unique_percentages(
+        quaternary_alloys[-1]
+    )
+
+    quaternary_element = list(unique_percentages.keys())[
+        np.argmin([len(unique_percentages[e]) for e in unique_percentages])
+    ]
+    ternary_elements = []
+    for element in unique_percentages:
+        if element != quaternary_element:
+            ternary_elements.append(element)
+
+    vmin = min(y for x in data for y in x)
+    vmax = max(y for x in data for y in x)
+
+    columns = int(np.ceil(np.sqrt(len(quaternary_alloys))))
+    rows = int(np.ceil(len(quaternary_alloys) / columns))
+    numGridCells = columns * rows
+    gridExcess = numGridCells - len(quaternary_alloys)
+
+    fig = plt.figure(figsize=(4 * columns, 4 * rows))
+
+    lastAx = None
+    for i in reversed(range(len(quaternary_alloys))):
+        iRow = i // columns
+        iCol = i % columns
+
+        ax = plt.subplot2grid((rows, columns), (iRow, iCol))
+
+        if gridExcess != 0 and iRow == (rows - 1):
+            if gridExcess % 2 == 0:
+                ax = plt.subplot2grid((rows, columns), (iRow, iCol + 1))
+            else:
+                ax = plt.subplot2grid(
+                    (rows, columns * 2), (iRow, 1 + (iCol * 2)), colspan=2
+                )
+
+        if lastAx is None:
+            lastAx = ax
+
+        unique_percentages = mg.analyse.find_unique_percentages(
+            quaternary_alloys[i]
+        )
+
+        if quaternary_element in unique_percentages:
+            quaternary_percentage = (
+                unique_percentages[quaternary_element][0] * 100
+            )
+        else:
+            quaternary_percentage = 0.0
+
+        remaining_percentage = round(100 - quaternary_percentage, 2)
+        remaining_percentage_str = pretty_percentage(str(remaining_percentage))
+        quaternary_percentage_str = pretty_percentage(
+            str(round(quaternary_percentage, 2))
+        )
+
+        title = (
+            "("
+            + "".join(ternary_elements)
+            + ")$_{"
+            + remaining_percentage_str
+            + "}$"
+            + quaternary_element
+            + "$_{"
+            + quaternary_percentage_str
+            + "}$"
+        )
+
+        ternary_alloys = quaternary_alloys[i][:]
+        for j in range(len(ternary_alloys)):
+            ternary_alloys[j].remove_element(quaternary_element)
+
+        ternary(
+            ternary_alloys,
+            data[i],
+            ax=ax,
+            vmin=vmin,
+            vmax=vmax,
+            title=title,
+            label=label,
+            showColorbar=False,
+        )
+
+    viridis_cmap = mpl.cm.get_cmap("viridis")
+
+    cax = fig.add_axes(
+        [
+            lastAx.get_position().x1 + 0.01,
+            lastAx.get_position().y0 + 0.03,
+            0.0075,
+            lastAx.get_position().height,
+        ]
+    )
+
+    colorbar = fig.colorbar(
+        mpl.cm.ScalarMappable(
+            norm=mpl.colors.Normalize(vmin=vmin, vmax=vmax),
+            cmap=viridis_cmap,
+        ),
+        cax=cax,
+    )
+    colorbar.set_label(label, labelpad=20, rotation=270)
+
+    plt.show()
+    plt.clf()
+    plt.cla()
+    plt.close()
+
+
 def colorline(
     x,
     y,
@@ -275,3 +410,11 @@ def make_segments(x, y):
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     return segments
+
+
+def pretty_percentage(string):
+    while string[-1] == "0":
+        string = string[:-1]
+    if string[-1] == ".":
+        string = string[:-1]
+    return string
