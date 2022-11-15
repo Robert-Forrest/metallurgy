@@ -1,5 +1,6 @@
 import re
 from typing import Union, Optional, List
+from numbers import Number
 
 import numpy as np
 import elementy
@@ -211,9 +212,9 @@ def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
 
 def system(
     elements: Union[list, str],
-    step: Union[int, float] = 1,
-    min_percent: Union[int, float] = 0,
-    max_percent: Union[int, float] = 100,
+    step: Number = 1,
+    min_percent: Number = 0,
+    max_percent: Number = 100,
     property_name: Optional[str] = None,
 ):
     """Generate a set of alloys in a particular elemental composition-space.
@@ -250,7 +251,7 @@ def system(
 
 def binary(
     elements: Union[list, str],
-    step: Union[int, float] = 0.5,
+    step: Number = 0.5,
     property_name: Optional[str] = None,
 ):
     """Generate a set of binary alloys in a particular elemental composition-space.
@@ -271,6 +272,8 @@ def binary(
 
     if isinstance(elements, str):
         elements = re.findall("[A-Z][^A-Z]*", elements)
+    if len(elements) != 2:
+        raise ValueError("Binary system must have 2 elements")
 
     x = 100
     alloys = []
@@ -293,9 +296,9 @@ def binary(
 
 def ternary(
     elements: Union[list, str],
-    step: Union[int, float] = 1,
-    min_percent: Union[int, float] = 0,
-    max_percent: Union[int, float] = 100,
+    step: Number = 1,
+    min_percent: Number = 0,
+    max_percent: Number = 100,
     property_name: Optional[str] = None,
     quaternary: Optional[dict] = None,
 ):
@@ -324,6 +327,8 @@ def ternary(
 
     if isinstance(elements, str):
         elements = re.findall("[A-Z][^A-Z]*", elements)
+    if len(elements) != 3:
+        raise ValueError("Ternary system must have 3 elements")
 
     alloys = []
     percentages = []
@@ -361,7 +366,6 @@ def ternary(
                         )
 
                     alloy = mg.Alloy(composition_str)
-
                     alloys.append(alloy)
                     percentages.append(list(alloy.composition.values()))
 
@@ -370,3 +374,58 @@ def ternary(
         return alloys, percentages, values
 
     return alloys, percentages
+
+
+def quaternary(
+    elements: Union[list, str],
+    step: Number = 1,
+    min_percent: Number = 0,
+    max_percent: Number = 100,
+    min_quaternary_percent: Number = 0,
+    quaternary_percent_step: Number = 25,
+    quaternary_percentages: Optional[List[Number]] = None,
+    property_name: Optional[str] = None,
+):
+    """Generate a set of quaternary alloys.
+
+    :group: alloy.generate
+
+    Parameters
+    ----------
+
+    elements
+        The elements of the composition-space.
+    step
+        The percentage step between alloys in the composition-space.
+    min_percent
+        The minimum percentage of each element in alloys in the composition-space.
+    max_percent
+        The maximum percentage of each element in alloys in the
+        composition-space.
+    property_name
+        A property to calculate for all alloys in the set generated.
+
+    """
+
+    if isinstance(elements, str):
+        elements = re.findall("[A-Z][^A-Z]*", elements)
+    if len(elements) != 4:
+        raise ValueError("Quaternary system must have 4 elements")
+
+    alloys = []
+
+    if quaternary_percentages is None:
+        quaternary_percentages = []
+        quaternary_percentage = 0
+        quaternary_step = 25
+        while quaternary_percentage < 100:
+            quaternary_percentages.append(quaternary_percentage)
+            quaternary_percentage += quaternary_step
+
+    for quaternary_percentage in quaternary_percentages:
+        ternary_alloys, ternary_percentages = ternary(
+            elements[:3], quaternary=(elements[3], quaternary_percentage)
+        )
+        alloys.append(ternary_alloys)
+
+    return alloys
