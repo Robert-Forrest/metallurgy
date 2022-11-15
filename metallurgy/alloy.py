@@ -1,11 +1,10 @@
 from __future__ import annotations
 import copy
 import re
-from typing import Union, Callable, Optional, List
-from collections import OrderedDict
+from typing import Union, Callable, Optional
+from collections import OrderedDict, Counter
 
 import numpy as np
-import pandas as pd
 import elementy
 
 
@@ -670,8 +669,20 @@ class Alloy:
             if "." in percentage_str:
                 length -= 2
             if length > sigfigs:
-                needs_rounding = True
-                break
+                easy_round = False
+                easy_rounders = ["0", "9"]
+                count = Counter(percentage_str)
+                for c in easy_rounders:
+                    if c in count and not easy_round:
+                        count[c] /= len(percentage_str)
+                        if count[c] > 0.5:
+                            easy_round = True
+                            self.composition[element] = round(
+                                self.composition[element], sigfigs
+                            )
+                if not easy_round:
+                    needs_rounding = True
+                    break
 
         if not needs_rounding:
             return
