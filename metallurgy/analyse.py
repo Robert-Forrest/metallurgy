@@ -70,7 +70,7 @@ def find_min(
 
 
 def find_unique_elements(alloys: List[mg.Alloy]) -> List[str]:
-    """Finds the unique elements in a list of alloy composition.
+    """Finds the unique elements in a list of alloy compositions.
 
     :group: alloy.utils
 
@@ -89,3 +89,27 @@ def find_unique_elements(alloys: List[mg.Alloy]) -> List[str]:
                 unique_elements.append(element)
 
     return unique_elements
+
+
+def find_unique_percentages(alloys: List[mg.Alloy]) -> dict:
+    """Finds the unique percentages per element in a list of alloy compositions.
+
+    :group: alloy.utils
+
+    Parameters
+    ----------
+
+    alloys
+        List of alloys in which to find the unique percentages.
+
+    """
+
+    unique_elements = find_unique_elements(alloys)
+    percentages = {e: [] for e in unique_elements}
+    for alloy in alloys:
+        for element in alloy.composition:
+            percentage = alloy.composition[element]
+            if percentage not in percentages[element]:
+                percentages[element].append(percentage)
+
+    return percentages
