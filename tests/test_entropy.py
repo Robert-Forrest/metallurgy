@@ -45,10 +45,10 @@ def test_ideal_entropy_xia():
         0.7343892084076673
     )
     assert mg.entropy.ideal_entropy_xia("XeArNi") == pytest.approx(
-        1.4161052076473997
+        1.4162078890605776
     )
     assert mg.entropy.ideal_entropy_xia(["Xe", "XeAr", "XeArNi"]) == [
         0,
         pytest.approx(0.7343892084076673),
-        pytest.approx(1.4161052076473997),
+        pytest.approx(1.4162078890605776),
     ]
