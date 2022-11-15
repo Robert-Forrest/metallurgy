@@ -814,9 +814,19 @@ def parse_composition_string(composition_string: str) -> dict:
         for element in sub_composition:
             sub_composition[element] *= sub_composition_percentage
 
-        remaining_composition_string = composition_string.split(")")[1][
-            len(str(int(sub_composition_percentage * 100))) :
-        ]
+        pre_sub_composition_string = composition_string.split(")")[0].split(
+            "("
+        )[0]
+        post_sub_composition_string = composition_string.split(")")[1].split(
+            "("
+        )[0]
+
+        remaining_composition_string = ""
+        if re.search("[a-zA-Z]", pre_sub_composition_string) is not None:
+            remaining_composition_string += pre_sub_composition_string
+        if re.search("[a-zA-Z]", post_sub_composition_string) is not None:
+            remaining_composition_string += post_sub_composition_string
+
         remaining_composition = parse_composition_string_block(
             remaining_composition_string
         )
