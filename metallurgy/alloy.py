@@ -93,6 +93,11 @@ class Alloy:
         else:
             return False
 
+    def __add__(self, other):
+        from . import generate
+
+        return generate.mixture([self, other])
+
     def __hash__(self):
         return hash(self.to_string())
 

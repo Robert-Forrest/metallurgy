@@ -196,7 +196,7 @@ def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
                             )
 
     if weights is None:
-        weights = [1.0] * len(alloys)
+        weights = [1.0 / len(alloys)] * len(alloys)
 
     mixed_composition = {}
     for element in shared_composition_space:
