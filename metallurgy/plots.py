@@ -64,12 +64,12 @@ def plot(alloys: list, data: list, label: str = None):
 def binary(
     alloys,
     data,
-    xlabel=None,
-    ylabel=None,
-    labels=None,
-    scatter_data=None,
-    use_colorline=False,
-    save_path=None,
+    xlabel: str = None,
+    ylabel: str = None,
+    labels: list = None,
+    scatter_data: list = None,
+    use_colorline: bool = False,
+    save_path: str = None,
 ):
     """Plots an alloy property across a binary alloy composition.
 
