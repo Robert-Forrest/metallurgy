@@ -113,3 +113,27 @@ def find_unique_percentages(alloys: List[mg.Alloy]) -> dict:
                 percentages[element].append(percentage)
 
     return percentages
+
+
+def composition_weighted_average(alloys, data):
+    unique_elements = find_unique_elements(alloys)
+
+    per_element_property = {e: 0 for e in unique_elements}
+    per_element_total = {e: 0 for e in unique_elements}
+    for i, alloy in enumerate(alloys):
+        for element in alloy.composition:
+            if data[i] is None:
+                continue
+
+            per_element_property[element] += (
+                data[i] * alloy.composition[element]
+            )
+            per_element_total[element] += alloy.composition[element]
+
+    for element in per_element_property:
+        if per_element_total[element] > 0:
+            per_element_property[element] /= per_element_total[element]
+        else:
+            per_element_property[element] = None
+
+    return per_element_property
