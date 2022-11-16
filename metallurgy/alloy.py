@@ -91,7 +91,7 @@ class Alloy:
         elif isinstance(other, (str, dict)):
             return self.to_string() == Alloy(other).to_string()
         else:
-            raise NotImplementedError
+            return False
 
     def __hash__(self):
         return hash(self.to_string())
