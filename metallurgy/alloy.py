@@ -824,6 +824,9 @@ def parse_composition_string(composition_string: str) -> dict:
     :group: alloy.utils
     """
 
+    if len(composition_string) == 0:
+        return None
+
     if "(" in composition_string:
 
         sub_composition_percentage = (
@@ -906,6 +909,9 @@ def parse_composition_dict(composition: dict) -> dict:
 
     :group: alloy.utils
     """
+
+    if len(composition) == 0:
+        return None
 
     tmp_composition = copy.deepcopy(composition)
 
