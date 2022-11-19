@@ -244,8 +244,10 @@ def system(
     if len(elements) == 2:
         return binary(elements, step, property_name)
     elif len(elements) == 3:
-        return ternary(
-            elements, step, min_percent, max_percent, property_name, quaternary
+        return ternary(elements, step, min_percent, max_percent, property_name)
+    elif len(elements) == 4:
+        return quaternary(
+            elements, step, min_percent, max_percent, property_name
         )
 
 
@@ -300,7 +302,7 @@ def ternary(
     min_percent: Number = 0,
     max_percent: Number = 100,
     property_name: Optional[str] = None,
-    quaternary: Optional[dict] = None,
+    quaternary_element: Optional[tuple] = None,
 ):
     """Generate a set of ternary alloys.
 
@@ -320,8 +322,9 @@ def ternary(
         composition-space.
     property_name
         A property to calculate for all alloys in the set generated.
-    quaternary
-        True if this ternary system is a member of an encompassing quaternary system.
+    quaternary_element
+        If this ternary system is a member of an encompassing quaternary system
+        provide the quaternary element and its percentage.
 
     """
 
@@ -355,14 +358,14 @@ def ternary(
                                 tmp_percentages[i]
                             )
 
-                    if quaternary is not None:
+                    if quaternary_element is not None:
                         composition_str = (
                             "("
                             + composition_str
                             + ")"
-                            + str(100 - quaternary[1])
-                            + quaternary[0]
-                            + str(quaternary[1])
+                            + str(100 - quaternary_element[1])
+                            + quaternary_element[0]
+                            + str(quaternary_element[1])
                         )
 
                     alloy = mg.Alloy(composition_str)
@@ -424,7 +427,8 @@ def quaternary(
 
     for quaternary_percentage in quaternary_percentages:
         ternary_alloys, ternary_percentages = ternary(
-            elements[:3], quaternary=(elements[3], quaternary_percentage)
+            elements[:3],
+            quaternary_element=(elements[3], quaternary_percentage),
         )
         alloys.append(ternary_alloys)
 

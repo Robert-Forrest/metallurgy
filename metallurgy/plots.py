@@ -18,11 +18,15 @@ from bokeh.io import export_png
 from bokeh.io import show as show_
 from bokeh.transform import dodge
 
-
 import metallurgy as mg
 
 
-def plot(alloys: list, data: list, label: str = None):
+def plot(
+    alloys: list,
+    data: list,
+    label: str = None,
+    save_path: str = None,
+):
     """An automatic interface to metallurgy's alloy system plotting
     functions.
 
@@ -46,17 +50,19 @@ def plot(alloys: list, data: list, label: str = None):
                 [alloy for sublist in alloys for alloy in sublist]
             )
         )
+    else:
+        raise ValueError("Could not determine number of elements.")
 
     if num_elements == 2:
-        return binary(alloys, data, ylabel=label)
+        return binary(alloys, data, ylabel=label, save_path=save_path)
     elif num_elements == 3:
-        return ternary(alloys, data, label=label)
+        return ternary(alloys, data, label=label, save_path=save_path)
     elif num_elements == 4:
-        return quaternary(alloys, data, label=label)
+        return quaternary(alloys, data, label=label, save_path=save_path)
     else:
         raise NotImplementedError(
             "No plotting available for "
-            + str(alloys[0].num_elements)
+            + str(num_elements)
             + " element alloys."
         )
 
@@ -112,6 +118,15 @@ def binary(
                 label = labels[i]
 
             ax1.plot(percentages, data[i], label=label)
+    elif isinstance(data[0], tuple):
+        ax1.plot(percentages, [d[0] for d in data])
+        ax1.fill_between(
+            percentages,
+            [d[0] - d[1] for d in data],
+            [d[0] + d[1] for d in data],
+            alpha=0.5,
+        )
+
     else:
         ax1.plot(percentages, data)
 
@@ -145,6 +160,7 @@ def binary(
 
     plt.tight_layout()
 
+    plt.gcf().set_dpi(300)
     if save_path is not None:
         plt.savefig(save_path)
     else:
@@ -263,6 +279,7 @@ def ternary(
 
     tax.get_axes().set_aspect(1)
     tax._redraw_labels()
+    plt.gcf().set_dpi(300)
 
     if ax is None:
         if save_path is None:
@@ -274,7 +291,12 @@ def ternary(
         figure.clf()
 
 
-def quaternary(quaternary_alloys, data, label):
+def quaternary(
+    quaternary_alloys,
+    data,
+    label,
+    save_path: Optional[str] = None,
+):
 
     unique_percentages = mg.analyse.find_unique_percentages(
         quaternary_alloys[-1]
@@ -380,7 +402,13 @@ def quaternary(quaternary_alloys, data, label):
     )
     colorbar.set_label(label, labelpad=20, rotation=270)
 
-    plt.show()
+    print("saving!:", save_path)
+
+    plt.gcf().set_dpi(300)
+    if save_path is None:
+        plt.show()
+    else:
+        plt.savefig(save_path)
     plt.clf()
     plt.cla()
     plt.close()
