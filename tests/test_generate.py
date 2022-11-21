@@ -70,7 +70,8 @@ def test_requirements():
         "Ni": {"min": 0.01, "max": 0.99, "precedence": 1},
     }
     random_alloys = mg.generate.random_alloys(
-        num_alloys, percentage_constraints=percentage_constraints
+        num_alloys,
+        percentage_constraints=percentage_constraints,
     )
 
     for random_alloy in random_alloys:
