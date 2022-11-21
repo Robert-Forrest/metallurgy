@@ -23,7 +23,7 @@ class Alloy:
 
     """
 
-    class Composition(dict):
+    class Composition(OrderedDict):
         """Atomic percentages of elements in an alloy.
 
         :group: alloy
@@ -40,7 +40,9 @@ class Alloy:
             super().__init__(value, *args, **kwargs)
             self.on_change = on_change
 
-        def __setitem__(self, element: str, percentage: float):
+        def __setitem__(
+            self, element: str, percentage: float, respond_to_change=True
+        ):
             """
             Set the percentage value of an element in the composition.
             Remove elements from the composition if below minimum threshold.
@@ -50,11 +52,13 @@ class Alloy:
             else:
                 if element in self.keys():
                     super().__delitem__(element)
-            self.on_change()
+            if hasattr(self, "on_change") and respond_to_change:
+                self.on_change()
 
-        def __delitem__(self, element):
+        def __delitem__(self, element, respond_to_change=True):
             super().__delitem__(element)
-            self.on_change()
+            if hasattr(self, "on_change") and respond_to_change:
+                self.on_change()
 
     def __init__(
         self,
@@ -336,7 +340,16 @@ class Alloy:
             self.clamp_composition()
             self.round_composition()
 
+        self.reorder_composition()
+
         delattr(self, "rescaling")
+
+    def reorder_composition(self):
+        ordered_elements = sorted(
+            self.composition, key=self.composition.get, reverse=True
+        )
+        for element in ordered_elements:
+            self.composition.move_to_end(element)
 
     def constrain_max_elements(self):
         """Removes elements from an alloy if there are more elements than
