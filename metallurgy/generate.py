@@ -63,7 +63,11 @@ def random_alloy(
             )
         )
 
-    percentages = list(np.random.dirichlet(np.ones(len(elements)), size=1)[0])
+    percentages = np.random.rand(len(elements))
+    percentages = (
+        percentages / percentages.sum() * (1 - percentage_step * len(elements))
+    )
+    percentages += percentage_step
 
     composition = {}
     for j in range(len(elements)):
