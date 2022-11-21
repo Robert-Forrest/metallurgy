@@ -212,10 +212,15 @@ class Alloy:
         :group: alloy.utils
         """
 
+        if len(self.composition) < 1:
+            return
+
         self.rescaling = True
 
         constraints_applied = False
         while not self.constraints_satisfied():
+
+            self.determine_percentage_constraints()
 
             constraints_applied = True
 
@@ -453,8 +458,23 @@ class Alloy:
                                         self.composition[element]
                                         > self.composition[superior_element]
                                     ):
+                                        # print(
+                                        #     "element above superior",
+                                        #     element,
+                                        #     superior_element,
+                                        #     self.composition[element],
+                                        #     self.constraints[
+                                        #         "local_percentages"
+                                        #     ][element]["max"],
+                                        #     self.composition[superior_element],
+                                        # )
+                                        # print(self.composition)
+                                        # print(self.constraints)
+                                        # print()
                                         satisfied = False
                                         break
+                                if not satisfied:
+                                    break
 
                     elif (
                         self.constraints["local_percentages"][element]["min"]
@@ -492,30 +512,28 @@ class Alloy:
         :group: alloy.utils
         """
 
-        sigfigs = 3
+        sigfigs = 4
         if self.constraints is not None:
             if "sigfigs" in self.constraints:
                 sigfigs = self.constraints["sigfigs"]
 
         while np.abs(1 - self.total_percentage) > 10 ** (-sigfigs):
             current_total = self.total_percentage
+            elements = self.elements
 
-            tmp_composition = copy.deepcopy(self.composition)
-            for element in self.composition:
+            for element in elements:
                 clamped_value = self.composition[element] / current_total
 
                 if self.constraints is not None:
                     if element in self.constraints["percentages"]:
-                        tmp_composition[element] = max(
+                        self.composition[element] = max(
                             clamped_value,
                             self.constraints["percentages"][element]["min"],
                         )
                     else:
-                        tmp_composition[element] = clamped_value
+                        self.composition[element] = clamped_value
                 else:
-                    tmp_composition[element] = clamped_value
-
-            self.composition = tmp_composition
+                    self.composition[element] = clamped_value
 
     def determine_percentage_constraints(self):
         """Determine the current constraints on an alloy composition.
@@ -540,18 +558,18 @@ class Alloy:
 
         for element in self.constraints["percentages"]:
             if element in self.composition:
+                element_constraint = self.constraints["percentages"][element]
                 if (
-                    self.constraints["percentages"][element]["precedence"]
+                    element_constraint["precedence"]
                     <= lowest_precedence["precedence"]
-                    and self.constraints["percentages"][element]["precedence"]
-                    > 0
+                    and element_constraint["precedence"] > 0
                     and self.composition[element]
                     < lowest_precedence["percentage"]
                 ):
 
-                    lowest_precedence["precedence"] = self.constraints[
-                        "percentages"
-                    ][element]["precedence"]
+                    lowest_precedence["precedence"] = element_constraint[
+                        "precedence"
+                    ]
                     lowest_precedence["element"] = element
                     lowest_precedence["percentage"] = self.composition[element]
 
@@ -569,6 +587,7 @@ class Alloy:
                 ]:
                     if e in self.composition:
                         superior_elements.append(self.composition[e])
+
                 if len(superior_elements) > 0:
                     tmp_percentages[element]["max"] = min(
                         [
@@ -576,16 +595,49 @@ class Alloy:
                             min(superior_elements),
                         ]
                     )
-                else:
-                    tmp_percentages[element]["max"] = 0
+
+                    tmp_percentages[element]["min"] = min(
+                        [
+                            tmp_percentages[element]["min"],
+                            tmp_percentages[element]["max"],
+                        ]
+                    )
+
+            # if (
+            #     len(
+            #         self.constraints["percentages"][element][
+            #             "inferior_elements"
+            #         ]
+            #     )
+            #     > 0
+            # ):
+            #     inferior_elements = []
+            #     for e in self.constraints["percentages"][element][
+            #         "inferior_elements"
+            #     ]:
+            #         if e in self.composition:
+            #             inferior_elements.append(self.composition[e])
+
+            #     if len(inferior_elements) > 0:
+            #         tmp_percentages[element]["min"] = max(
+            #             [
+            #                 self.constraints["percentages"][element]["min"],
+            #                 max(inferior_elements),
+            #             ]
+            #         )
+
+            #         tmp_percentages[element]["max"] = max(
+            #             [
+            #                 tmp_percentages[element]["min"],
+            #                 tmp_percentages[element]["max"],
+            #             ]
+            #         )
 
         if lowest_precedence["element"] is not None:
             for element in self.composition:
                 if element not in tmp_percentages:
-                    maxPercent = lowest_precedence["percentage"]
-
                     tmp_percentages[element] = {
-                        "max": maxPercent,
+                        "max": lowest_precedence["percentage"],
                         "min": 0,
                         "precedence": 0,
                         "superior_elements": [],
@@ -751,19 +803,23 @@ class Alloy:
                         filtered_precedence_order[i]
                         in self.constraints["local_percentages"]
                     ):
-                        if (integer_parts[decimal_part_index] + 1) / (
-                            10**sigfigs
-                        ) > self.constraints["local_percentages"][
-                            filtered_precedence_order[i]
-                        ][
-                            "max"
-                        ]:
-                            constraints_violated = True
+                        if decimal_part_index < len(integer_parts):
+
+                            if (integer_parts[decimal_part_index] + 1) / (
+                                10**sigfigs
+                            ) > self.constraints["local_percentages"][
+                                filtered_precedence_order[i]
+                            ][
+                                "max"
+                            ]:
+                                constraints_violated = True
 
                 if not constraints_violated:
                     if decimal_part_index < len(integer_parts):
                         integer_parts[decimal_part_index] += 1
                         undershoot -= 1
+                else:
+                    break
                 i += 1
 
                 if i >= len(filtered_precedence_order):
@@ -913,19 +969,17 @@ def parse_composition_dict(composition: dict) -> dict:
     if len(composition) == 0:
         return None
 
-    tmp_composition = copy.deepcopy(composition)
-
     needRescale = False
-    for element in tmp_composition:
-        if tmp_composition[element] > 1:
+    for element in composition:
+        if composition[element] > 1:
             needRescale = True
             break
 
     if needRescale:
-        for element in tmp_composition:
-            tmp_composition[element] /= 100.0
+        for element in composition:
+            composition[element] /= 100.0
 
-    return filter_order_composition(tmp_composition)
+    return filter_order_composition(composition)
 
 
 def filter_order_composition(composition: dict) -> OrderedDict:
@@ -958,7 +1012,7 @@ def parse_constraints(
     percentages: dict = {},
     allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
     disallowed_elements: list = [],
-    sigfigs: int = 3,
+    sigfigs: int = 4,
     percentage_step: float = 0.01,
 ) -> dict:
     """Parse constraint rules from input
@@ -1007,6 +1061,7 @@ def parse_constraints(
 
     for element in percentages:
         percentages[element]["superior_elements"] = []
+        percentages[element]["inferior_elements"] = []
         for other_element in percentages:
             if element != other_element:
                 if (
@@ -1016,14 +1071,35 @@ def parse_constraints(
                     percentages[element]["superior_elements"].append(
                         other_element
                     )
+                elif (
+                    percentages[element]["precedence"]
+                    > percentages[other_element]["precedence"]
+                ):
+                    percentages[element]["inferior_elements"].append(
+                        other_element
+                    )
 
-        inferior_min = percentages[element]["min"]
-        for other_element in percentages:
-            if other_element not in percentages[element]["superior_elements"]:
-                inferior_min = max(
-                    [inferior_min, percentages[other_element]["min"]]
+        if len(percentages[element]["superior_elements"]) > 0:
+            inferior_min = percentages[element]["min"]
+            for other_element in percentages:
+                if (
+                    other_element
+                    not in percentages[element]["superior_elements"]
+                ):
+                    inferior_min = max(
+                        [inferior_min, percentages[other_element]["min"]]
+                    )
+            if inferior_min < percentages[element]["max"]:
+                percentages[element]["min"] = inferior_min
+
+        if len(percentages[element]["inferior_elements"]) > 0:
+            superior_min = percentages[element]["min"]
+            for other_element in percentages[element]["inferior_elements"]:
+                superior_min = max(
+                    [superior_min, percentages[other_element]["min"]]
                 )
-        percentages[element]["min"] = inferior_min
+            if superior_min > percentages[element]["min"]:
+                percentages[element]["min"] = superior_min
 
     min_sum = sum([percentages[e]["min"] for e in percentages])
     if min_sum > 1:
@@ -1087,12 +1163,6 @@ def donate_percentage(
 
     if donor in constraints["local_percentages"]:
 
-        # if (
-        #     constraints["local_percentages"][recipient]["precedence"]
-        #     < constraints["local_percentages"][donor]["precedence"]
-        # ):
-        #     return
-
         if composition[donor] > constraints["local_percentages"][donor]["max"]:
             donor_surplus = (
                 composition[donor]
@@ -1154,7 +1224,7 @@ def element_is_in_range(
     if element not in constraints["local_percentages"]:
         return True
 
-    sigfigs = 3
+    sigfigs = 4
     if constraints is not None:
         if "sigfigs" in constraints:
             sigfigs = constraints["sigfigs"]
