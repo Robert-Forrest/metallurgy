@@ -51,3 +51,11 @@ def test_sub_alloy_parsing():
         == mg.Alloy("Xe50(Fe20Ag80)50")
         == "Fe10Ag40Xe50"
     )
+
+
+def test_multiple_round():
+
+    assert mg.alloy.multiple_round(0.015, 0.02) == 0.02
+    assert mg.alloy.multiple_round(0.015, 0.01) == 0.02
+    assert mg.alloy.multiple_round(0.12345, 0.03) == 0.12
+    assert mg.alloy.multiple_round(0.12345, 0.2) == 0.2
