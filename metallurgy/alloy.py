@@ -414,6 +414,7 @@ class Alloy:
                     self.constraints["percentage_step"],
                 )
             )
+
             if discrepancy > self.constraints["percentage_step"]:
                 # print("Sum != 1", self.total_percentage, discrepancy)
                 # print(self.composition)
@@ -525,12 +526,12 @@ class Alloy:
         :group: alloy.utils
         """
 
-        sigfigs = 4
+        digits = 4
         if self.constraints is not None:
-            if "sigfigs" in self.constraints:
-                sigfigs = self.constraints["sigfigs"]
+            if "digits" in self.constraints:
+                digits = self.constraints["digits"]
 
-        while np.abs(1 - self.total_percentage) > 10 ** (-sigfigs):
+        while np.abs(1 - self.total_percentage) > 10 ** (-digits):
             current_total = self.total_percentage
             elements = self.elements
 
@@ -727,10 +728,13 @@ class Alloy:
         elif len(self.composition) == 1:
             self.composition[self.elements[0]] = 1.0
 
+        digits = 4
+        percentage_step = 0.0001
         if self.constraints is not None:
-            sigfigs = self.constraints["sigfigs"]
-        else:
-            sigfigs = 4
+            if "digits" in self.constraints:
+                digits = self.constraints["digits"]
+            if "percentage_step" in self.constraints:
+                percentage_step = self.constraints["percentage_step"]
 
         needs_rounding = False
         for element in self.elements:
@@ -738,7 +742,7 @@ class Alloy:
             length = len(percentage_str)
             if "." in percentage_str:
                 length -= 2
-            if length > sigfigs:
+            if length > digits:
                 easy_round = False
                 easy_rounders = ["0", "9"]
                 count = Counter(percentage_str)
@@ -748,7 +752,7 @@ class Alloy:
                         if count[c] > 0.5:
                             easy_round = True
                             self.composition[element] = round(
-                                self.composition[element], sigfigs
+                                self.composition[element], digits
                             )
                 if not easy_round:
                     needs_rounding = True
@@ -762,13 +766,13 @@ class Alloy:
 
         for element in self.elements:
 
-            rounded_percentage = normal_round(
-                self.composition[element], sigfigs
+            rounded_percentage = multiple_round(
+                self.composition[element], percentage_step
             )
 
             if rounded_percentage > 0:
 
-                percentage = str(self.composition[element] * (10**sigfigs))
+                percentage = str(self.composition[element] * (10**digits))
                 split_percentage = percentage.split(".")
 
                 integer_parts.append(int(split_percentage[0]))
@@ -780,7 +784,7 @@ class Alloy:
                 else:
                     decimal_parts.append(0.0)
 
-        undershoot = (10**sigfigs) - sum(integer_parts)
+        undershoot = (10**digits) - sum(integer_parts)
 
         if undershoot > 0:
             if self.constraints is not None:
@@ -819,7 +823,7 @@ class Alloy:
                         if decimal_part_index < len(integer_parts):
 
                             if (integer_parts[decimal_part_index] + 1) / (
-                                10**sigfigs
+                                10**digits
                             ) > self.constraints["local_percentages"][
                                 filtered_precedence_order[i]
                             ][
@@ -841,8 +845,8 @@ class Alloy:
             i = 0
             for element in self.elements:
                 if i < len(integer_parts):
-                    self.composition[element] = normal_round(
-                        integer_parts[i] / (10**sigfigs), sigfigs
+                    self.composition[element] = multiple_round(
+                        integer_parts[i] / (10**digits), percentage_step
                     )
                 else:
                     self.composition[element] = 0
@@ -854,7 +858,7 @@ class Alloy:
             for element in self.elements:
 
                 if i < len(integer_parts):
-                    rounded_value = integer_parts[i] / (10**sigfigs)
+                    rounded_value = integer_parts[i] / (10**digits)
 
                     if self.constraints is not None:
                         if element in self.constraints["local_percentages"]:
@@ -1025,7 +1029,6 @@ def parse_constraints(
     percentages: dict = {},
     allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
     disallowed_elements: list = [],
-    sigfigs: int = 4,
     percentage_step: float = 0.01,
 ) -> dict:
     """Parse constraint rules from input
@@ -1044,7 +1047,7 @@ def parse_constraints(
             List of elements allowed in an alloy
         disallowed_elements
             List of elements not allowed in an alloy
-        sigfigs
+        digits
             Number of significant figures to consider for percentages
         percentage_step
             Increment between percentages
@@ -1124,13 +1127,17 @@ def parse_constraints(
         if element in allowed_elements:
             allowed_elements.remove(element)
 
+    digits = len(str(percentage_step))
+    if "." in str(percentage_step):
+        digits -= 2
+
     return {
         "percentages": percentages,
         "local_percentages": percentages,
         "allowed_elements": allowed_elements,
         "min_elements": min_elements,
         "max_elements": max_elements,
-        "sigfigs": sigfigs,
+        "digits": digits,
         "percentage_step": percentage_step,
     }
 
@@ -1191,12 +1198,12 @@ def donate_percentage(
     else:
         donor_surplus = composition[donor]
 
-    if normal_round(donor_surplus, constraints["sigfigs"] + 1) > 0:
+    if normal_round(donor_surplus, constraints["digits"] + 1) > 0:
         if recipient_deficit <= 0 or recipient_deficit >= donor_surplus:
             donation = min([0.1, donor_surplus])
         else:
             donation = min([0.1, recipient_deficit])
-        donation = normal_round(donation, constraints["sigfigs"] + 1)
+        donation = normal_round(donation, constraints["digits"] + 1)
         # print(recipient, "gets", donation, "from", donor)
         composition[recipient] += donation
         composition[donor] -= donation
@@ -1237,34 +1244,42 @@ def element_is_in_range(
     if element not in constraints["local_percentages"]:
         return True
 
-    sigfigs = 4
+    digits = 4
+    percentage_step = 0.0001
     if constraints is not None:
-        if "sigfigs" in constraints:
-            sigfigs = constraints["sigfigs"]
+        if "digits" in constraints:
+            digits = constraints["digits"]
+        if "percentage_step" in constraints:
+            percentage_step = constraints["percentage_step"]
 
     if element in composition:
-        rounded_percentage = normal_round(composition[element], sigfigs)
+        rounded_percentage = multiple_round(
+            composition[element], percentage_step
+        )
     else:
-
         rounded_percentage = 0
 
     if direction == "min":
         if inclusive:
-            return rounded_percentage >= normal_round(
-                constraints["local_percentages"][element][direction], sigfigs
+            return rounded_percentage >= multiple_round(
+                constraints["local_percentages"][element][direction],
+                percentage_step,
             )
         else:
-            return rounded_percentage > normal_round(
-                constraints["local_percentages"][element][direction], sigfigs
+            return rounded_percentage > multiple_round(
+                constraints["local_percentages"][element][direction],
+                percentage_step,
             )
     elif direction == "max":
         if inclusive:
-            return rounded_percentage <= normal_round(
-                constraints["local_percentages"][element][direction], sigfigs
+            return rounded_percentage <= multiple_round(
+                constraints["local_percentages"][element][direction],
+                percentage_step,
             )
         else:
-            return rounded_percentage < normal_round(
-                constraints["local_percentages"][element][direction], sigfigs
+            return rounded_percentage < multiple_round(
+                constraints["local_percentages"][element][direction],
+                percentage_step,
             )
 
     return False
@@ -1288,7 +1303,7 @@ def normal_round(num: float, ndigits: int = 0) -> float:
 
 
 def multiple_round(
-    num: float, multiple: Union[float, int]
+    num: float, multiple: Union[float, int], digits=4
 ) -> Union[float, int]:
     """Round a number to the nearest multiple of another number.
 
@@ -1301,4 +1316,4 @@ def multiple_round(
     multiple
         Multiple-of to round towards
     """
-    return multiple * round(num / multiple)
+    return round(multiple * round(num / multiple), digits)
