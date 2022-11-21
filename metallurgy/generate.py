@@ -12,6 +12,7 @@ def random_alloy(
     min_elements: int = 1,
     max_elements: int = 10,
     percentage_constraints={},
+    percentage_step=0.01,
     allowed_elements=[e for e in elementy.PeriodicTable().elements],
     constrain_alloy=False,
 ):
@@ -72,6 +73,7 @@ def random_alloy(
         composition,
         constraints={
             "percentages": percentage_constraints,
+            "percentage_step": percentage_step,
             "min_elements": min_elements,
             "max_elements": max_elements,
         },
@@ -88,6 +90,7 @@ def random_alloys(
     min_elements: int = 1,
     max_elements: int = 10,
     percentage_constraints: dict = {},
+    percentage_step=0.01,
     allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
     constrain_alloys=False,
 ):
@@ -108,6 +111,7 @@ def random_alloys(
             min_elements,
             max_elements,
             percentage_constraints,
+            percentage_step,
             allowed_elements,
             constrain_alloy=constrain_alloys,
         )
