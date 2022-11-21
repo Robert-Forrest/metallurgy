@@ -412,6 +412,7 @@ class Alloy:
                 - multiple_round(
                     self.total_percentage,
                     self.constraints["percentage_step"],
+                    self.constraints["digits"],
                 )
             )
 
@@ -527,11 +528,19 @@ class Alloy:
         """
 
         digits = 4
+        percentage_step = 0.01
         if self.constraints is not None:
             if "digits" in self.constraints:
                 digits = self.constraints["digits"]
+            if "percentage_step" in self.constraints:
+                percentage_step = self.constraints["percentage_step"]
 
-        while np.abs(1 - self.total_percentage) > 10 ** (-digits):
+        while (
+            multiple_round(
+                np.abs(1 - self.total_percentage), percentage_step, digits
+            )
+            >= percentage_step
+        ):
             current_total = self.total_percentage
             elements = self.elements
 
