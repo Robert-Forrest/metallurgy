@@ -167,13 +167,3 @@ __all__ = [
     "get_all_properties",
     "write_csv",
 ]
-
-
-# def setup_alloy_properties():
-#     props = get_all_properties()
-#     for p in props:
-#         if not hasattr(Alloy, p):
-#             setattr(Alloy, p, property(lambda self: calculate(self, p)))
-
-
-# setup_alloy_properties()
