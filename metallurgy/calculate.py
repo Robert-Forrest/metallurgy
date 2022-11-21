@@ -5,7 +5,7 @@ metallurgy.
 
 import inspect
 from dataclasses import fields
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Union, Iterable
 
 import elementy
 
@@ -83,7 +83,7 @@ def get_all_properties() -> List[str]:
 
 def calculate(
     alloy: Union[mg.Alloy, str, dict],
-    property_name: str,
+    property_name: Union[str, List[str]],
     uncertainty: bool = False,
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the a particular property calculated for an alloy, using other
@@ -104,6 +104,38 @@ def calculate(
         If using a cerebral model, activate dropout layers during inference and
         gather uncertainty information.
     """
+    if isinstance(property_name, Iterable) and not isinstance(
+        property_name, (str, dict)
+    ):
+        model_properties = []
+        analytical_properties = []
+        if mg.get_model() is not None:
+            import cerebral as cb
+
+            model = mg.get_model()
+            for p in property_name:
+                if p in [
+                    f["name"]
+                    for f in cb.models.get_model_prediction_features(model)
+                ]:
+                    model_properties.append(p)
+
+        for p in property_name:
+            if p not in model_properties:
+                analytical_properties.append(p)
+
+        values = {}
+        for p in analytical_properties:
+            values[p] = calculate(alloy, p)
+
+        if len(model_properties) > 0:
+            predictions = cb.models.predict(
+                model, alloy, uncertainty=uncertainty
+            )
+            for p in model_properties:
+                values[p] = predictions[p]
+
+        return values
 
     # If we have a predictive model available to use
     if mg.get_model() is not None:
