@@ -310,7 +310,7 @@ class Alloy:
 
         if not constraints_applied:
             self.clamp_composition()
-            self.round_composition()
+        self.round_composition()
 
         self.reorder_composition()
 
@@ -508,14 +508,19 @@ class Alloy:
                 percentage_step = self.constraints["percentage_step"]
 
         while (
-            multiple_round(
-                np.abs(1 - self.total_percentage), percentage_step, digits
+            np.abs(
+                1
+                - multiple_round(
+                    self.total_percentage, percentage_step, digits
+                )
             )
             >= percentage_step
         ):
+
             current_total = self.total_percentage
             elements = self.elements
 
+            clamped_rounded_total = 0
             for element in elements:
                 clamped_value = self.composition[element] / current_total
 
@@ -529,6 +534,56 @@ class Alloy:
                         self.composition[element] = clamped_value
                 else:
                     self.composition[element] = clamped_value
+
+                if element in self.composition:
+                    clamped_rounded_total += multiple_round(
+                        self.composition[element], percentage_step, digits
+                    )
+
+            while (
+                round(np.abs(1 - clamped_rounded_total), digits)
+                >= percentage_step
+            ):
+                elements = self.elements
+                for element in elements:
+                    if element not in self.composition:
+                        continue
+
+                    if self.constraints is not None:
+                        if element in self.constraints["percentages"]:
+                            change = max(
+                                [
+                                    percentage_step,
+                                    max(
+                                        [
+                                            0,
+                                            self.constraints["percentages"][
+                                                element
+                                            ]["max"]
+                                            - self.composition[element],
+                                        ]
+                                    ),
+                                ]
+                            )
+                        else:
+                            change = percentage_step
+                    else:
+                        change = percentage_step
+
+                    change = min([change, np.abs(1 - clamped_rounded_total)])
+                    if clamped_rounded_total > 1:
+                        change *= -1
+
+                    change = multiple_round(change, percentage_step, digits)
+
+                    self.composition.__setitem__(
+                        element,
+                        self.composition[element] + change,
+                        respond_to_change=False,
+                    )
+                    clamped_rounded_total += change
+                    if np.abs(1 - clamped_rounded_total) > percentage_step / 2:
+                        break
 
     def determine_percentage_constraints(self):
         """Determine the current constraints on an alloy composition.
@@ -650,6 +705,42 @@ class Alloy:
 
         self.constraints["local_percentages"] = tmp_percentages
 
+        if self.constraints["max_elements"] == len(
+            self.constraints["local_percentages"]
+        ):
+            total_max = 0
+            for element in self.composition:
+                if element in self.constraints["local_percentages"]:
+                    total_max += self.constraints["local_percentages"][
+                        element
+                    ]["max"]
+            while total_max < 1:
+                for element in self.constraints["local_percentages"]:
+                    if element not in self.composition:
+                        value = min(
+                            [
+                                self.constraints["local_percentages"][element][
+                                    "max"
+                                ],
+                                1 - total_max,
+                            ]
+                        )
+                        self.composition.__setitem__(
+                            element, value, respond_to_change=False
+                        )
+                        total_max += value
+
+                if total_max < 1:
+                    element_to_add = np.random.choice(
+                        self.constraints["allowed_elements"], 1
+                    )[0]
+                    if element_to_add not in self.composition:
+                        value = np.random.uniform()
+                        self.composition.__setitem__(
+                            element_to_add, value, respond_to_change=False
+                        )
+                        total_max += value
+
     def to_string(self) -> str:
         """Convert the alloy composition to a string
 
@@ -732,8 +823,10 @@ class Alloy:
                         count[c] /= len(percentage_str)
                         if count[c] > 0.5:
                             easy_round = True
-                            self.composition[element] = round(
-                                self.composition[element], digits
+                            self.composition[element] = multiple_round(
+                                self.composition[element],
+                                percentage_step,
+                                digits,
                             )
                 if not easy_round:
                     needs_rounding = True
@@ -746,24 +839,17 @@ class Alloy:
         decimal_parts = []
 
         for element in self.elements:
+            percentage = str(self.composition[element] * (10**digits))
+            split_percentage = percentage.split(".")
 
-            rounded_percentage = multiple_round(
-                self.composition[element], percentage_step
-            )
+            integer_parts.append(int(split_percentage[0]))
 
-            if rounded_percentage > 0:
-
-                percentage = str(self.composition[element] * (10**digits))
-                split_percentage = percentage.split(".")
-
-                integer_parts.append(int(split_percentage[0]))
-
-                if len(split_percentage) > 1:
-                    decimal_parts.append(
-                        float(percentage) - float(split_percentage[0])
-                    )
-                else:
-                    decimal_parts.append(0.0)
+            if len(split_percentage) > 1:
+                decimal_parts.append(
+                    float(percentage) - float(split_percentage[0])
+                )
+            else:
+                decimal_parts.append(0.0)
 
         undershoot = (10**digits) - sum(integer_parts)
 
@@ -827,19 +913,24 @@ class Alloy:
             for element in self.elements:
                 if i < len(integer_parts):
                     self.composition[element] = multiple_round(
-                        integer_parts[i] / (10**digits), percentage_step
+                        integer_parts[i] / (10**digits),
+                        percentage_step,
+                        digits,
                     )
                 else:
                     self.composition[element] = 0
                 i += 1
 
         else:
-
             i = 0
             for element in self.elements:
 
                 if i < len(integer_parts):
-                    rounded_value = integer_parts[i] / (10**digits)
+                    rounded_value = multiple_round(
+                        integer_parts[i] / (10**digits),
+                        percentage_step,
+                        digits,
+                    )
 
                     if self.constraints is not None:
                         if element in self.constraints["local_percentages"]:
@@ -857,6 +948,21 @@ class Alloy:
                     self.composition[element] = 0
 
                 i += 1
+
+        deviation = 1 - self.total_percentage
+        abs_deviation = np.abs(deviation)
+        if abs_deviation >= percentage_step:
+            num_steps = int(abs_deviation // percentage_step)
+
+            j = 0
+            for _ in range(num_steps):
+                step = percentage_step
+                if deviation < 0:
+                    step *= -1
+
+                self.composition[self.elements[j]] += step
+                if j > self.num_elements:
+                    j = 0
 
 
 def parse_composition(composition: Union[str, dict, Alloy]) -> dict:
@@ -1225,42 +1331,34 @@ def element_is_in_range(
     if element not in constraints["local_percentages"]:
         return True
 
-    digits = 4
-    percentage_step = 0.0001
-    if constraints is not None:
-        if "digits" in constraints:
-            digits = constraints["digits"]
-        if "percentage_step" in constraints:
-            percentage_step = constraints["percentage_step"]
-
     if element in composition:
-        rounded_percentage = multiple_round(
-            composition[element], percentage_step
-        )
+        percentage = composition[element]
     else:
-        rounded_percentage = 0
+        percentage = 0
 
     if direction == "min":
         if inclusive:
-            return rounded_percentage >= multiple_round(
-                constraints["local_percentages"][element][direction],
-                percentage_step,
+            return (
+                percentage
+                >= constraints["local_percentages"][element][direction]
             )
         else:
-            return rounded_percentage > multiple_round(
-                constraints["local_percentages"][element][direction],
-                percentage_step,
+            return (
+                percentage
+                > constraints["local_percentages"][element][direction]
             )
+
     elif direction == "max":
         if inclusive:
-            return rounded_percentage <= multiple_round(
-                constraints["local_percentages"][element][direction],
-                percentage_step,
+            return (
+                percentage
+                <= constraints["local_percentages"][element][direction]
             )
+
         else:
-            return rounded_percentage < multiple_round(
-                constraints["local_percentages"][element][direction],
-                percentage_step,
+            return (
+                percentage
+                < constraints["local_percentages"][element][direction]
             )
 
     return False
