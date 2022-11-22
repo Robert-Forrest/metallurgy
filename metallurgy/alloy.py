@@ -264,14 +264,7 @@ class Alloy:
                         inclusive=True,
                     ):
                         continue
-                    # print(
-                    #     element,
-                    #     self.composition[element],
-                    #     "out of",
-                    #     direction,
-                    #     "range",
-                    #     self.constraints["local_percentages"][element],
-                    # )
+
                     for other_element in reverse_precedence_order:
                         if (
                             element != other_element
@@ -285,27 +278,6 @@ class Alloy:
                                 inclusive=False,
                             ):
                                 continue
-
-                            # if (
-                            #     other_element
-                            #     in self.constraints["local_percentages"]
-                            # ):
-                            #     print(
-                            #         other_element,
-                            #         self.composition[other_element],
-                            #         "in",
-                            #         direction,
-                            #         "range",
-                            #         self.constraints["local_percentages"][
-                            #             other_element
-                            #         ],
-                            #     )
-                            # else:
-                            #     print(
-                            #         other_element,
-                            #         self.composition[other_element],
-                            #         "not constrained",
-                            #     )
 
                             if direction == "min":
                                 donate_percentage(
