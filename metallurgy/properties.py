@@ -1,6 +1,14 @@
 """Utility functions handling property units and property name formatting."""
 
 # A variety of units for some alloy properties
+pretty_names = {
+    "Dmax": "$D_{\mathrm{max}}$",
+    "Tl": "$T_l$",
+    "Tg": "$T_g$",
+    "Tx": "$T_x$",
+    "deltaT": "$\Delta T$",
+}
+
 units = {
     "Dmax": "mm",
     "Tl": "K",
@@ -42,6 +50,8 @@ def pretty_name(property_name: str) -> str:
             name += " ".join(
                 word.title() for word in property_name_parts[0:-1]
             )
+    elif property_name in pretty_names:
+        name += pretty_names[property_name]
     else:
         name += " ".join(word.title() for word in property_name_parts)
     return name
