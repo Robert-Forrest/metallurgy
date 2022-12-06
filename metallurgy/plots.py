@@ -402,8 +402,6 @@ def quaternary(
     )
     colorbar.set_label(label, labelpad=20, rotation=270)
 
-    print("saving!:", save_path)
-
     plt.gcf().set_dpi(300)
     if save_path is None:
         plt.show()
