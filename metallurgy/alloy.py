@@ -353,15 +353,15 @@ class Alloy:
     def constrain_min_elements(self):
         """Adds elements to an alloy if there are fewer elements than
         allowed by the min_elements constraint."""
-        if len(self.composition) < self.constraints["min_elements"]:
 
-            while len(self.composition) < self.constraints["min_elements"]:
-
-                element_to_add = np.random.choice(
-                    self.constraints["allowed_elements"], 1
-                )[0]
-                if element_to_add not in self.composition:
-                    self.composition[element_to_add] = np.random.uniform()
+        while len(self.composition) < self.constraints["min_elements"]:
+            element_to_add = np.random.choice(
+                self.constraints["allowed_elements"], 1
+            )[0]
+            if element_to_add not in self.composition:
+                self.composition.__setitem__(
+                    element_to_add, np.random.uniform()
+                )
 
     def constrain_num_elements(self):
         """Applies max and min element count constraints.
@@ -523,6 +523,9 @@ class Alloy:
             clamped_rounded_total = 0
             for element in elements:
                 clamped_value = self.composition[element] / current_total
+                clamped_value = multiple_round(
+                    clamped_value, percentage_step, digits
+                )
 
                 if self.constraints is not None:
                     if element in self.constraints["percentages"]:
@@ -535,10 +538,7 @@ class Alloy:
                 else:
                     self.composition[element] = clamped_value
 
-                if element in self.composition:
-                    clamped_rounded_total += multiple_round(
-                        self.composition[element], percentage_step, digits
-                    )
+                clamped_rounded_total += clamped_value
 
             while (
                 round(np.abs(1 - clamped_rounded_total), digits)
@@ -730,14 +730,27 @@ class Alloy:
                         )
                         total_max += value
 
-                if total_max < 1:
+                if total_max < 1 and len(
+                    self.constraints["allowed_elements"]
+                ) > len(self.composition):
                     element_to_add = np.random.choice(
                         self.constraints["allowed_elements"], 1
                     )[0]
                     if element_to_add not in self.composition:
                         value = np.random.uniform()
                         self.composition.__setitem__(
-                            element_to_add, value, respond_to_change=False
+                            element_to_add,
+                            value,
+                            respond_to_change=False,
+                        )
+                        total_max += value
+                else:
+                    for element in self.elements:
+                        value = np.random.uniform()
+                        self.composition.__setitem__(
+                            element,
+                            self.composition[element] + value,
+                            respond_to_change=False,
                         )
                         total_max += value
 
@@ -960,7 +973,11 @@ class Alloy:
                 if deviation < 0:
                     step *= -1
 
-                self.composition[self.elements[j]] += step
+                self.composition.__setitem__(
+                    self.elements[j],
+                    self.composition[self.elements[j]] + step,
+                    respond_to_change=False,
+                )
                 if j > self.num_elements:
                     j = 0
 
@@ -1290,10 +1307,20 @@ def donate_percentage(
             donation = min([0.1, donor_surplus])
         else:
             donation = min([0.1, recipient_deficit])
-        donation = normal_round(donation, constraints["digits"] + 1)
-        # print(recipient, "gets", donation, "from", donor)
-        composition[recipient] += donation
-        composition[donor] -= donation
+
+        # donation = multiple_round(
+        #     donation, constraints["percentage_step"], constraints["digits"]
+        # )
+
+        # print(
+        #     recipient,
+        #     "gets",
+        #     donation,
+        #     "from",
+        #     donor,
+        # )
+        composition.__setitem__(recipient, composition[recipient] + donation)
+        composition.__setitem__(donor, composition[donor] - donation)
         # print(composition)
         # print()
 

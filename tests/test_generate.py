@@ -130,6 +130,15 @@ def test_constraints():
             "min_elements": 1,
             "percentage_step": 0.005,
         },
+        {
+            "percentages": {
+                "Zr": {"min": 0.45, "max": 0.65},
+                "Ti": {"min": 0.0, "max": 0.8},
+            },
+            "max_elements": 2,
+            "min_elements": 2,
+            "percentage_step": 0.005,
+        },
     ]
 
     for constraint in constraint_sets:

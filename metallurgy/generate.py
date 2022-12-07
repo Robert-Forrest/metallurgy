@@ -54,6 +54,12 @@ def random_alloy(
             )
         )
 
+    elif max_elements == min_elements:
+        if max_elements == len(list(percentage_constraints.keys())):
+            elements = list(percentage_constraints.keys())
+        elif max_elements == len(allowed_elements):
+            elements = allowed_elements[:]
+
     else:
         elements = list(
             np.random.choice(
@@ -80,6 +86,7 @@ def random_alloy(
             "percentage_step": percentage_step,
             "min_elements": min_elements,
             "max_elements": max_elements,
+            "allowed_elements": allowed_elements,
         },
     )
 
