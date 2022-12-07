@@ -162,6 +162,7 @@ def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
                     "percentages": {},
                     "min_elements": 1,
                     "max_elements": 1,
+                    "percentage_step": 0.01,
                 }
 
             if "min_elements" in alloy.constraints:
@@ -173,6 +174,11 @@ def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
                 constraints["max_elements"] = max(
                     constraints["max_elements"],
                     alloy.constraints["max_elements"],
+                )
+            if "percentage_step" in alloy.constraints:
+                constraints["percentage_step"] = min(
+                    constraints["percentage_step"],
+                    alloy.constraints["percentage_step"],
                 )
 
             if "percentages" in alloy.constraints:
@@ -207,6 +213,31 @@ def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
                                 constraints["percentages"][element]["max"],
                                 alloy.constraints["percentages"][element][
                                     "max"
+                                ],
+                            )
+
+                    if (
+                        "precedence"
+                        in alloy.constraints["percentages"][element]
+                    ):
+                        if (
+                            "precedence"
+                            not in constraints["percentages"][element]
+                        ):
+                            constraints["percentages"][element][
+                                "precedence"
+                            ] = alloy.constraints["percentages"][element][
+                                "precedence"
+                            ]
+                        else:
+                            constraints["percentages"][element][
+                                "precedence"
+                            ] = max(
+                                constraints["percentages"][element][
+                                    "precedence"
+                                ],
+                                alloy.constraints["percentages"][element][
+                                    "precedence"
                                 ],
                             )
 

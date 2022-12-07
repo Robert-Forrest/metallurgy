@@ -529,16 +529,17 @@ class Alloy:
 
                 if self.constraints is not None:
                     if element in self.constraints["percentages"]:
-                        self.composition[element] = max(
+                        clamped_value = max(
                             clamped_value,
                             self.constraints["percentages"][element]["min"],
                         )
-                    else:
-                        self.composition[element] = clamped_value
-                else:
-                    self.composition[element] = clamped_value
 
-                clamped_rounded_total += clamped_value
+                self.composition.__setitem__(
+                    element, clamped_value, respond_to_change=False
+                )
+
+                if element in self.composition:
+                    clamped_rounded_total += self.composition[element]
 
             while (
                 round(np.abs(1 - clamped_rounded_total), digits)
