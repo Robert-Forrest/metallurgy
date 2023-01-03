@@ -59,3 +59,12 @@ def test_multiple_round():
     assert mg.alloy.multiple_round(0.015, 0.01) == 0.02
     assert mg.alloy.multiple_round(0.12345, 0.03) == 0.12
     assert mg.alloy.multiple_round(0.12345, 0.2) == 0.2
+
+
+def test_structure():
+
+    assert mg.Alloy("CuZr", "A1") == "Cu100"
+    assert mg.Alloy("CuZr", "B2") == "Cu50Zr50"
+    assert mg.Alloy("CuZr", "L1_0") == "Cu50Zr50"
+    assert mg.Alloy("CuZr", "D2_1") == "Zr85.71Cu14.29"
+    assert mg.Alloy("ZrCu", "D2_1") == "Cu85.71Zr14.29"

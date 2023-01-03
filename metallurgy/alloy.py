@@ -7,6 +7,9 @@ from collections import OrderedDict, Counter
 import numpy as np
 import elementy
 
+from .prototypes import get_prototype
+from .prototype import Prototype
+
 
 class Alloy:
     """An alloy, a mixture of chemical elements with specific percentages.
@@ -16,9 +19,12 @@ class Alloy:
     Attributes
     ----------
 
-    composition : dict
+    composition
         Dictionary matching element symbols to atomic percentages.
-    constraints : dict
+    structure
+        String referring to a crystal structure prototype which defines atomic
+        percentages.
+    constraints
         Dictionary of constraints to follow when adjusting atomic  percentages.
 
     """
@@ -63,13 +69,34 @@ class Alloy:
     def __init__(
         self,
         composition: Union[str, dict, Alloy],
-        constraints: Union[dict, None] = None,
+        structure: Optional[Union[str, Prototype]] = None,
+        constraints: Optional[dict] = None,
         rescale: bool = True,
     ):
 
         self.composition = parse_composition(composition)
         if self.composition is None:
             raise Exception("Invalid composition:", composition)
+
+        if structure is not None:
+            if isinstance(structure, str):
+                structure = get_prototype(structure)
+            self.structure = structure
+
+            structure_composition = {}
+            for structure_element_index in self.structure.elements:
+                if structure_element_index >= len(self.elements):
+                    element_index = len(self.elements) - 1
+                else:
+                    element_index = structure_element_index
+
+                if self.elements[element_index] not in structure_composition:
+                    structure_composition[self.elements[element_index]] = 0
+                structure_composition[
+                    self.elements[element_index]
+                ] += self.structure.composition[element_index]
+
+            self.composition = structure_composition
 
         self.constraints = None
 
@@ -317,8 +344,21 @@ class Alloy:
         delattr(self, "rescaling")
 
     def reorder_composition(self):
+        ordered_elements = self.elements
+        if self.constraints is not None:
+            ordered_elements = sorted(
+                self.composition,
+                key=lambda x: (
+                    self.constraints["percentages"][x]["precedence"]
+                    if x in self.constraints["percentages"]
+                    else 0
+                ),
+                reverse=True,
+            )
         ordered_elements = sorted(
-            self.composition, key=self.composition.get, reverse=True
+            ordered_elements,
+            key=self.composition.get,
+            reverse=True,
         )
         for element in ordered_elements:
             self.composition.move_to_end(element)

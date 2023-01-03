@@ -10,6 +10,7 @@ import pandas as pd
 from elementy import PeriodicTable
 
 from .alloy import Alloy
+from .prototype import Prototype
 from .linear_mixture import linear_mixture
 from .deviation import deviation
 from .calculate import calculate, get_property_function, get_all_properties
@@ -142,6 +143,7 @@ def write_csv(
 __all__ = [
     "periodic_table",
     "Alloy",
+    "Prototype",
     "linear_mixture",
     "deviation",
     "density",
