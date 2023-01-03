@@ -7,6 +7,35 @@ from numbers import Number
 import metallurgy as mg
 
 
+def valence_number(
+    alloy: Union[mg.Alloy, str, dict], orbital: str
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the number of the valence electrons which are in a particular
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the valence proportion.
+
+    orbital : str
+        The orbital to calculate the proportion of.
+    """
+
+    if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
+        return [valence_number(a, orbital) for a in alloy]
+
+    if not isinstance(alloy, mg.Alloy):
+        alloy = mg.Alloy(alloy)
+
+    proportion = valence_proportion(alloy, orbital)
+
+    return proportion * mg.linear_mixture(alloy, "valence_electrons")
+
+
 def valence_proportion(
     alloy: Union[mg.Alloy, str, dict], orbital: str
 ) -> Union[Number, None, List[Union[Number, None]]]:
@@ -31,8 +60,6 @@ def valence_proportion(
     if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    total_valence = mg.linear_mixture(alloy, "valence_electrons")
-
     orbital_count = {}
     for element in alloy.elements:
         orbital_count[element] = 0
@@ -49,6 +76,8 @@ def valence_proportion(
             if orbitals[-1 - i]["orbital"][-1] == orbital:
                 orbital_count[element] += orbitals[-1 - i]["electrons"]
             i += 1
+
+    total_valence = mg.linear_mixture(alloy, "valence_electrons")
 
     if total_valence > 0:
         total = 0
@@ -129,3 +158,75 @@ def f_valence(
 
     """
     return valence_proportion(alloy, "f")
+
+
+def s_valence_number(
+    alloy: Union[mg.Alloy, str, dict]
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the number of valence electrons which are in the s
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the s-valence proportion.
+
+    """
+    return valence_number(alloy, "s")
+
+
+def p_valence_number(
+    alloy: Union[mg.Alloy, str, dict]
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the number of the valence electrons which are in the p
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the p-valence number.
+
+    """
+    return valence_number(alloy, "p")
+
+
+def d_valence_number(
+    alloy: Union[mg.Alloy, str, dict]
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the number of the valence electrons which are in the d
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the d-valence number.
+
+    """
+    return valence_number(alloy, "d")
+
+
+def f_valence_number(
+    alloy: Union[mg.Alloy, str, dict]
+) -> Union[Number, None, List[Union[Number, None]]]:
+    """Returns the number of the valence electrons which are in the f
+    orbital.
+
+    :group: calculations.valence
+
+    Parameters
+    ----------
+
+    alloy : mg.Alloy, str, dict
+        The alloy for which to calculate the f-valence number.
+
+    """
+    return valence_number(alloy, "f")
