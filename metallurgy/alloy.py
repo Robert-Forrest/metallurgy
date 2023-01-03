@@ -74,14 +74,45 @@ class Alloy:
         rescale: bool = True,
     ):
 
-        self.composition = parse_composition(composition)
+        self.original_composition, composition_structure = parse_composition(
+            composition
+        )
+        self.composition = filter_order_composition(self.original_composition)
+
         if self.composition is None:
             raise Exception("Invalid composition:", composition)
+        if structure is None and composition_structure is not None:
+            structure = composition_structure
 
         if structure is not None:
             if isinstance(structure, str):
-                structure = get_prototype(structure)
+                structure = copy.deepcopy(get_prototype(structure))
             self.structure = structure
+
+            if not all(
+                value == list(self.original_composition.values())[0]
+                for value in self.original_composition.values()
+            ):
+                structure_elements_ordered = sorted(
+                    self.structure.composition,
+                    key=lambda x: self.structure.composition[x],
+                    reverse=True,
+                )
+
+                composition_elements_ordered = [
+                    self.elements.index(e) for e in self.original_composition
+                ]
+
+                index_translation = {
+                    i: j
+                    for i, j in zip(
+                        composition_elements_ordered,
+                        structure_elements_ordered,
+                    )
+                }
+                for b in self.structure.basis:
+                    if b["element"] in index_translation:
+                        b["element"] = index_translation[b["element"]]
 
             structure_composition = {}
             for structure_element_index in self.structure.elements:
@@ -97,6 +128,8 @@ class Alloy:
                 ] += self.structure.composition[element_index]
 
             self.composition = structure_composition
+        else:
+            self.structure = None
 
         self.constraints = None
 
@@ -824,6 +857,9 @@ class Alloy:
 
             composition_str += element + percentage_str
 
+        if self.structure is not None:
+            composition_str += "[" + self.structure.name + "]"
+
         return composition_str
 
     def to_pretty_string(self) -> str:
@@ -1031,9 +1067,9 @@ def parse_composition(composition: Union[str, dict, Alloy]) -> dict:
     if isinstance(composition, str):
         return parse_composition_string(composition)
     elif isinstance(composition, dict):
-        return parse_composition_dict(composition)
+        return parse_composition_dict(composition), None
     elif isinstance(composition, Alloy):
-        return composition.composition
+        return composition.composition, None
 
 
 def parse_composition_string(composition_string: str) -> dict:
@@ -1044,6 +1080,12 @@ def parse_composition_string(composition_string: str) -> dict:
 
     if len(composition_string) == 0:
         return None
+
+    if "[" in composition_string:
+        structure = composition_string.split("[")[1].split("]")[0]
+        composition_string = composition_string.split("[")[0]
+    else:
+        structure = None
 
     if "(" in composition_string:
 
@@ -1086,7 +1128,7 @@ def parse_composition_string(composition_string: str) -> dict:
     else:
         composition = parse_composition_string_block(composition_string)
 
-    return filter_order_composition(composition)
+    return composition, structure
 
 
 def parse_composition_string_block(composition_string: str) -> dict:
