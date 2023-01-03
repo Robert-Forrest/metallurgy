@@ -1,4 +1,5 @@
 import re
+import copy
 from typing import Union, Optional, List
 from numbers import Number
 
@@ -6,15 +7,17 @@ import numpy as np
 import elementy
 
 import metallurgy as mg
+from .prototypes import get_random_prototype
 
 
 def random_alloy(
     min_elements: int = 1,
     max_elements: int = 10,
     percentage_constraints={},
-    percentage_step=0.01,
+    percentage_step: float = 0.01,
     allowed_elements=[e for e in elementy.PeriodicTable().elements],
-    constrain_alloy=False,
+    constrain_alloy: bool = False,
+    structure: bool = False,
 ):
     """Generate a random alloy.
 
@@ -69,15 +72,21 @@ def random_alloy(
             )
         )
 
-    percentages = np.random.rand(len(elements))
-    percentages = (
-        percentages / percentages.sum() * (1 - percentage_step * len(elements))
-    )
-    percentages += percentage_step
+    if not structure:
+        percentages = np.random.rand(len(elements))
+        percentages = (
+            percentages
+            / percentages.sum()
+            * (1 - percentage_step * len(elements))
+        )
+        percentages += percentage_step
 
-    composition = {}
-    for j in range(len(elements)):
-        composition[elements[j]] = percentages[j]
+        composition = {}
+        for j in range(len(elements)):
+            composition[elements[j]] = percentages[j]
+    else:
+        random_structure = copy.deepcopy(get_random_prototype())
+        composition = "".join(elements) + "[" + random_structure.name + "]"
 
     alloy = mg.Alloy(
         composition,
@@ -104,6 +113,7 @@ def random_alloys(
     percentage_step=0.01,
     allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
     constrain_alloys=False,
+    structures=False,
 ):
     """Generate multiple random alloys.
 
@@ -125,6 +135,7 @@ def random_alloys(
             percentage_step,
             allowed_elements,
             constrain_alloy=constrain_alloys,
+            structure=structures,
         )
         for _ in range(num_alloys)
     ]

@@ -1,3 +1,5 @@
+import random
+
 from .prototype import Prototype
 
 
@@ -8,6 +10,10 @@ def get_prototype(name: str):
         raise NotImplementedError(
             name + " prototype structure has not been implemented"
         )
+
+
+def get_random_prototype():
+    return get_prototype(random.choice(list(prototypes.keys())))
 
 
 prototypes = {
