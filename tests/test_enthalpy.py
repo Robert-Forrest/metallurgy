@@ -57,6 +57,6 @@ def test_wigner_seitz_discontinuity():
 
 
 def test_topological_enthalpy():
-    assert mg.enthalpy.calculate_topological_enthalpy(
+    assert mg.enthalpy.topological_enthalpy(
         {"Cu": 0.5, "Zr": 0.5}
     ) == pytest.approx(13.629999999999999)

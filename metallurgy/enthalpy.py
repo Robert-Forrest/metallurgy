@@ -415,7 +415,7 @@ def mixing_Gibbs_free_energy(alloy: Union[mg.Alloy, str, dict]) -> Number:
     )
 
 
-def calculate_topological_enthalpy(alloy):
+def topological_enthalpy(alloy):
     """Calculates the topological enthalpy. See equation 16b of
     http://dx.doi.org/10.1016/j.cpc.2016.08.013
 
@@ -435,14 +435,14 @@ def calculate_topological_enthalpy(alloy):
     if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    topological_enthalpy = 0
+    te = 0
     for element in alloy.composition:
-        topological_enthalpy += (
+        te += (
             mg.periodic_table.elements[element]["fusion_enthalpy"]
             * alloy.composition[element]
         )
 
-    return topological_enthalpy
+    return te
 
 
 def mismatch_PHS(alloy: Union[mg.Alloy, str, dict]) -> Number:
