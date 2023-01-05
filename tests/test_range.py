@@ -1,6 +1,6 @@
 import metallurgy as mg
 
 
-def test_melting_temperature():
+def test_melting_temperature_range():
 
-    assert mg.range({"Cu": 0.5, "Zr": 0.5}, "melting_temperature") == 385.115
+    assert mg.range("CuZr", "melting_temperature") == 770.23

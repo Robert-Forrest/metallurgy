@@ -11,10 +11,16 @@ from elementy import PeriodicTable
 
 from .alloy import Alloy
 from .prototype import Prototype
-from .linear_mixture import linear_mixture
-from .deviation import deviation
-from .range import range
-from .calculate import calculate, get_property_function, get_all_properties
+from .calculate import (
+    calculate,
+    linear_mixture,
+    deviation,
+    range,
+    maximum,
+    minimum,
+    get_property_function,
+    get_all_properties,
+)
 from .plots import plot
 from . import prototypes
 from . import properties
@@ -150,6 +156,8 @@ __all__ = [
     "linear_mixture",
     "deviation",
     "range",
+    "maximum",
+    "minimum",
     "density",
     "valence",
     "entropy",
