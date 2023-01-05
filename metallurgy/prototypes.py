@@ -5,7 +5,7 @@ from .prototype import Prototype
 
 def get_prototype(name: str):
     if name in prototypes:
-        return Prototype(**prototypes[name])
+        return prototypes[name]
     else:
         raise NotImplementedError(
             name + " prototype structure has not been implemented"
@@ -16,10 +16,27 @@ def get_random_prototype():
     return get_prototype(random.choice(list(prototypes.keys())))
 
 
+def find_prototype(query):
+    matches = []
+    for prototype in prototypes:
+        match = True
+        for key in query:
+            if hasattr(prototypes[prototype], key):
+                if getattr(prototypes[prototype], key) != query[key]:
+                    match = False
+                    break
+            else:
+                match = False
+                break
+        if match:
+            matches.append(prototypes[prototype].name)
+    return matches
+
+
 prototypes = {
-    "B2": {
-        "name": "B2",
-        "lattice": [
+    "B2": Prototype(
+        name="B2",
+        lattice=[
             [
                 1,
                 0,
@@ -36,7 +53,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -54,10 +71,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "F5_1": {
-        "name": "F5_1",
-        "lattice": [
+        space_group="Pm-3m",
+    ),
+    "F5_1": Prototype(
+        name="F5_1",
+        lattice=[
             [
                 0.5,
                 -0.28868,
@@ -74,7 +92,7 @@ prototypes = {
                 0.33333,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -108,10 +126,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A3'": {
-        "name": "A3'",
-        "lattice": [
+        space_group="R-3m",
+    ),
+    "A3'": Prototype(
+        name="A3'",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -128,7 +147,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -162,10 +181,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A10": {
-        "name": "A10",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "A10": Prototype(
+        name="A10",
+        lattice=[
             [
                 0.5,
                 -0.288675,
@@ -182,7 +202,7 @@ prototypes = {
                 0.333333,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -192,10 +212,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A11": {
-        "name": "A11",
-        "lattice": [
+        space_group="R3m",
+    ),
+    "A11": Prototype(
+        name="A11",
+        lattice=[
             [
                 0.5,
                 -0.5,
@@ -212,7 +233,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -246,10 +267,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A15": {
-        "name": "A15",
-        "lattice": [
+        space_group="Cmca",
+    ),
+    "A15": Prototype(
+        name="A15",
+        lattice=[
             [
                 1,
                 0,
@@ -266,7 +288,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -332,10 +354,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Ah": {
-        "name": "Ah",
-        "lattice": [
+        space_group="Pm-3n",
+    ),
+    "Ah": Prototype(
+        name="Ah",
+        lattice=[
             [
                 1,
                 0,
@@ -352,7 +375,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -362,10 +385,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Af": {
-        "name": "Af",
-        "lattice": [
+        space_group="Pm-3m",
+    ),
+    "Af": Prototype(
+        name="Af",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -382,7 +406,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -392,10 +416,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A1": {
-        "name": "A1",
-        "lattice": [
+        space_group="P6/mmm",
+    ),
+    "A1": Prototype(
+        name="A1",
+        lattice=[
             [
                 0.5,
                 0.5,
@@ -412,7 +437,7 @@ prototypes = {
                 0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -422,10 +447,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A2": {
-        "name": "A2",
-        "lattice": [
+        space_group="Fm-3m",
+    ),
+    "A2": Prototype(
+        name="A2",
+        lattice=[
             [
                 0.5,
                 0.5,
@@ -442,7 +468,7 @@ prototypes = {
                 0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -452,10 +478,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A4": {
-        "name": "A4",
-        "lattice": [
+        space_group="Im-3m",
+    ),
+    "A4": Prototype(
+        name="A4",
+        lattice=[
             [
                 0,
                 0.5,
@@ -472,7 +499,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -490,10 +517,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A5": {
-        "name": "A5",
-        "lattice": [
+        space_group="Fd-3m",
+    ),
+    "A5": Prototype(
+        name="A5",
+        lattice=[
             [
                 1,
                 0,
@@ -510,7 +538,7 @@ prototypes = {
                 0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -528,10 +556,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A6": {
-        "name": "A6",
-        "lattice": [
+        space_group="I4_1/amd",
+    ),
+    "A6": Prototype(
+        name="A6",
+        lattice=[
             [
                 1,
                 0,
@@ -548,7 +577,7 @@ prototypes = {
                 0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -558,10 +587,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A8": {
-        "name": "A8",
-        "lattice": [
+        space_group="I4/mmm",
+    ),
+    "A8": Prototype(
+        name="A8",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -578,7 +608,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -604,10 +634,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A20": {
-        "name": "A20",
-        "lattice": [
+        space_group="P3_121",
+    ),
+    "A20": Prototype(
+        name="A20",
+        lattice=[
             [
                 0.5,
                 -0.5,
@@ -624,7 +655,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -642,10 +673,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Lonsdaleite": {
-        "name": "Lonsdaleite",
-        "lattice": [
+        space_group="Cmcm",
+    ),
+    "Lonsdaleite": Prototype(
+        name="Lonsdaleite",
+        lattice=[
             [
                 0.5,
                 -0.866025,
@@ -662,7 +694,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -696,10 +728,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A3": {
-        "name": "A3",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "A3": Prototype(
+        name="A3",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -716,7 +749,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -734,10 +767,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A9": {
-        "name": "A9",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "A9": Prototype(
+        name="A9",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -754,7 +788,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -788,10 +822,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A14": {
-        "name": "A14",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "A14": Prototype(
+        name="A14",
+        lattice=[
             [
                 0.5,
                 -0.5,
@@ -808,7 +843,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -842,10 +877,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A17": {
-        "name": "A17",
-        "lattice": [
+        space_group="Cmca",
+    ),
+    "A17": Prototype(
+        name="A17",
+        lattice=[
             [
                 0.5,
                 -0.5,
@@ -862,7 +898,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -896,10 +932,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B1": {
-        "name": "B1",
-        "lattice": [
+        space_group="Cmca",
+    ),
+    "B1": Prototype(
+        name="B1",
+        lattice=[
             [
                 0,
                 0.5,
@@ -916,7 +953,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -934,10 +971,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B4": {
-        "name": "B4",
-        "lattice": [
+        space_group="Fm-3m",
+    ),
+    "B4": Prototype(
+        name="B4",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -954,7 +992,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -988,10 +1026,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B9": {
-        "name": "B9",
-        "lattice": [
+        space_group="P6/mmm",
+    ),
+    "B9": Prototype(
+        name="B9",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -1008,7 +1047,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1058,10 +1097,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Bh": {
-        "name": "Bh",
-        "lattice": [
+        space_group="P3_221",
+    ),
+    "Bh": Prototype(
+        name="Bh",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -1078,7 +1118,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1096,10 +1136,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Bk": {
-        "name": "Bk",
-        "lattice": [
+        space_group="P-6m2",
+    ),
+    "Bk": Prototype(
+        name="Bk",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -1116,7 +1157,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1150,10 +1191,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B10": {
-        "name": "B10",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "B10": Prototype(
+        name="B10",
+        lattice=[
             [
                 1,
                 0,
@@ -1170,7 +1212,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1204,10 +1246,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B11": {
-        "name": "B11",
-        "lattice": [
+        space_group="P4/nmm",
+    ),
+    "B11": Prototype(
+        name="B11",
+        lattice=[
             [
                 1,
                 0,
@@ -1224,7 +1267,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1258,10 +1301,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B12": {
-        "name": "B12",
-        "lattice": [
+        space_group="P4_2/mmc",
+    ),
+    "B12": Prototype(
+        name="B12",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -1278,7 +1322,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1312,10 +1356,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B17": {
-        "name": "B17",
-        "lattice": [
+        space_group="P6_3mc",
+    ),
+    "B17": Prototype(
+        name="B17",
+        lattice=[
             [
                 1,
                 0,
@@ -1332,7 +1377,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1366,10 +1411,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B33": {
-        "name": "B33",
-        "lattice": [
+        space_group="P4_2/mmc",
+    ),
+    "B33": Prototype(
+        name="B33",
+        lattice=[
             [
                 0.5,
                 -0.5,
@@ -1386,7 +1432,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1420,10 +1466,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B3": {
-        "name": "B3",
-        "lattice": [
+        space_group="Cmcm",
+    ),
+    "B3": Prototype(
+        name="B3",
+        lattice=[
             [
                 0,
                 0.5,
@@ -1440,7 +1487,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1458,10 +1505,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B19": {
-        "name": "B19",
-        "lattice": [
+        space_group="F-43m",
+    ),
+    "B19": Prototype(
+        name="B19",
+        lattice=[
             [
                 1,
                 0,
@@ -1478,7 +1526,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1512,10 +1560,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B35": {
-        "name": "B35",
-        "lattice": [
+        space_group="Pmma",
+    ),
+    "B35": Prototype(
+        name="B35",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -1532,7 +1581,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1582,10 +1631,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Bi": {
-        "name": "Bi",
-        "lattice": [
+        space_group="P6/mmm",
+    ),
+    "Bi": Prototype(
+        name="Bi",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -1602,7 +1652,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1668,10 +1718,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B8_1": {
-        "name": "B8_1",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "B8_1": Prototype(
+        name="B8_1",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -1688,7 +1739,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1722,10 +1773,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B8_2": {
-        "name": "B8_2",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "B8_2": Prototype(
+        name="B8_2",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -1742,7 +1794,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1792,10 +1844,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B24": {
-        "name": "B24",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "B24": Prototype(
+        name="B24",
+        lattice=[
             [
                 0,
                 0.5,
@@ -1812,7 +1865,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1830,10 +1883,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "B32": {
-        "name": "B32",
-        "lattice": [
+        space_group="Fmmm",
+    ),
+    "B32": Prototype(
+        name="B32",
+        lattice=[
             [
                 0,
                 0.5,
@@ -1850,7 +1904,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1884,10 +1938,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C1_depleted": {
-        "name": "C1_depleted",
-        "lattice": [
+        space_group="Fd-3m",
+    ),
+    "C1_depleted": Prototype(
+        name="C1_depleted",
+        lattice=[
             [
                 0,
                 0.5,
@@ -1904,7 +1959,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1930,10 +1985,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C1": {
-        "name": "C1",
-        "lattice": [
+        space_group="Fm-3m",
+    ),
+    "C1": Prototype(
+        name="C1",
+        lattice=[
             [
                 0,
                 0.5,
@@ -1950,7 +2006,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -1976,10 +2032,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C3": {
-        "name": "C3",
-        "lattice": [
+        space_group="Fm-3m",
+    ),
+    "C3": Prototype(
+        name="C3",
+        lattice=[
             [
                 1,
                 0,
@@ -1996,7 +2053,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2046,10 +2103,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C9": {
-        "name": "C9",
-        "lattice": [
+        space_group="Pn-3m",
+    ),
+    "C9": Prototype(
+        name="C9",
+        lattice=[
             [
                 0,
                 0.5,
@@ -2066,7 +2124,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2116,10 +2174,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C32": {
-        "name": "C32",
-        "lattice": [
+        space_group="Fd-3m",
+    ),
+    "C32": Prototype(
+        name="C32",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -2136,7 +2195,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2162,10 +2221,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C6": {
-        "name": "C6",
-        "lattice": [
+        space_group="P6/mmm",
+    ),
+    "C6": Prototype(
+        name="C6",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -2182,7 +2242,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2208,10 +2268,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C7": {
-        "name": "C7",
-        "lattice": [
+        space_group="P-3m1",
+    ),
+    "C7": Prototype(
+        name="C7",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -2228,7 +2289,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2278,10 +2339,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C33": {
-        "name": "C33",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "C33": Prototype(
+        name="C33",
+        lattice=[
             [
                 0.5,
                 -0.28868,
@@ -2298,7 +2360,7 @@ prototypes = {
                 0.33333,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2340,10 +2402,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C11_b": {
-        "name": "C11_b",
-        "lattice": [
+        space_group="R-3m",
+    ),
+    "C11_b": Prototype(
+        name="C11_b",
+        lattice=[
             [
                 1,
                 0,
@@ -2360,7 +2423,7 @@ prototypes = {
                 0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2386,10 +2449,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C1_b": {
-        "name": "C1_b",
-        "lattice": [
+        space_group="I4/mmm",
+    ),
+    "C1_b": Prototype(
+        name="C1_b",
+        lattice=[
             [
                 0,
                 0.5,
@@ -2406,7 +2470,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2432,10 +2496,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C19": {
-        "name": "C19",
-        "lattice": [
+        space_group="F-43m",
+    ),
+    "C19": Prototype(
+        name="C19",
+        lattice=[
             [
                 0.5,
                 -0.28868,
@@ -2452,7 +2517,7 @@ prototypes = {
                 0.33333,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2478,10 +2543,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C15": {
-        "name": "C15",
-        "lattice": [
+        space_group="R-3m",
+    ),
+    "C15": Prototype(
+        name="C15",
+        lattice=[
             [
                 0,
                 0.5,
@@ -2498,7 +2564,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2548,10 +2614,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D5_3": {
-        "name": "D5_3",
-        "lattice": [
+        space_group="Fd-3m",
+    ),
+    "D5_3": Prototype(
+        name="D5_3",
+        lattice=[
             [
                 -0.5,
                 0.5,
@@ -2568,7 +2635,7 @@ prototypes = {
                 -0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2890,10 +2957,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D0_3": {
-        "name": "D0_3",
-        "lattice": [
+        space_group="Ia-3",
+    ),
+    "D0_3": Prototype(
+        name="D0_3",
+        lattice=[
             [
                 0,
                 0.5,
@@ -2910,7 +2978,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -2944,10 +3012,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D5_1": {
-        "name": "D5_1",
-        "lattice": [
+        space_group="Fm-3m",
+    ),
+    "D5_1": Prototype(
+        name="D5_1",
+        lattice=[
             [
                 0.5,
                 -0.2886752,
@@ -2964,7 +3033,7 @@ prototypes = {
                 0.33333333,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3046,10 +3115,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D0_19": {
-        "name": "D0_19",
-        "lattice": [
+        space_group="R-3c",
+    ),
+    "D0_19": Prototype(
+        name="D0_19",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -3066,7 +3136,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 1,
                 "vector": [
@@ -3132,10 +3202,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D0_9": {
-        "name": "D0_9",
-        "lattice": [
+        space_group="P6_3/mmc",
+    ),
+    "D0_9": Prototype(
+        name="D0_9",
+        lattice=[
             [
                 1,
                 0,
@@ -3152,7 +3223,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3186,10 +3257,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D0_22": {
-        "name": "D0_22",
-        "lattice": [
+        space_group="Pm-3m",
+    ),
+    "D0_22": Prototype(
+        name="D0_22",
+        lattice=[
             [
                 1,
                 0,
@@ -3206,7 +3278,7 @@ prototypes = {
                 0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3240,10 +3312,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D2_d": {
-        "name": "D2_d",
-        "lattice": [
+        space_group="I4/mmm",
+    ),
+    "D2_d": Prototype(
+        name="D2_d",
+        lattice=[
             [
                 0.5,
                 -0.86602540378,
@@ -3260,7 +3333,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3310,10 +3383,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D5_2": {
-        "name": "D5_2",
-        "lattice": [
+        space_group="P6/mmm",
+    ),
+    "D5_2": Prototype(
+        name="D5_2",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -3330,7 +3404,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3372,10 +3446,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D7_2": {
-        "name": "D7_2",
-        "lattice": [
+        space_group="P-3m1",
+    ),
+    "D7_2": Prototype(
+        name="D7_2",
+        lattice=[
             [
                 -0.5,
                 0.5,
@@ -3392,7 +3467,7 @@ prototypes = {
                 -0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3506,10 +3581,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "E2_1": {
-        "name": "E2_1",
-        "lattice": [
+        space_group="Fm-3m",
+    ),
+    "E2_1": Prototype(
+        name="E2_1",
+        lattice=[
             [
                 1,
                 0,
@@ -3526,7 +3602,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3568,10 +3644,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "L1_2": {
-        "name": "L1_2",
-        "lattice": [
+        space_group="Fm-3m",
+    ),
+    "L1_2": Prototype(
+        name="L1_2",
+        lattice=[
             [
                 1,
                 0,
@@ -3588,7 +3665,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3622,10 +3699,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "L6_0": {
-        "name": "L6_0",
-        "lattice": [
+        space_group="Pm-3m ",
+    ),
+    "L6_0": Prototype(
+        name="L6_0",
+        lattice=[
             [
                 1,
                 0,
@@ -3642,7 +3720,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3676,10 +3754,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "L1_3": {
-        "name": "L1_3",
-        "lattice": [
+        space_group="P4/mmm ",
+    ),
+    "L1_3": Prototype(
+        name="L1_3",
+        lattice=[
             [
                 0.5,
                 -0.5,
@@ -3696,7 +3775,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3730,10 +3809,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "L2_1": {
-        "name": "L2_1",
-        "lattice": [
+        space_group="P4/mmm ",
+    ),
+    "L2_1": Prototype(
+        name="L2_1",
+        lattice=[
             [
                 0,
                 0.5,
@@ -3750,7 +3830,7 @@ prototypes = {
                 0,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 1,
                 "vector": [
@@ -3784,10 +3864,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "L'2": {
-        "name": "L'2",
-        "lattice": [
+        space_group="Fm-3m",
+    ),
+    "L'2": Prototype(
+        name="L'2",
+        lattice=[
             [
                 1,
                 0,
@@ -3804,7 +3885,7 @@ prototypes = {
                 0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3830,10 +3911,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "L1_0": {
-        "name": "L1_0",
-        "lattice": [
+        space_group="I4/mmm ",
+    ),
+    "L1_0": Prototype(
+        name="L1_0",
+        lattice=[
             [
                 1,
                 0,
@@ -3850,7 +3932,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3868,10 +3950,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "ZrGa2": {
-        "name": "ZrGa2",
-        "lattice": [
+        space_group="P4/mmm ",
+    ),
+    "ZrGa2": Prototype(
+        name="ZrGa2",
+        lattice=[
             [
                 1,
                 0,
@@ -3888,7 +3971,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -3938,10 +4021,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "SiO2-b": {
-        "name": "SiO2-b",
-        "lattice": [
+        space_group="Cmmm",
+    ),
+    "SiO2-b": Prototype(
+        name="SiO2-b",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -3958,7 +4042,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4032,10 +4116,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Al2O3-a": {
-        "name": "Al2O3-a",
-        "lattice": [
+        space_group="P3221",
+    ),
+    "Al2O3-a": Prototype(
+        name="Al2O3-a",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -4052,7 +4137,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4294,10 +4379,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "SiO2-a": {
-        "name": "SiO2-a",
-        "lattice": [
+        space_group="R3c",
+    ),
+    "SiO2-a": Prototype(
+        name="SiO2-a",
+        lattice=[
             [
                 0.5,
                 -0.8660254038,
@@ -4314,7 +4400,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4388,10 +4474,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Fe5CoN2": {
-        "name": "Fe5CoN2",
-        "lattice": [
+        space_group="P3221",
+    ),
+    "Fe5CoN2": Prototype(
+        name="Fe5CoN2",
+        lattice=[
             [
                 1,
                 0,
@@ -4408,7 +4495,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4474,10 +4561,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Nd2Fe14B": {
-        "name": "Nd2Fe14B",
-        "lattice": [
+        space_group="unknown",
+    ),
+    "Nd2Fe14B": Prototype(
+        name="Nd2Fe14B",
+        lattice=[
             [
                 1,
                 0,
@@ -4494,7 +4582,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4528,10 +4616,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "A7": {
-        "name": "A7",
-        "lattice": [
+        space_group="P4_2/mnm",
+    ),
+    "A7": Prototype(
+        name="A7",
+        lattice=[
             [
                 0.5,
                 -0.288675,
@@ -4548,7 +4637,7 @@ prototypes = {
                 0.333333,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4566,10 +4655,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "Alpha B": {
-        "name": "Alpha B",
-        "lattice": [
+        space_group="R3m",
+    ),
+    "Alpha B": Prototype(
+        name="Alpha B",
+        lattice=[
             [
                 0.5,
                 -0.288675,
@@ -4586,7 +4676,7 @@ prototypes = {
                 0.33333,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4684,10 +4774,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D2_1": {
-        "name": "D2_1",
-        "lattice": [
+        space_group="R-3m ",
+    ),
+    "D2_1": Prototype(
+        name="D2_1",
+        lattice=[
             [
                 1,
                 0,
@@ -4704,7 +4795,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4762,10 +4853,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "D0_23": {
-        "name": "D0_23",
-        "lattice": [
+        space_group="Pm-3m ",
+    ),
+    "D0_23": Prototype(
+        name="D0_23",
+        lattice=[
             [
                 -0.5,
                 0.5,
@@ -4782,7 +4874,7 @@ prototypes = {
                 -0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4848,10 +4940,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "TiPt_8": {
-        "name": "TiPt_8",
-        "lattice": [
+        space_group="unknown",
+    ),
+    "TiPt_8": Prototype(
+        name="TiPt_8",
+        lattice=[
             [
                 -0.5,
                 0.5,
@@ -4868,7 +4961,7 @@ prototypes = {
                 -0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4942,10 +5035,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "GaPtNi_2": {
-        "name": "GaPtNi_2",
-        "lattice": [
+        space_group="unknown",
+    ),
+    "GaPtNi_2": Prototype(
+        name="GaPtNi_2",
+        lattice=[
             [
                 1,
                 0,
@@ -4962,7 +5056,7 @@ prototypes = {
                 1,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -4996,10 +5090,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "C12": {
-        "name": "C12",
-        "lattice": [
+        space_group="unknown",
+    ),
+    "C12": Prototype(
+        name="C12",
+        lattice=[
             [
                 0.5,
                 -0.28868,
@@ -5016,7 +5111,7 @@ prototypes = {
                 0.33333,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -5066,10 +5161,11 @@ prototypes = {
                 ],
             },
         ],
-    },
-    "CsFeS_2": {
-        "name": "CsFeS_2",
-        "lattice": [
+        space_group="unknown",
+    ),
+    "CsFeS_2": Prototype(
+        name="CsFeS_2",
+        lattice=[
             [
                 -0.5,
                 0.5,
@@ -5086,7 +5182,7 @@ prototypes = {
                 -0.5,
             ],
         ],
-        "basis": [
+        basis=[
             {
                 "element": 0,
                 "vector": [
@@ -5152,5 +5248,6 @@ prototypes = {
                 ],
             },
         ],
-    },
+        space_group="unknown",
+    ),
 }

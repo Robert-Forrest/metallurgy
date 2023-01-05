@@ -13,8 +13,10 @@ from .alloy import Alloy
 from .prototype import Prototype
 from .linear_mixture import linear_mixture
 from .deviation import deviation
+from .range import range
 from .calculate import calculate, get_property_function, get_all_properties
 from .plots import plot
+from . import prototypes
 from . import properties
 from . import density
 from . import valence
@@ -144,8 +146,10 @@ __all__ = [
     "periodic_table",
     "Alloy",
     "Prototype",
+    "prototypes",
     "linear_mixture",
     "deviation",
+    "range",
     "density",
     "valence",
     "entropy",

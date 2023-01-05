@@ -1,6 +1,8 @@
 from typing import List
 from numbers import Number
 from collections import Counter
+from math import gcd
+from string import ascii_uppercase
 
 
 class Prototype:
@@ -21,11 +23,16 @@ class Prototype:
     """
 
     def __init__(
-        self, name: str, lattice: List[List[Number]], basis: List[dict]
+        self,
+        name: str,
+        lattice: List[List[Number]],
+        basis: List[dict],
+        space_group: str,
     ):
         self.name = name
         self.lattice = lattice
         self.basis = basis
+        self.space_group = space_group
 
     @property
     def num_atoms(self) -> int:
@@ -63,3 +70,17 @@ class Prototype:
         :group: structures
         """
         return len(self.elements)
+
+    @property
+    def formula(self) -> str:
+        counts = self.element_counts
+        divisor = gcd(*counts.values())
+
+        formula_str = ""
+        for element, label in zip(counts.keys(), ascii_uppercase):
+            formula_str += label
+            number = int(counts[element] / divisor)
+            if number > 1:
+                formula_str += str(number)
+
+        return formula_str

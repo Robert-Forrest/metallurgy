@@ -154,8 +154,10 @@ def calculate(
     # Check for simple linear mixture or deviations of elemental properties
     if "_linearmix" in property_name:
         return mg.linear_mixture(alloy, property_name.split("_linearmix")[0])
-    if "_deviation" in property_name:
+    elif "_deviation" in property_name:
         return mg.deviation(alloy, property_name.split("_deviation")[0])
+    elif "_range" in property_name:
+        return mg.range(alloy, property_name.split("_range")[0])
 
     # Otherwise, check all function names to find a match to the property
     property_function = get_property_function(property_name)
