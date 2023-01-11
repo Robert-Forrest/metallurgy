@@ -19,9 +19,18 @@ def get_random_prototype():
 def find_prototype(query):
     matches = []
     for prototype in prototypes:
+
         match = True
         for key in query:
-            if hasattr(prototypes[prototype], key):
+            if key == "sites":
+                basis_vectors = [
+                    b["vector"] for b in prototypes[prototype].basis
+                ]
+                if not all(vector in query[key] for vector in basis_vectors):
+                    match = False
+                    break
+
+            elif hasattr(prototypes[prototype], key):
                 if getattr(prototypes[prototype], key) != query[key]:
                     match = False
                     break
@@ -5249,5 +5258,52 @@ prototypes = {
             },
         ],
         space_group="unknown",
+    ),
+    "BaPtSb": Prototype(
+        name="BaPtSb",
+        lattice=[
+            [
+                0.5,
+                -0.8660,
+                0,
+            ],
+            [
+                0.5,
+                0.8660,
+                0,
+            ],
+            [
+                0,
+                0,
+                1,
+            ],
+        ],
+        basis=[
+            {
+                "element": 0,
+                "vector": [
+                    0,
+                    0,
+                    0,
+                ],
+            },
+            {
+                "element": 1,
+                "vector": [
+                    0.333333,
+                    0.666667,
+                    0.5,
+                ],
+            },
+            {
+                "element": 2,
+                "vector": [
+                    0.666667,
+                    0.333333,
+                    0.5,
+                ],
+            },
+        ],
+        space_group="P-6m2",
     ),
 }
