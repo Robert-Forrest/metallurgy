@@ -100,7 +100,8 @@ class Alloy:
                 )
 
                 composition_elements_ordered = [
-                    self.elements.index(e) for e in self.original_composition
+                    list(self.original_composition.keys()).index(e)
+                    for e in self.original_composition
                 ]
 
                 index_translation = {
