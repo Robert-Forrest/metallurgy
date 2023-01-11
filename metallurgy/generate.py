@@ -1,13 +1,14 @@
-import re
 import copy
-from typing import Union, Optional, List
+import re
 from numbers import Number
+from typing import List, Optional, Union
 
-import numpy as np
 import elementy
+import numpy as np
 
 import metallurgy as mg
-from .prototypes import get_random_prototype
+
+from .prototypes import find_prototype, get_random_prototype
 
 
 def random_alloy(
@@ -85,8 +86,12 @@ def random_alloy(
         for j in range(len(elements)):
             composition[elements[j]] = percentages[j]
     else:
-        random_structure = copy.deepcopy(get_random_prototype())
-        composition = "".join(elements) + "[" + random_structure.name + "]"
+        composition = "".join(elements)
+
+        possible_structures = find_prototype({"num_elements": len(elements)})
+        if len(possible_structures) > 0:
+            random_structure = np.random.choice(possible_structures, 1)[0]
+            composition += "[" + random_structure + "]"
 
     alloy = mg.Alloy(
         composition,
@@ -156,14 +161,20 @@ def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
 
     """
 
+    for i in range(len(alloys)):
+        if not isinstance(alloys[i], mg.Alloy):
+            alloys[i] = mg.Alloy(alloys[i])
+
     if len(alloys) == 1:
         return alloys[0]
 
     shared_composition_space = []
+    structures = []
     for alloy in alloys:
         for element in alloy.elements:
             if element not in shared_composition_space:
                 shared_composition_space.append(element)
+        structures.append(alloy.structure)
 
     constraints = None
     for alloy in alloys:
@@ -264,7 +275,14 @@ def mixture(alloys: List[mg.Alloy], weights: Optional[list] = None):
                     alloys[i].composition[element] * weights[i]
                 )
 
-    return mg.Alloy(mixed_composition, constraints=constraints)
+    structure = [
+        s
+        for _, s in sorted(zip(weights, structures), key=lambda pair: pair[0])
+    ][0]
+
+    return mg.Alloy(
+        mixed_composition, structure=structure, constraints=constraints
+    )
 
 
 def system(
