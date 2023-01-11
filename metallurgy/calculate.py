@@ -181,6 +181,10 @@ def calculate(
         return mg.deviation(alloy, property_name.split("_deviation")[0])
     elif "_range" in property_name:
         return mg.range(alloy, property_name.split("_range")[0])
+    elif "_maximum" in property_name:
+        return mg.maximum(alloy, property_name.split("_maximum")[0])
+    elif "_minimum" in property_name:
+        return mg.minimum(alloy, property_name.split("_minimum")[0])
 
     # Otherwise, check all function names to find a match to the property
     property_function = get_property_function(property_name)
@@ -376,13 +380,15 @@ def range(
 
     # If a list of alloys is given, return a list of linear mixture data
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [range(a, property_name) for a in list(alloy)]
+        return [mg.range(a, property_name) for a in list(alloy)]
 
     # Convert input alloy to an Alloy instance if not already
     elif not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
     per_element_values = get_per_element_values(alloy, property_name)
+    if per_element_values is None or None in per_element_values:
+        return None
     return np.abs(np.max(per_element_values) - np.min(per_element_values))
 
 
