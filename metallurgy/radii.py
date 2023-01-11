@@ -1,7 +1,7 @@
 """Module enabling calculation of radius related alloy properties."""
 
-from typing import Union, List
 from collections.abc import Iterable
+from typing import List, Union
 
 import numpy as np
 
@@ -33,20 +33,20 @@ def radius_gamma(
 
     max_radius = 0
     min_radius = 1000
+    radii = {}
+    for element in alloy.elements:
+        radii[element] = mg.periodic_table.elements[element]["radius"]
+        if radii[element] is None:
+            return None
+
+        if radii[element] > max_radius:
+            max_radius = radii[element]
+        if radii[element] < min_radius:
+            min_radius = radii[element]
 
     mean_radius = 0
     for element in alloy.elements:
-        mean_radius += (
-            alloy.composition[element]
-            * mg.periodic_table.elements[element]["radius"]
-        )
-
-    for element in alloy.elements:
-        r = mg.periodic_table.elements[element]["radius"]
-        if r > max_radius:
-            max_radius = r
-        if r < min_radius:
-            min_radius = r
+        mean_radius += alloy.composition[element] * radii[element]
 
     r_min_delta_sq = (min_radius + mean_radius) ** 2
     r_max_delta_sq = (max_radius + mean_radius) ** 2
