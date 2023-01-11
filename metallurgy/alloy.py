@@ -1090,22 +1090,11 @@ def parse_composition_string(composition_string: str) -> dict:
 
     if "(" in composition_string:
 
-        sub_composition_percentage = (
-            float(
-                re.split(r"(\d+(?:\.\d+)?)", composition_string.split(")")[1])[
-                    1
-                ]
-            )
-            / 100.0
-        )
-
         sub_composition_string = composition_string.split(")")[0].split("(")[1]
 
         sub_composition = parse_composition_string_block(
             sub_composition_string
         )
-        for element in sub_composition:
-            sub_composition[element] *= sub_composition_percentage
 
         pre_sub_composition_string = composition_string.split(")")[0].split(
             "("
@@ -1120,9 +1109,41 @@ def parse_composition_string(composition_string: str) -> dict:
         if re.search("[a-zA-Z]", post_sub_composition_string) is not None:
             remaining_composition_string += post_sub_composition_string
 
+        split_composition = re.findall(
+            r"[A-Z][^A-Z]*", remaining_composition_string
+        )
+
+        composition_sum = 0
+        for element_percentage in split_composition:
+            split_element_percentage = re.split(
+                r"(\d+(?:\.\d+)?)", element_percentage
+            )
+            if len(split_element_percentage) > 1:
+                composition_sum += float(split_element_percentage[1])
+        if composition_sum == 0:
+            composition_sum = 1
+
+        sub_composition_percentage = float(
+            re.split(r"(\d+(?:\.\d+)?)", composition_string.split(")")[1])[1]
+        )
+        sub_composition_sum = sum(
+            [sub_composition[p] for p in sub_composition]
+        )
+        total_sum = composition_sum + sub_composition_percentage
+        scale_factor = 1
+        if total_sum > 1.0:
+            scale_factor = 100
+        sub_composition_percentage /= scale_factor
+        for element in sub_composition:
+            sub_composition[element] *= (
+                sub_composition_percentage / sub_composition_sum
+            )
+
         remaining_composition = parse_composition_string_block(
             remaining_composition_string
         )
+        for element in remaining_composition:
+            remaining_composition[element] *= 1 - sub_composition_percentage
 
         composition = {**sub_composition, **remaining_composition}
 
@@ -1138,9 +1159,20 @@ def parse_composition_string_block(composition_string: str) -> dict:
 
     :group: alloy.utils
     """
+
     composition = {}
 
     split_composition = re.findall(r"[A-Z][^A-Z]*", composition_string)
+
+    composition_sum = 0
+    for element_percentage in split_composition:
+        split_element_percentage = re.split(
+            r"(\d+(?:\.\d+)?)", element_percentage
+        )
+        if len(split_element_percentage) > 1:
+            composition_sum += float(split_element_percentage[1])
+    if composition_sum == 0:
+        composition_sum = 1
 
     for element_percentage in split_composition:
         split_element_percentage = re.split(
@@ -1155,7 +1187,8 @@ def parse_composition_string_block(composition_string: str) -> dict:
                 )
 
             composition[split_element_percentage[0]] = round(
-                float(split_element_percentage[1]) / 100.0, decimal_places
+                float(split_element_percentage[1]) / composition_sum,
+                decimal_places,
             )
         else:
             composition[split_element_percentage[0]] = 1.0 / len(
