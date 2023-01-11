@@ -1,6 +1,5 @@
-import pytest
-
 import metallurgy as mg
+import pytest
 
 
 def test_random_alloy(random_alloy=None):
@@ -199,3 +198,6 @@ def test_mixture():
     assert len(mixed.elements) <= 2
     assert mixed.composition["Cu"] <= 0.6
     assert mixed.composition["Cu"] >= 0.1
+
+    assert mg.generate.mixture(["Cu[A1]", "Fe[A2]"]) == "Cu50Fe50[A1]"
+    assert mg.generate.mixture(["Cu[A2]", "Fe[A1]"]) == "Cu50Fe50[A2]"
