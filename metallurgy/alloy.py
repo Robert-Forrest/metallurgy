@@ -1,14 +1,15 @@
 from __future__ import annotations
+
 import copy
 import re
-from typing import Union, Callable, Optional
-from collections import OrderedDict, Counter
+from collections import Counter, OrderedDict
+from typing import Callable, Optional, Union
 
-import numpy as np
 import elementy
+import numpy as np
 
-from .prototypes import get_prototype
 from .prototype import Prototype
+from .prototypes import get_prototype
 
 
 class Alloy:
@@ -129,6 +130,7 @@ class Alloy:
                 ] += self.structure.composition[element_index]
 
             self.composition = structure_composition
+
         else:
             self.structure = None
 
