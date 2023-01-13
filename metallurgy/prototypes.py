@@ -4666,8 +4666,8 @@ prototypes = {
         ],
         space_group="R3m",
     ),
-    "Alpha B": Prototype(
-        name="Alpha B",
+    "Alpha_B": Prototype(
+        name="Alpha_B",
         lattice=[
             [
                 0.5,
