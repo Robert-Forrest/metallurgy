@@ -32,6 +32,7 @@ class Prototype:
         self.name = name
         self.lattice = lattice
         self.basis = basis
+        self.original_basis = basis
         self.space_group = space_group
 
     @property

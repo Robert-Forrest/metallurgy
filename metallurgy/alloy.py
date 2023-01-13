@@ -78,6 +78,7 @@ class Alloy:
         self.original_composition, composition_structure = parse_composition(
             composition
         )
+        self.original_elements = list(set(self.original_composition.keys()))
         self.composition = filter_order_composition(self.original_composition)
 
         if self.composition is None:
@@ -199,6 +200,24 @@ class Alloy:
         :group: alloy
         """
         return list(self.composition.keys())
+
+    @property
+    def elements_structure_order(self) -> list:
+        """List of elements in the alloy in the order of the structure basis.
+
+        :group: alloy
+        """
+        if self.structure is not None:
+            return list(
+                set(
+                    [
+                        self.original_elements[b["element"]]
+                        for b in self.structure.original_basis
+                    ]
+                )
+            )
+        else:
+            return self.elements
 
     @property
     def num_elements(self) -> int:
