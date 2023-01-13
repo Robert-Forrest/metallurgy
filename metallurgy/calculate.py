@@ -439,7 +439,7 @@ def minimum(
 
     # If a list of alloys is given, return a list of linear mixture data
     if isinstance(alloy, Iterable) and not isinstance(alloy, (str, dict)):
-        return [maximum(a, property_name) for a in list(alloy)]
+        return [minimum(a, property_name) for a in list(alloy)]
 
     # Convert input alloy to an Alloy instance if not already
     elif not isinstance(alloy, mg.Alloy):
