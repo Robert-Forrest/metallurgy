@@ -218,7 +218,9 @@ class Alloy:
         if self.structure is not None:
             unique_elements = []
             for b in self.structure.original_basis:
-                if self.original_elements[b["element"]] not in unique_elements:
+                if b["element"] < len(self.original_elements) and (
+                    self.original_elements[b["element"]] not in unique_elements
+                ):
                     unique_elements.append(
                         self.original_elements[b["element"]]
                     )
