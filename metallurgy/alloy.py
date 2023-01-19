@@ -78,7 +78,7 @@ class Alloy:
         self.original_composition, composition_structure = parse_composition(
             composition
         )
-        self.original_elements = list(set(self.original_composition.keys()))
+        self.original_elements = list(self.original_composition.keys())
         self.composition = filter_order_composition(self.original_composition)
 
         if self.composition is None:
@@ -86,54 +86,9 @@ class Alloy:
         if structure is None and composition_structure is not None:
             structure = composition_structure
 
+        self._structure = None
         if structure is not None:
-            if isinstance(structure, str):
-                structure = copy.deepcopy(get_prototype(structure))
             self.structure = structure
-
-            if not all(
-                value == list(self.original_composition.values())[0]
-                for value in self.original_composition.values()
-            ):
-                structure_elements_ordered = sorted(
-                    self.structure.composition,
-                    key=lambda x: self.structure.composition[x],
-                    reverse=True,
-                )
-
-                composition_elements_ordered = [
-                    list(self.original_composition.keys()).index(e)
-                    for e in self.original_composition
-                ]
-
-                index_translation = {
-                    i: j
-                    for i, j in zip(
-                        composition_elements_ordered,
-                        structure_elements_ordered,
-                    )
-                }
-                for b in self.structure.basis:
-                    if b["element"] in index_translation:
-                        b["element"] = index_translation[b["element"]]
-
-            structure_composition = {}
-            for structure_element_index in self.structure.elements:
-                if structure_element_index >= len(self.elements):
-                    element_index = len(self.elements) - 1
-                else:
-                    element_index = structure_element_index
-
-                if self.elements[element_index] not in structure_composition:
-                    structure_composition[self.elements[element_index]] = 0
-                structure_composition[
-                    self.elements[element_index]
-                ] += self.structure.composition[element_index]
-
-            self.composition = structure_composition
-
-        else:
-            self.structure = None
 
         self.constraints = None
 
@@ -194,6 +149,59 @@ class Alloy:
             self.rescale()
 
     @property
+    def structure(self) -> str:
+        return self._structure
+
+    @structure.setter
+    def structure(self, structure):
+
+        if isinstance(structure, str):
+            structure = copy.deepcopy(get_prototype(structure))
+        self._structure = structure
+
+        if not all(
+            value == list(self.original_composition.values())[0]
+            for value in self.original_composition.values()
+        ):
+            structure_elements_ordered = sorted(
+                self.structure.composition,
+                key=lambda x: self.structure.composition[x],
+                reverse=True,
+            )
+
+            composition_elements_ordered = [
+                list(self.original_composition.keys()).index(e)
+                for e in self.original_composition
+            ]
+
+            index_translation = {
+                i: min([j, max(composition_elements_ordered)])
+                for i, j in zip(
+                    composition_elements_ordered,
+                    structure_elements_ordered,
+                )
+            }
+
+            for b in self.structure.basis:
+                if b["element"] in index_translation:
+                    b["element"] = index_translation[b["element"]]
+
+        structure_composition = {}
+        for structure_element_index in self.structure.elements:
+            if structure_element_index >= len(self.elements):
+                element_index = len(self.elements) - 1
+            else:
+                element_index = structure_element_index
+
+            if self.elements[element_index] not in structure_composition:
+                structure_composition[self.elements[element_index]] = 0
+            structure_composition[
+                self.elements[element_index]
+            ] += self.structure.composition[element_index]
+
+        self.composition = structure_composition
+
+    @property
     def elements(self) -> list:
         """List of elements in the alloy.
 
@@ -208,14 +216,13 @@ class Alloy:
         :group: alloy
         """
         if self.structure is not None:
-            return list(
-                set(
-                    [
+            unique_elements = []
+            for b in self.structure.original_basis:
+                if self.original_elements[b["element"]] not in unique_elements:
+                    unique_elements.append(
                         self.original_elements[b["element"]]
-                        for b in self.structure.original_basis
-                    ]
-                )
-            )
+                    )
+            return unique_elements
         else:
             return self.elements
 
