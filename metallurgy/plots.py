@@ -1,21 +1,16 @@
 from typing import List, Optional
 
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.collections as mcoll
 import matplotlib as mpl
+import matplotlib.collections as mcoll
+import matplotlib.pyplot as plt
+import numpy as np
 import ternary as ternary_plt
-from bokeh.sampledata.periodic_table import elements
-from bokeh.models import (
-    ColumnDataSource,
-    LinearColorMapper,
-    LogColorMapper,
-    ColorBar,
-    BasicTicker,
-)
-from bokeh.plotting import figure
 from bokeh.io import export_png
 from bokeh.io import show as show_
+from bokeh.models import (BasicTicker, ColorBar, ColumnDataSource,
+                          LinearColorMapper, LogColorMapper)
+from bokeh.plotting import figure
+from bokeh.sampledata.periodic_table import elements
 from bokeh.transform import dodge
 
 import metallurgy as mg
@@ -25,6 +20,7 @@ def plot(
     alloys: list,
     data: list,
     label: str = None,
+    labels: Optional[List[str]] = None,
     save_path: str = None,
 ):
     """An automatic interface to metallurgy's alloy system plotting
@@ -54,7 +50,9 @@ def plot(
         raise ValueError("Could not determine number of elements.")
 
     if num_elements == 2:
-        return binary(alloys, data, ylabel=label, save_path=save_path)
+        return binary(
+            alloys, data, ylabel=label, labels=labels, save_path=save_path
+        )
     elif num_elements == 3:
         return ternary(alloys, data, label=label, save_path=save_path)
     elif num_elements == 4:
@@ -72,7 +70,7 @@ def binary(
     data,
     xlabel: str = None,
     ylabel: str = None,
-    labels: list = None,
+    labels: List[str] = None,
     scatter_data: list = None,
     use_colorline: bool = False,
     save_path: str = None,
@@ -118,14 +116,30 @@ def binary(
                 label = labels[i]
 
             ax1.plot(percentages, data[i], label=label)
+
     elif isinstance(data[0], tuple):
-        ax1.plot(percentages, [d[0] for d in data])
-        ax1.fill_between(
-            percentages,
-            [d[0] - d[1] for d in data],
-            [d[0] + d[1] for d in data],
-            alpha=0.5,
-        )
+        if isinstance(data[0][0], list):
+            for i in range(len(data[0][0])):
+                label = None
+                if labels is not None:
+                    label = labels[i]
+
+                ax1.plot(percentages, [d[0][i] for d in data], label=label)
+                ax1.fill_between(
+                    percentages,
+                    [d[0][i] - d[1][i] for d in data],
+                    [d[0][i] + d[1][i] for d in data],
+                    alpha=0.5,
+                )
+
+        else:
+            ax1.plot(percentages, [d[0] for d in data])
+            ax1.fill_between(
+                percentages,
+                [d[0] - d[1] for d in data],
+                [d[0] + d[1] for d in data],
+                alpha=0.5,
+            )
 
     else:
         ax1.plot(percentages, data)
@@ -141,6 +155,9 @@ def binary(
                 zorder=20,
             )
         ax1.legend(loc="best")
+    elif labels is not None:
+        ax1.legend(loc="best")
+
     ax1.autoscale()
 
     if not isinstance(data[0], list) and not use_colorline:
