@@ -5,11 +5,11 @@ metallurgy.
 
 import inspect
 from dataclasses import fields
-from typing import Callable, List, Optional, Union, Iterable
 from numbers import Number
+from typing import Callable, Iterable, List, Optional, Union
 
-import numpy as np
 import elementy
+import numpy as np
 
 import metallurgy as mg
 
@@ -51,12 +51,7 @@ def get_property_function(property_name: str) -> Union[Callable, None]:
                 return getattr(module[1], func)
 
 
-def get_all_properties() -> List[str]:
-    """Returns every calculatable property for alloy compositions.
-
-    :group: utils
-    """
-
+def get_all_elemental_properties(add_suffixes: bool = False) -> List[str]:
     properties = []
 
     for p in fields(elementy.element.Element):
@@ -66,7 +61,17 @@ def get_all_properties() -> List[str]:
             p.type in [int, float, Optional[float]]
             and p.name not in properties
         ):
-            properties.append(p.name)
+            if not add_suffixes:
+                properties.append(p.name)
+            else:
+                properties.append(p.name + "_linearmix")
+                properties.append(p.name + "_deviation")
+
+    return properties
+
+
+def get_all_complex_properties() -> List[str]:
+    properties = []
 
     # Get all modules in metallurgy
     modules = inspect.getmembers(mg, inspect.ismodule)
@@ -79,6 +84,19 @@ def get_all_properties() -> List[str]:
                 and func not in properties
             ):
                 properties.append(func)
+    return properties
+
+
+def get_all_properties(add_suffixes: bool = False) -> List[str]:
+    """Returns every calculatable property for alloy compositions.
+
+    :group: utils
+    """
+
+    properties = (
+        get_all_elemental_properties(add_suffixes=add_suffixes)
+        + get_all_complex_properties()
+    )
 
     return properties
 
@@ -106,7 +124,7 @@ def get_per_element_values(alloy, property_name):
 
 def calculate(
     alloy: Union[mg.Alloy, str, dict],
-    property_name: Union[str, List[str]],
+    property_name: Optional[Union[str, List[str]]] = None,
     uncertainty: bool = False,
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the a particular property calculated for an alloy, using other
@@ -127,6 +145,9 @@ def calculate(
         If using a cerebral model, activate dropout layers during inference and
         gather uncertainty information.
     """
+    if property_name is None:
+        property_name = [p for p in get_all_properties(add_suffixes=True)]
+
     if isinstance(property_name, Iterable) and not isinstance(
         property_name, (str, dict)
     ):
