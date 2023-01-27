@@ -66,6 +66,9 @@ def get_all_elemental_properties(add_suffixes: bool = False) -> List[str]:
             else:
                 properties.append(p.name + "_linearmix")
                 properties.append(p.name + "_deviation")
+                properties.append(p.name + "_range")
+                properties.append(p.name + "_minimum")
+                properties.append(p.name + "_maximum")
 
     return properties
 
