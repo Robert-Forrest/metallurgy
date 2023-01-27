@@ -413,7 +413,9 @@ def range(
     per_element_values = get_per_element_values(alloy, property_name)
     if per_element_values is None or None in per_element_values:
         return None
-    return np.abs(np.max(per_element_values) - np.min(per_element_values))
+    return float(
+        np.abs(np.max(per_element_values) - np.min(per_element_values))
+    )
 
 
 def maximum(
@@ -441,7 +443,14 @@ def maximum(
     elif not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    return np.max(get_per_element_values(alloy, property_name))
+    raw_values = get_per_element_values(alloy, property_name)
+    if raw_values is not None:
+        values = []
+        for v in raw_values:
+            if v is not None:
+                values.append(v)
+
+        return float(np.max(values))
 
 
 def minimum(
@@ -469,4 +478,10 @@ def minimum(
     elif not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    return np.min(get_per_element_values(alloy, property_name))
+    raw_values = get_per_element_values(alloy, property_name)
+    if raw_values is not None:
+        values = []
+        for v in raw_values:
+            if v is not None:
+                values.append(v)
+        return float(np.min(values))
