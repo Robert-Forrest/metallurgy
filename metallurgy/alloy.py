@@ -165,6 +165,10 @@ class Alloy:
             reverse=True,
         )
 
+        for i in range(len(self.elements)):
+            if i not in structure_elements_ordered:
+                structure_elements_ordered.append(i)
+
         if not all(
             value == list(self.original_composition.values())[0]
             for value in self.original_composition.values()
@@ -175,10 +179,6 @@ class Alloy:
             ]
         else:
             composition_elements_ordered = structure_elements_ordered[:]
-
-        for i in range(len(self.elements)):
-            if i not in structure_elements_ordered:
-                structure_elements_ordered.append(i)
 
         index_translation = {
             i: min([j, max(composition_elements_ordered)])
@@ -195,7 +195,7 @@ class Alloy:
         structure_composition = {}
         for i, element in enumerate(self.elements):
             if i >= len(self.structure.elements):
-                structure_element_index = i - len(self.structure.elements)
+                structure_element_index = i % len(self.structure.elements)
             else:
                 structure_element_index = i
 
