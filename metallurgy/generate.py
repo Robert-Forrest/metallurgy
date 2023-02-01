@@ -8,7 +8,7 @@ import numpy as np
 
 import metallurgy as mg
 
-from .prototypes import find_prototype, get_random_prototype
+from .prototypes import get_random_prototype
 
 
 def random_alloy(
@@ -88,10 +88,7 @@ def random_alloy(
     else:
         composition = "".join(elements)
 
-        possible_structures = find_prototype({"num_elements": len(elements)})
-        if len(possible_structures) > 0:
-            random_structure = np.random.choice(possible_structures, 1)[0]
-            composition += "[" + random_structure + "]"
+        composition += "[" + get_random_prototype().name + "]"
 
     alloy = mg.Alloy(
         composition,
