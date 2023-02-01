@@ -86,11 +86,11 @@ class Alloy:
         if structure is None and composition_structure is not None:
             structure = composition_structure
 
+        self.constraints = None
+
         self._structure = None
         if structure is not None:
             self.structure = structure
-
-        self.constraints = None
 
         if rescale:
             self.rescale()
@@ -159,47 +159,55 @@ class Alloy:
             structure = copy.deepcopy(get_prototype(structure))
         self._structure = structure
 
+        structure_elements_ordered = sorted(
+            self.structure.composition,
+            key=lambda x: self.structure.composition[x],
+            reverse=True,
+        )
+
         if not all(
             value == list(self.original_composition.values())[0]
             for value in self.original_composition.values()
         ):
-            structure_elements_ordered = sorted(
-                self.structure.composition,
-                key=lambda x: self.structure.composition[x],
-                reverse=True,
-            )
-
             composition_elements_ordered = [
                 list(self.original_composition.keys()).index(e)
                 for e in self.original_composition
             ]
+        else:
+            composition_elements_ordered = structure_elements_ordered[:]
 
-            index_translation = {
-                i: min([j, max(composition_elements_ordered)])
-                for i, j in zip(
-                    composition_elements_ordered,
-                    structure_elements_ordered,
-                )
-            }
+        for i in range(len(self.elements)):
+            if i not in structure_elements_ordered:
+                structure_elements_ordered.append(i)
 
-            for b in self.structure.basis:
-                if b["element"] in index_translation:
-                    b["element"] = index_translation[b["element"]]
+        index_translation = {
+            i: min([j, max(composition_elements_ordered)])
+            for i, j in zip(
+                composition_elements_ordered,
+                structure_elements_ordered,
+            )
+        }
+
+        for b in self.structure.basis:
+            if b["element"] in index_translation:
+                b["element"] = index_translation[b["element"]]
 
         structure_composition = {}
-        for structure_element_index in self.structure.elements:
-            if structure_element_index >= len(self.elements):
-                element_index = len(self.elements) - 1
+        for i, element in enumerate(self.elements):
+            if i >= len(self.structure.elements):
+                structure_element_index = i - len(self.structure.elements)
             else:
-                element_index = structure_element_index
+                structure_element_index = i
 
-            if self.elements[element_index] not in structure_composition:
-                structure_composition[self.elements[element_index]] = 0
-            structure_composition[
-                self.elements[element_index]
-            ] += self.structure.composition[element_index]
+            if element not in structure_composition:
+                structure_composition[element] = 0
+            structure_composition[element] += self.structure.composition[
+                structure_element_index
+            ]
 
         self.composition = structure_composition
+
+        self.rescale()
 
     @property
     def elements(self) -> list:
@@ -399,11 +407,11 @@ class Alloy:
             self.clamp_composition()
             self.round_composition()
 
+        self.reorder_composition()
+
         if not constraints_applied:
             self.clamp_composition()
         self.round_composition()
-
-        self.reorder_composition()
 
         delattr(self, "rescaling")
 
@@ -866,7 +874,7 @@ class Alloy:
         """
 
         composition_str = ""
-        for element in self.elements:
+        for element in self.composition:
             percentage_str = str(self.composition[element] * 100.0)
 
             split_str = percentage_str.split(".")
@@ -877,6 +885,7 @@ class Alloy:
                 decimal_places = len(
                     str(self.composition[element]).split(".")[1]
                 )
+
                 percentage_str = str(
                     round(float(percentage_str), decimal_places)
                 )
