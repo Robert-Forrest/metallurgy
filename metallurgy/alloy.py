@@ -160,8 +160,8 @@ class Alloy:
         self._structure = structure
 
         structure_elements_ordered = sorted(
-            self.structure.composition,
-            key=lambda x: self.structure.composition[x],
+            self._structure.composition,
+            key=lambda x: self._structure.composition[x],
             reverse=True,
         )
 
@@ -180,17 +180,13 @@ class Alloy:
         else:
             composition_elements_ordered = structure_elements_ordered[:]
 
-        index_translation = {
-            i: min([j, max(composition_elements_ordered)])
+        self.structure_element_translation = {
+            i: j
             for i, j in zip(
                 composition_elements_ordered,
                 structure_elements_ordered,
             )
         }
-
-        for b in self.structure.basis:
-            if b["element"] in index_translation:
-                b["element"] = index_translation[b["element"]]
 
         structure_composition = {}
         for i, element in enumerate(self.elements):
@@ -202,7 +198,7 @@ class Alloy:
             if element not in structure_composition:
                 structure_composition[element] = 0
             structure_composition[element] += self.structure.composition[
-                structure_element_index
+                self.structure_element_translation[structure_element_index]
             ]
 
         self.composition = structure_composition
@@ -224,15 +220,17 @@ class Alloy:
         :group: alloy
         """
         if self.structure is not None:
-            unique_elements = []
-            for b in self.structure.original_basis:
-                if b["element"] < len(self.original_elements) and (
-                    self.original_elements[b["element"]] not in unique_elements
-                ):
-                    unique_elements.append(
-                        self.original_elements[b["element"]]
-                    )
-            return unique_elements
+            sorted_translation = sorted(
+                self.structure_element_translation.items(),
+                key=lambda x: x[1],
+            )
+
+            elements = []
+            for pair in sorted_translation:
+                if pair[0] < len(self.elements):
+                    elements.append(self.elements[pair[0]])
+            return elements
+
         else:
             return self.elements
 
