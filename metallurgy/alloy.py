@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import re
 from collections import Counter, OrderedDict
+from types import SimpleNamespace
 from typing import Callable, Optional, Union
 
 import elementy
@@ -156,7 +157,12 @@ class Alloy:
     def structure(self, structure):
 
         if isinstance(structure, str):
-            structure = copy.deepcopy(get_prototype(structure))
+            try:
+                structure = copy.deepcopy(get_prototype(structure))
+            except:
+                self._structure = SimpleNamespace(**{"name": structure})
+                return
+
         self._structure = structure
 
         structure_elements_ordered = sorted(
