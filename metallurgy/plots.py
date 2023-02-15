@@ -53,7 +53,10 @@ def plot(
         raise ValueError("Must provide either alloys or elements.")
 
     if elements is not None:
-        alloys, percentages = mg.generate.system(elements, step=step)
+        if len(elements) < 4:
+            alloys, percentages = mg.generate.system(elements, step=step)
+        else:
+            alloys = mg.generate.system(elements, step=step)
 
     if len(data) == 0 and property_name is None:
         raise ValueError("Must provide either data or a property_name.")
