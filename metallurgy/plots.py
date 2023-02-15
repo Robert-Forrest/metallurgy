@@ -3,6 +3,7 @@ from typing import List, Optional
 import matplotlib as mpl
 import matplotlib.collections as mcoll
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import numpy as np
 import ternary as ternary_plt
 from bokeh.io import export_png
@@ -91,7 +92,7 @@ def binary(
         The alloys across the binary composition
     """
 
-    fig = plt.figure()
+    fig = Figure()
     ax1 = fig.add_subplot(111)
 
     elements = []
@@ -180,17 +181,15 @@ def binary(
     if ylabel is not None:
         ax1.set_ylabel(ylabel)
 
-    plt.tight_layout()
+    fig.tight_layout()
 
-    plt.gcf().set_dpi(300)
+    # fig.gcf().set_dpi(300)
     if save_path is not None:
-        plt.savefig(save_path)
+        fig.savefig(save_path)
     else:
-        plt.show()
+        fig.show()
 
-    plt.cla()
-    plt.clf()
-    plt.close()
+    fig.clf()
 
 
 def ternary(
@@ -301,13 +300,13 @@ def ternary(
 
     tax.get_axes().set_aspect(1)
     tax._redraw_labels()
-    plt.gcf().set_dpi(300)
+    # plt.gcf().set_dpi(300)
 
     if ax is None:
         if save_path is None:
             tax.show()
         else:
-            tax.savefig(save_path + ".png")
+            tax.savefig(save_path)
 
         tax.close()
         figure.clf()
@@ -340,7 +339,7 @@ def quaternary(
     numGridCells = columns * rows
     gridExcess = numGridCells - len(quaternary_alloys)
 
-    fig = plt.figure(figsize=(4 * columns, 4 * rows))
+    fig = Figure(figsize=(4 * columns, 4 * rows))
 
     lastAx = None
     for i in reversed(range(len(quaternary_alloys))):
