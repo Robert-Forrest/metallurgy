@@ -23,11 +23,14 @@ import metallurgy as mg
 
 
 def plot(
-    alloys: list,
-    data: list,
+    alloys: Optional = None,
+    data: Optional[list] = [],
+    elements: Optional[List[str]] = None,
+    property_name: str = None,
     label: str = None,
     labels: Optional[List[str]] = None,
     save_path: str = None,
+    step: Optional = None,
 ):
     """An automatic interface to metallurgy's alloy system plotting
     functions.
@@ -43,6 +46,19 @@ def plot(
         String for labelling the plotted data.
 
     """
+
+    if (alloys is None and elements is None) or (
+        alloys is not None and elements is not None
+    ):
+        raise ValueError("Must provide either alloys or elements.")
+
+    if elements is not None:
+        alloys, percentages = mg.generate.system(elements, step=step)
+
+    if len(data) == 0 and property_name is None:
+        raise ValueError("Must provide either data or a property_name.")
+    elif property_name is not None:
+        data = mg.calculate(alloys, property_name)
 
     if isinstance(alloys[0], mg.Alloy):
         num_elements = len(mg.analyse.find_unique_elements(alloys))
