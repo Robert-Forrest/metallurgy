@@ -3,21 +3,16 @@ from typing import List, Optional
 import matplotlib as mpl
 import matplotlib.collections as mcoll
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 import numpy as np
 import ternary as ternary_plt
 from bokeh.io import export_png
 from bokeh.io import show as show_
-from bokeh.models import (
-    BasicTicker,
-    ColorBar,
-    ColumnDataSource,
-    LinearColorMapper,
-    LogColorMapper,
-)
+from bokeh.models import (BasicTicker, ColorBar, ColumnDataSource,
+                          LinearColorMapper, LogColorMapper)
 from bokeh.plotting import figure
 from bokeh.sampledata.periodic_table import elements
 from bokeh.transform import dodge
+from matplotlib.figure import Figure
 
 import metallurgy as mg
 
