@@ -369,11 +369,6 @@ class Alloy:
 
         if len(self.composition) < 1:
             return
-        elif len(self.composition) == 1:
-            self.composition.__setitem__(
-                self.elements[0], 1.0, respond_to_change=False
-            )
-            return
 
         self.rescaling = True
 
