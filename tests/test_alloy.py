@@ -74,6 +74,16 @@ def test_structure():
         == "Fe38As38Cu12Sc12[D0_3]"
     )
 
+    assert (
+        mg.Alloy(
+            {"Fe": 0.6666666666666666, "O": 0.3333333333333333},
+            structure="BaPtSb",
+        )
+        == "Fe66.667O33.333[BaPtSb]"
+    )
+
+    assert mg.Alloy("CuZr", "D5_3") == "Cu70Zr30[D5_3]"
+
 
 def test_structure_change():
 

@@ -193,13 +193,28 @@ class Alloy:
                 structure_element_index = i
             self.structure_element_translation[i] = structure_element_index
 
+        if len(self.elements) < len(self.structure.elements):
+            for i, element in enumerate(self.structure.elements):
+                if i not in self.structure_element_translation:
+                    self.structure_element_translation[i] = i % len(
+                        self.elements
+                    )
+
         structure_composition = {}
         for i in self.structure_element_translation:
-            if i not in structure_composition:
-                structure_composition[i] = 0
-            structure_composition[i] += self.structure.composition[
-                self.structure_element_translation[i]
-            ]
+            element_index = self.structure_element_translation[i]
+            if i < len(self.elements):
+                if i not in structure_composition:
+                    structure_composition[i] = 0
+                structure_composition[i] += self.structure.composition[
+                    element_index
+                ]
+            else:
+                if element_index not in structure_composition:
+                    structure_composition[element_index] = 0
+                structure_composition[
+                    element_index
+                ] += self.structure.composition[i]
 
         if not all(
             value == list(self.original_composition.values())[0]
@@ -242,16 +257,19 @@ class Alloy:
         else:
             translated_structure_composition = {}
             for i in self.structure_element_translation:
+                if i >= self.num_elements:
+                    continue
                 translated_structure_composition[
                     self.elements[i]
                 ] = structure_composition[i]
 
-            for i in range(len(self.elements)):
-                self.structure_element_translation[
+            filtered_translation = {}
+            for i in structure_composition:
+                filtered_translation[
                     self.elements[i]
                 ] = self.structure_element_translation[i]
 
-                del self.structure_element_translation[i]
+            self.structure_element_translation = filtered_translation
 
         self.composition = translated_structure_composition
         self.rescale()
