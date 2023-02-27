@@ -183,6 +183,7 @@ class Alloy:
             digits = 0
             for element in self.composition:
                 digits = max([digits, len(str(self.composition[element])) - 2])
+            digits = min([5, digits])
 
         self.structure_element_translation = {}
         for i, element in enumerate(self.elements):
