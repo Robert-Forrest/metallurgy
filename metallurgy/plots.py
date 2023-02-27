@@ -25,7 +25,7 @@ def plot(
     label: str = None,
     labels: Optional[List[str]] = None,
     save_path: str = None,
-    step: Optional = None,
+    step: Optional = 1,
 ):
     """An automatic interface to metallurgy's alloy system plotting
     functions.
@@ -69,14 +69,21 @@ def plot(
     else:
         raise ValueError("Could not determine number of elements.")
 
+    if step is not None:
+        step /= 100
+
     if num_elements == 2:
         return binary(
             alloys, data, ylabel=label, labels=labels, save_path=save_path
         )
     elif num_elements == 3:
-        return ternary(alloys, data, label=label, save_path=save_path)
+        return ternary(
+            alloys, data, label=label, save_path=save_path, step=step
+        )
     elif num_elements == 4:
-        return quaternary(alloys, data, label=label, save_path=save_path)
+        return quaternary(
+            alloys, data, label=label, save_path=save_path, step=step
+        )
     else:
         raise NotImplementedError(
             "No plotting available for "
@@ -129,13 +136,13 @@ def binary(
         cbar = plt.colorbar(lc)
         cbar.set_label(elements[0] + " %", rotation=270)
 
-    elif isinstance(data[0], list):
-        for i in range(len(data)):
+    elif isinstance(data[0], (list, np.ndarray)):
+        for i in range(len(data[0])):
             label = None
             if labels is not None:
                 label = labels[i]
 
-            ax1.plot(percentages, data[i], label=label)
+            ax1.plot(percentages, [d[i] for d in data], label=label)
 
     elif isinstance(data[0], tuple):
         if isinstance(data[0][0], list):
@@ -331,6 +338,7 @@ def quaternary(
     data,
     label,
     save_path: Optional[str] = None,
+    step: Optional[float] = 0.01,
 ):
 
     unique_percentages = mg.analyse.find_unique_percentages(
@@ -415,6 +423,7 @@ def quaternary(
             title=title,
             label=label,
             showColorbar=False,
+            step=step,
         )
 
     viridis_cmap = mpl.cm.get_cmap("viridis")
