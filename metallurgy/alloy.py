@@ -341,12 +341,16 @@ class Alloy:
 
         :group: alloy.utils
         """
-        for element in self.constraints["local_percentages"]:
-            if element not in self.composition:
-                if self.constraints["local_percentages"][element]["min"] > 0:
-                    self.composition[element] = self.constraints[
-                        "local_percentages"
-                    ][element]["min"]
+        if "local_percentages" in self.constraints:
+            for element in self.constraints["local_percentages"]:
+                if element not in self.composition:
+                    if (
+                        self.constraints["local_percentages"][element]["min"]
+                        > 0
+                    ):
+                        self.composition[element] = self.constraints[
+                            "local_percentages"
+                        ][element]["min"]
 
     def rescale(self):
         """Adjust elemental percentages to match constraints
@@ -536,7 +540,10 @@ class Alloy:
         """
 
         satisfied = True
-        if self.constraints is not None:
+        if (
+            self.constraints is not None
+            and "local_percentages" in self.constraints
+        ):
 
             discrepancy = np.abs(
                 1
@@ -695,7 +702,10 @@ class Alloy:
                     clamped_value, percentage_step, digits
                 )
 
-                if self.constraints is not None:
+                if (
+                    self.constraints is not None
+                    and "percentages" in self.constraints
+                ):
                     if element in self.constraints["percentages"]:
                         clamped_value = max(
                             clamped_value,
@@ -718,7 +728,10 @@ class Alloy:
                     if element not in self.composition:
                         continue
 
-                    if self.constraints is not None:
+                    if (
+                        self.constraints is not None
+                        and "percentages" in self.constraints
+                    ):
                         if element in self.constraints["percentages"]:
                             change = max(
                                 [
