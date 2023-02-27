@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import math
 import re
 from collections import Counter, OrderedDict
 from types import SimpleNamespace
@@ -179,36 +180,79 @@ class Alloy:
             value == list(self.original_composition.values())[0]
             for value in self.original_composition.values()
         ):
-            composition_elements_ordered = [
-                list(self.original_composition.keys()).index(e)
-                for e in self.original_composition
-            ]
-        else:
-            composition_elements_ordered = structure_elements_ordered[:]
+            digits = 0
+            for element in self.composition:
+                digits = max([digits, len(str(self.composition[element])) - 2])
 
-        self.structure_element_translation = {
-            i: j
-            for i, j in zip(
-                composition_elements_ordered,
-                structure_elements_ordered,
-            )
-        }
-
-        structure_composition = {}
+        self.structure_element_translation = {}
         for i, element in enumerate(self.elements):
             if i >= len(self.structure.elements):
                 structure_element_index = i % len(self.structure.elements)
             else:
                 structure_element_index = i
+            self.structure_element_translation[i] = structure_element_index
 
-            if element not in structure_composition:
-                structure_composition[element] = 0
-            structure_composition[element] += self.structure.composition[
-                self.structure_element_translation[structure_element_index]
+        structure_composition = {}
+        for i in self.structure_element_translation:
+            if i not in structure_composition:
+                structure_composition[i] = 0
+            structure_composition[i] += self.structure.composition[
+                self.structure_element_translation[i]
             ]
 
-        self.composition = structure_composition
+        if not all(
+            value == list(self.original_composition.values())[0]
+            for value in self.original_composition.values()
+        ):
+            total = sum(structure_composition.values())
+            for i in structure_composition:
+                structure_composition[i] /= total
+                structure_composition[i] = multiple_round(
+                    structure_composition[i], 10 ** (-digits - 1), digits + 1
+                )
 
+            self.structure_element_translation = {}
+            taken = []
+
+            for element in self.composition:
+                for i in structure_composition:
+                    if i not in taken and math.isclose(
+                        self.composition[element],
+                        structure_composition[i],
+                        abs_tol=10 ** (-digits),
+                    ):
+                        self.structure_element_translation[element] = i
+                        taken.append(i)
+                        break
+
+            translated_structure_composition = {}
+            for element in self.structure_element_translation:
+                translated_structure_composition[
+                    element
+                ] = structure_composition[
+                    self.structure_element_translation[element]
+                ]
+
+            if self.constraints is None:
+                self.constraints = {
+                    "digits": digits,
+                    "percentage_step": (10**-digits),
+                }
+        else:
+            translated_structure_composition = {}
+            for i in self.structure_element_translation:
+                translated_structure_composition[
+                    self.elements[i]
+                ] = structure_composition[i]
+
+            for i in range(len(self.elements)):
+                self.structure_element_translation[
+                    self.elements[i]
+                ] = self.structure_element_translation[i]
+
+                del self.structure_element_translation[i]
+
+        self.composition = translated_structure_composition
         self.rescale()
 
     @property
@@ -233,8 +277,7 @@ class Alloy:
 
             elements = []
             for pair in sorted_translation:
-                if pair[0] < len(self.elements):
-                    elements.append(self.elements[pair[0]])
+                elements.append(pair[0])
             return elements
 
         else:
@@ -421,7 +464,7 @@ class Alloy:
 
     def reorder_composition(self):
         ordered_elements = self.elements
-        if self.constraints is not None:
+        if self.constraints is not None and "percentages" in self.constraints:
             ordered_elements = sorted(
                 self.composition,
                 key=lambda x: (
@@ -510,7 +553,8 @@ class Alloy:
                 # print()
                 satisfied = False
 
-            if satisfied:
+            if satisfied and "local_percentages" in self.constraints:
+
                 for element in self.constraints["local_percentages"]:
                     if element in self.composition:
                         if (
@@ -596,12 +640,20 @@ class Alloy:
                         break
 
             if satisfied:
-                if len(self.composition) > self.constraints["max_elements"]:
+                if (
+                    "max_elements" in self.constraints
+                    and len(self.composition)
+                    > self.constraints["max_elements"]
+                ):
                     satisfied = False
                     # print("too many elements")
                     # print(self.composition)
                     # print()
-                elif len(self.composition) < self.constraints["min_elements"]:
+                elif (
+                    "min_elements" in self.constraints
+                    and len(self.composition)
+                    < self.constraints["min_elements"]
+                ):
                     satisfied = False
                     # print("too few elements")
                     # print(self.composition)
@@ -712,7 +764,7 @@ class Alloy:
         :group: alloy.utils
         """
 
-        if self.constraints is None:
+        if self.constraints is None or "percentages" not in self.constraints:
             return
 
         tmp_percentages = copy.deepcopy(self.constraints["percentages"])
@@ -992,7 +1044,10 @@ class Alloy:
 
                 precedence = {}
                 for element in self.elements:
-                    if element in self.constraints["local_percentages"]:
+                    if (
+                        "local_percentages" in self.constraints
+                        and element in self.constraints["local_percentages"]
+                    ):
                         precedence[element] = self.constraints[
                             "local_percentages"
                         ][element]["precedence"]
@@ -1018,7 +1073,8 @@ class Alloy:
                 constraints_violated = False
                 if self.constraints is not None:
                     if (
-                        filtered_precedence_order[i]
+                        "local_percentages" in self.constraints
+                        and filtered_precedence_order[i]
                         in self.constraints["local_percentages"]
                     ):
                         if decimal_part_index < len(integer_parts):

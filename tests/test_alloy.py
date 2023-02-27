@@ -67,8 +67,8 @@ def test_structure():
     assert mg.Alloy("CuZr", "A1") == "Cu50Zr50[A1]"
     assert mg.Alloy("CuZr", "B2") == "Cu50Zr50[B2]"
     assert mg.Alloy("CuZr", "L1_0") == "Cu50Zr50[L1_0]"
-    assert mg.Alloy("ZrCu", "D2_1") == "Cu85.71Zr14.29[D2_1]"
-    assert mg.Alloy("CuZr", "D2_1") == "Zr85.71Cu14.29[D2_1]"
+    assert mg.Alloy("ZrCu", "D2_1") == "Cu85.72Zr14.28[D2_1]"
+    assert mg.Alloy("CuZr", "D2_1") == "Zr85.72Cu14.28[D2_1]"
     assert (
         mg.Alloy("Fe38As38Cu12Sc12[D0_3]").to_string()
         == "Fe38As38Cu12Sc12[D0_3]"
@@ -83,18 +83,18 @@ def test_structure_change():
 
     a = mg.Alloy("CuZr", "B1")
     a.structure = "D0_23"
-    assert a == "Cu75Zr50[D0_23]"
+    assert a == "Cu75Zr25[D0_23]"
 
 
 def test_structure_element_order():
     assert mg.Alloy("Cu", "A1").elements_structure_order == ["Cu"]
     assert mg.Alloy("CuZr", "B1").elements_structure_order == ["Cu", "Zr"]
-    assert mg.Alloy("CuZr", "C32").elements_structure_order == ["Zr", "Cu"]
+    assert mg.Alloy("CuZr", "C32").elements_structure_order == ["Cu", "Zr"]
     assert mg.Alloy("Cu66.67Mn33.33", "C32").elements_structure_order == [
         "Mn",
         "Cu",
     ]
-    assert mg.Alloy("CuZr", "D5_3").elements_structure_order == ["Zr", "Cu"]
+    assert mg.Alloy("CuZr", "D5_3").elements_structure_order == ["Cu", "Zr"]
 
 
 def test_scale_conversion():
