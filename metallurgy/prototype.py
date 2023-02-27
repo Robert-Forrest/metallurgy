@@ -1,8 +1,8 @@
-from typing import List
-from numbers import Number
 from collections import Counter
 from math import gcd
+from numbers import Number
 from string import ascii_uppercase
+from typing import List
 
 
 class Prototype:
