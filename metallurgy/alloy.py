@@ -271,7 +271,9 @@ class Alloy:
 
             self.structure_element_translation = filtered_translation
 
-        self.composition = translated_structure_composition
+        if len(translated_structure_composition) > 0:
+            self.composition = translated_structure_composition
+
         self.rescale()
 
     @property
