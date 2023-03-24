@@ -288,6 +288,7 @@ def system(
     min_percent: Number = 0,
     max_percent: Number = 100,
     property_name: Optional[str] = None,
+    crystal_structure: Optional[str] = None,
 ):
     """Generate a set of alloys in a particular elemental composition-space.
 
@@ -314,12 +315,26 @@ def system(
         elements = re.findall("[A-Z][^A-Z]*", elements)
 
     if len(elements) == 2:
-        return binary(elements, step, property_name)
+        return binary(
+            elements, step, property_name, crystal_structure=crystal_structure
+        )
     elif len(elements) == 3:
-        return ternary(elements, step, min_percent, max_percent, property_name)
+        return ternary(
+            elements,
+            step,
+            min_percent,
+            max_percent,
+            property_name,
+            crystal_structure=crystal_structure,
+        )
     elif len(elements) == 4:
         return quaternary(
-            elements, step, min_percent, max_percent, property_name
+            elements,
+            step,
+            min_percent,
+            max_percent,
+            property_name,
+            crystal_structure=crystal_structure,
         )
 
 
@@ -327,6 +342,7 @@ def binary(
     elements: Union[list, str],
     step: Number = 0.5,
     property_name: Optional[str] = None,
+    crystal_structure: Optional[str] = None,
 ):
     """Generate a set of binary alloys in a particular elemental composition-space.
 
@@ -353,11 +369,10 @@ def binary(
     alloys = []
     percentages = []
     while x >= 0:
-        alloys.append(
-            mg.Alloy(
-                elements[0] + str(x) + elements[1] + str(100 - x),
-            )
-        )
+        alloy_str = elements[0] + str(x) + elements[1] + str(100 - x)
+        if crystal_structure is not None:
+            alloy_str += "[" + crystal_structure + "]"
+        alloys.append(mg.Alloy(alloy_str))
         percentages.append(x)
         x -= step
 
@@ -375,6 +390,7 @@ def ternary(
     max_percent: Number = 100,
     property_name: Optional[str] = None,
     quaternary_element: Optional[tuple] = None,
+    crystal_structure: Optional[str] = None,
 ):
     """Generate a set of ternary alloys.
 
@@ -440,6 +456,9 @@ def ternary(
                             + str(quaternary_element[1])
                         )
 
+                    if crystal_structure is not None:
+                        composition_str += "[" + crystal_structure + "]"
+
                     alloy = mg.Alloy(composition_str)
                     alloys.append(alloy)
                     percentages.append(list(alloy.composition.values()))
@@ -460,6 +479,7 @@ def quaternary(
     quaternary_percent_step: Number = 25,
     quaternary_percentages: Optional[List[Number]] = None,
     property_name: Optional[str] = None,
+    crystal_structure: Optional[str] = None,
 ):
     """Generate a set of quaternary alloys.
 
@@ -501,6 +521,7 @@ def quaternary(
         ternary_alloys, ternary_percentages = ternary(
             elements[:3],
             quaternary_element=(elements[3], quaternary_percentage),
+            crystal_structure=crystal_structure,
         )
         alloys.append(ternary_alloys)
 
