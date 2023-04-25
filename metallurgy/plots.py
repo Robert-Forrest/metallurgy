@@ -72,6 +72,9 @@ def plot(
     if step is not None:
         step /= 100
 
+    if label is None:
+        label = property_name
+
     if num_elements == 2:
         return binary(
             alloys, data, ylabel=label, labels=labels, save_path=save_path
