@@ -231,7 +231,6 @@ def binary(
 
     fig.tight_layout()
 
-    # fig.gcf().set_dpi(300)
     if save_path is not None:
         fig.savefig(save_path)
     else:
@@ -269,9 +268,9 @@ def ternary(
     fontsize = 10
     tick_fontsize = 6
     tick_offset = 0.018
-    gridline_width = 0.3
+    gridline_width = 0.5
     gridline_style = "--"
-    gridline_color = "white"
+    gridline_color = "black"  # "white"
 
     elements = []
     for alloy in alloys:
@@ -313,6 +312,7 @@ def ternary(
 
     tax.set_axis_limits({"b": [0, 100], "l": [0, 100], "r": [0, 100]})
     tax.get_ticks_from_axis_limits(multiple=multiple)
+    tax.clear_matplotlib_ticks()
     tax.set_custom_ticks(
         fontsize=tick_fontsize, offset=tick_offset, multiple=multiple
     )
@@ -320,9 +320,9 @@ def ternary(
     tax.left_axis_label(elements[2] + " %", fontsize=fontsize, offset=0.12)
     tax.right_axis_label(elements[1] + " %", fontsize=fontsize, offset=0.12)
     tax.bottom_axis_label(elements[0] + " %", fontsize=fontsize, offset=0.12)
-    tax.clear_matplotlib_ticks()
 
-    tax.set_title(title, pad=15)
+    if title is not None:
+        tax.set_title(title, pad=15)
 
     viridis_cmap = mpl.cm.get_cmap("viridis")
     tax.heatmap(
@@ -335,20 +335,20 @@ def ternary(
     )
 
     if scatter_data is not None:
-        for scatter_datum in scatter_data:
-            tax.scatter(
-                scatter_datum["data"],
-                marker=scatter_datum["marker"],
-                label=scatter_datum["label"],
-                edgecolors="k",
-                zorder=20,
-            )
+        tax.scatter(
+            [[i * step for i in d["data"]] for d in scatter_data],
+            s=40,
+            linewidths=0.5,
+            marker="o",
+            edgecolors="k",
+            zorder=20,
+        )
 
-        tax.legend(loc="upper right", handletextpad=0.1, frameon=False)
+        # tax.legend(loc="upper right", handletextpad=0.1, frameon=False)
 
     tax.get_axes().set_aspect(1)
     tax._redraw_labels()
-    # plt.gcf().set_dpi(300)
+    figure.tight_layout()
 
     if ax is None:
         if save_path is None:
