@@ -4,6 +4,7 @@ import matplotlib as mpl
 import matplotlib.collections as mcoll
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 import ternary as ternary_plt
 from bokeh.io import export_png
 from bokeh.io import show as show_
@@ -16,6 +17,8 @@ from matplotlib.figure import Figure
 
 import metallurgy as mg
 
+sns.set()
+
 
 def plot(
     alloys: Optional = None,
@@ -26,6 +29,7 @@ def plot(
     labels: Optional[List[str]] = None,
     save_path: str = None,
     step: Optional = 1,
+    scatter_data: list = None,
 ):
     """An automatic interface to metallurgy's alloy system plotting
     functions.
@@ -77,15 +81,29 @@ def plot(
 
     if num_elements == 2:
         return binary(
-            alloys, data, ylabel=label, labels=labels, save_path=save_path
+            alloys,
+            data,
+            ylabel=label,
+            labels=labels,
+            save_path=save_path,
+            scatter_data=scatter_data,
         )
     elif num_elements == 3:
         return ternary(
-            alloys, data, label=label, save_path=save_path, step=step
+            alloys,
+            data,
+            label=label,
+            save_path=save_path,
+            step=step,
+            scatter_data=scatter_data,
         )
     elif num_elements == 4:
         return quaternary(
-            alloys, data, label=label, save_path=save_path, step=step
+            alloys,
+            data,
+            label=label,
+            save_path=save_path,
+            step=step,
         )
     else:
         raise NotImplementedError(
@@ -174,18 +192,24 @@ def binary(
     else:
         ax1.plot(percentages, data)
 
-    if scatter_data is not None:
+    if scatter_data is not None and len(scatter_data) > 0:
         for scatter_datum in scatter_data:
             ax1.scatter(
                 scatter_datum["data"][0],
                 scatter_datum["data"][1],
-                marker=scatter_datum["marker"],
-                label=scatter_datum["label"],
+                marker=scatter_datum["marker"]
+                if "marker" in scatter_datum
+                else None,
+                label=scatter_datum["label"]
+                if "label" in scatter_datum
+                else None,
                 edgecolors="k",
                 zorder=20,
             )
-        ax1.legend(loc="best")
-    elif labels is not None:
+        if "label" in scatter_data[0]:
+            ax1.legend(loc="best")
+
+    if labels is not None:
         ax1.legend(loc="best")
 
     ax1.autoscale()
