@@ -8,8 +8,13 @@ import seaborn as sns
 import ternary as ternary_plt
 from bokeh.io import export_png
 from bokeh.io import show as show_
-from bokeh.models import (BasicTicker, ColorBar, ColumnDataSource,
-                          LinearColorMapper, LogColorMapper)
+from bokeh.models import (
+    BasicTicker,
+    ColorBar,
+    ColumnDataSource,
+    LinearColorMapper,
+    LogColorMapper,
+)
 from bokeh.plotting import figure
 from bokeh.sampledata.periodic_table import elements
 from bokeh.transform import dodge
@@ -367,7 +372,6 @@ def quaternary(
     save_path: Optional[str] = None,
     step: Optional[float] = 0.01,
 ):
-
     unique_percentages = mg.analyse.find_unique_percentages(
         quaternary_alloys[-1]
     )

@@ -12,7 +12,6 @@ def test_calculate_property_name():
 
 
 def test_calculate_property_name_list():
-
     multi_calc = mg.calculate(
         {"Cu": 0.5, "Zr": 0.5}, ["melting_temperature", "mass"]
     )

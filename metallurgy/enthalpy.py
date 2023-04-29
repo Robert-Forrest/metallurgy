@@ -2,7 +2,7 @@
 
 from collections.abc import Iterable
 from numbers import Number
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -312,7 +312,6 @@ def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
         alloy = mg.Alloy(alloy)
 
     if alloy.num_elements > 1:
-
         element_pairs = [
             (a, b)
             for idx, a in enumerate(alloy.elements)
@@ -338,7 +337,6 @@ def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
                 return None
 
             for _ in range(10):
-
                 surface_concentration_a = calculate_surface_concentration(
                     pair, [volume_a, volume_b], tmp_composition
                 )
@@ -359,7 +357,6 @@ def mixing_enthalpy(alloy: Union[mg.Alloy, str, dict]):
             )
 
             if interface_ab is not None and interface_ba is not None:
-
                 chemical_enthalpy = (
                     alloy.composition[pair[0]]
                     * alloy.composition[pair[1]]
@@ -435,14 +432,14 @@ def topological_enthalpy(alloy):
     if not isinstance(alloy, mg.Alloy):
         alloy = mg.Alloy(alloy)
 
-    te = 0
+    topo = 0
     for element in alloy.composition:
-        te += (
+        topo += (
             mg.periodic_table.elements[element]["fusion_enthalpy"]
             * alloy.composition[element]
         )
 
-    return te
+    return topo
 
 
 def mismatch_PHS(alloy: Union[mg.Alloy, str, dict]) -> Number:

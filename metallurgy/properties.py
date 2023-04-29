@@ -2,11 +2,11 @@
 
 # A variety of units for some alloy properties
 pretty_names = {
-    "Dmax": "$D_{\mathrm{max}}$",
+    "Dmax": r"$D_{\mathrm{max}}$",
     "Tl": "$T_l$",
     "Tg": "$T_g$",
     "Tx": "$T_x$",
-    "deltaT": "$\Delta T$",
+    "deltaT": r"$\Delta T$",
 }
 
 units = {

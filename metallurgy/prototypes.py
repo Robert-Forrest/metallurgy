@@ -12,14 +12,16 @@ def get_prototype(name: str):
         )
 
 
-def get_random_prototype():
-    return get_prototype(random.choice(list(prototypes.keys())))
+def get_random_prototype(allowed_prototypes=None):
+    if allowed_prototypes is None:
+        return get_prototype(random.choice(list(prototypes.keys())))
+    else:
+        return get_prototype(random.choice(allowed_prototypes))
 
 
 def find_prototype(query):
     matches = []
     for prototype in prototypes:
-
         match = True
         for key in query:
             if key == "sites":

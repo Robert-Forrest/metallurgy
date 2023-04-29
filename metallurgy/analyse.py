@@ -1,8 +1,8 @@
 """Module enabling analysis of alloy data"""
 
 import re
-from typing import Tuple, Union, List
 from numbers import Number
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -31,7 +31,6 @@ def find_max(
 
     system = mg.generate.system(elements, property_name=property_name)
     if system is not None:
-
         alloys, percentages, values = system
 
         max_index = np.argmax(values)
@@ -61,7 +60,6 @@ def find_min(
 
     system = mg.generate.system(elements, property_name=property_name)
     if system is not None:
-
         alloys, percentages, values = system
 
         min_index = np.argmin(values)
@@ -92,7 +90,8 @@ def find_unique_elements(alloys: List[mg.Alloy]) -> List[str]:
 
 
 def find_unique_percentages(alloys: List[mg.Alloy]) -> dict:
-    """Finds the unique percentages per element in a list of alloy compositions.
+    """Finds the unique percentages per element in a list of
+    alloy compositions.
 
     :group: alloy.utils
 

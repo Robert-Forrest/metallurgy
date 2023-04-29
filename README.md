@@ -4,7 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/metallurgy/badge/?version=latest)](https://metallurgy.readthedocs.io/en/latest/?badge=latest)
 
 The Metallurgy package enables calculation of approximate properties of alloy
-mixtures, based on the linear mixture of elemental properties. 
+mixtures, based on the linear mixture of elemental properties.
 
 
 ## Installation
@@ -23,12 +23,13 @@ mixture of elements:
 
 ```python
 import metallurgy as mg
+
 Bronze = mg.Alloy("Cu88Sn12")
 ```
 
 An alloy can be defined in several ways:
 
-```python
+```pycon
 >>> mg.Alloy("Cu50Zr50")
 Cu50Zr50
 
@@ -44,7 +45,7 @@ Ni50Fe35Co15
 >>> mg.Alloy("(FeCo)50Ni50")
 Ni50Fe25Co25
 
->>> mg.Alloy({"Pt":30, "Al":45, "Ag":25})
+>>> mg.Alloy({"Pt": 30, "Al": 45, "Ag": 25})
 Al45Pt30Ag25
 ```
 
@@ -56,7 +57,7 @@ An Alloy object has access to properties containing the percentage values of the
 composition, the elements in the composition, and has helper functions which can
 convert the composition to a simple string or even a LaTeX formatted string:
 
-```python
+```pycon
 >>> Bronze.composition
 {'Cu': 0.88, 'Sn': 0.12}
 
@@ -87,7 +88,7 @@ $$\delta A = \sqrt{\sum_{i=1}^{N} c_i \left(1 - \frac{A_i}{\Sigma A}\right)^2} $
 The metallurgy package can be used to calculate a variety of approximate alloy
 properties:
 
-```python
+```pycon
 Bronze = mg.Alloy("Cu88Sn12")
 
 >>> mg.linear_mixture(Bronze, "mass")
@@ -115,7 +116,7 @@ Elemental data is provided by the
 calculate a variety of other alloy properties that are more complex than simple
 linear mixture or deviations of elemental properties:
 
-```python
+```pycon
 >>> mg.enthalpy.mixing_Gibbs_free_energy(Bronze)
 -2039.0961905675026
 
@@ -140,15 +141,15 @@ these alloy properties.
 Metallurgy can also be used to generate collections of alloys, either randomly
 or across a composition-space.
 
-```python
+```pycon
 >>> mg.generate.binary(["Fe", "Co"], step=10)
-[Fe100, Fe90Co10, Fe80Co20, Fe70Co30, Fe60Co40, 
+[Fe100, Fe90Co10, Fe80Co20, Fe70Co30, Fe60Co40,
 Fe50Co50, Co60Fe40, Co70Fe30, Co80Fe20, Co90Fe10, Co100]
 
 >>> mg.generate.ternary(["Fe", "Co", "Al"], step=20)
-[Fe100, Fe80Co20, Fe80Al20, Fe60Co40, Fe60Co20Al20, 
-Fe60Al40, Co60Fe40, Fe40Co40Al20, Fe40Al40Co20, Al60Fe40, 
-Co80Fe20, Co60Fe20Al20, Co40Al40Fe20, Al60Fe20Co20, 
+[Fe100, Fe80Co20, Fe80Al20, Fe60Co40, Fe60Co20Al20,
+Fe60Al40, Co60Fe40, Fe40Co40Al20, Fe40Al40Co20, Al60Fe40,
+Co80Fe20, Co60Fe20Al20, Co40Al40Fe20, Al60Fe20Co20,
 Al80Fe20, Co100, Co80Al20, Co60Al40, Al60Co40, Al80Co20, Al100]
 
 >>> mg.generate.random_alloy()
@@ -163,7 +164,7 @@ maximum and minimum number of constituent elements, requirements on the
 percentage range that particular elements must be within, and whitelists of
 allowed elements:
 
-```python
+```pycon
 >>> mg.generate.random_alloy(min_elements=2, max_elements=3)
 Au50.7Hf36.3Ru13
 
@@ -177,7 +178,7 @@ Yb64.8Cu30Ni5.2
 The process of generating random alloys can be performed in bulk to create
 datasets of random alloys:
 
-```python
+```pycon
 >>> mg.generate.random_alloys(10, min_elements=2, max_elements=3)
 [Fl94.6Xe5.4, Po64.2Tl23.3Np12.5, Tb61.6Ta38.4, Lu50.8Ho38.1In11.1, Rn69Es31, S70.4Ts29.6, Pr79.3He13.4Cm7.3, As84.3V15.7, Ge45.3Xe41.2Na13.5, Ra70.4He29.6]
 ```
@@ -187,7 +188,7 @@ datasets of random alloys:
 Once you have created a dataset of alloys, you may wish to view graphically a
 particular material property on a population level:
 
-```python
+```pycon
 >>> binary, percentages = mg.generate.binary(["Cu", "Zr"])
 >>> mixing_enthalpies = mg.enthalpy.mixing_enthalpy(binary)
 >>> mg.plots.binary(binary, mixing_enthalpies, ylabel="Mixing enthalpy (kJ/mol)")
@@ -195,7 +196,7 @@ particular material property on a population level:
 
 ![CuZr binary mixing enthalpy](https://raw.githubusercontent.com/Robert-Forrest/metallurgy/main/images/CuZr_enthalpy.png "Mixing enthalpy across the Cu-Zr composition")
 
-```python
+```pycon
 >>> ternary, percentages = mg.generate.ternary(["Cu", "Zr", "Al"])
 >>> mixing_enthalpies = mg.enthalpy.mixing_enthalpy(ternary)
 >>> mg.plots.ternary(ternary, mixing_enthalpies, label="Mixing enthalpy (kJ/mol)")
@@ -205,7 +206,7 @@ particular material property on a population level:
 the Cu-Zr-Al composition")
 
 
-```python
+```pycon
 >>> import matplotlib.pyplot as plt
 >>> alloys = mg.generate.random_alloys(10000)
 >>> plt.hist(mg.linear_mixture(alloys, "density"))

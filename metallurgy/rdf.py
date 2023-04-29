@@ -1,10 +1,9 @@
 import numpy as np
-from ovito.io import import_file, export_file
+from ovito.io import import_file
 from ovito.modifiers import CoordinationAnalysisModifier
 
 
 def rdf(structure_path):
-
     pipeline = import_file(structure_path)
     pipeline.modifiers.append(
         CoordinationAnalysisModifier(cutoff=10, number_of_bins=150)
@@ -16,7 +15,6 @@ def rdf(structure_path):
 
 
 def smoothness(structure_path, filter=False):
-
     RDF = rdf(structure_path)
 
     RDF_diffs = []

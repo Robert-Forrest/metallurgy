@@ -85,3 +85,6 @@ class Prototype:
                 formula_str += str(number)
 
         return formula_str
+
+    def __repr__(self) -> str:
+        return self.name

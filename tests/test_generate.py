@@ -9,7 +9,6 @@ def test_random_alloy(random_alloy=None):
 
 
 def test_random_alloys():
-
     num_alloys = 100
     random_alloys = mg.generate.random_alloys(num_alloys)
 
@@ -20,7 +19,6 @@ def test_random_alloys():
 
 
 def test_generate_binary_alloys():
-
     elements = ["Cu", "Zr"]
 
     step = 1
@@ -43,7 +41,6 @@ def test_generate_binary_alloys():
 
 
 def test_generate_ternary_alloys():
-
     elements = ["Cu", "Zr", "Al"]
 
     step = 1
@@ -75,35 +72,37 @@ def check_constraints(alloys, constraints):
                     <= constraints["percentages"][element]["max"]
                 )
 
-                if "precedence" in constraints["percentages"][element]:
-                    for other_element in constraints["percentages"]:
-                        if element == other_element:
-                            continue
+            if "precedence" in constraints["percentages"][element]:
+                for other_element in alloy.composition:
+                    if element == other_element:
+                        continue
 
-                        if other_element in alloy.composition:
-                            if (
+                    if (
+                        other_element in constraints["percentages"]
+                        and "precedence"
+                        in constraints["percentages"][other_element]
+                    ):
+                        if (
+                            constraints["percentages"][element]["precedence"]
+                            > constraints["percentages"][other_element][
                                 "precedence"
-                                in constraints["percentages"][other_element]
-                            ):
-                                if (
-                                    constraints["percentages"][element][
-                                        "precedence"
-                                    ]
-                                    > constraints["percentages"][
-                                        other_element
-                                    ]["precedence"]
-                                ):
-                                    assert (
-                                        alloy.composition[element]
-                                        >= alloy.composition[other_element]
-                                    )
+                            ]
+                        ):
+                            assert (
+                                alloy.composition[element]
+                                >= alloy.composition[other_element]
+                            )
+                    elif constraints["percentages"][element]["precedence"] > 0:
+                        assert (
+                            alloy.composition[element]
+                            >= alloy.composition[other_element]
+                        )
 
             else:
                 assert constraints["percentages"][element]["min"] == 0
 
 
 def test_constraints():
-
     num_alloys = 100
 
     constraint_sets = [
@@ -138,6 +137,13 @@ def test_constraints():
             "min_elements": 2,
             "percentage_step": 0.005,
         },
+        {
+            "percentages": {
+                "Zr": {"precedence": 1},
+            },
+            "max_elements": 5,
+            "min_elements": 1,
+        },
     ]
 
     for constraint in constraint_sets:
@@ -146,14 +152,20 @@ def test_constraints():
             min_elements=constraint["min_elements"],
             max_elements=constraint["max_elements"],
             percentage_constraints=constraint["percentages"],
-            percentage_step=constraint["percentage_step"],
+            percentage_step=constraint["percentage_step"]
+            if "percentage_step" in constraint
+            else None,
+            constrain_alloys=True,
         )
 
         check_constraints(random_alloys, constraint)
 
+    check_constraints(
+        [mg.Alloy("Cu", constraints=constraint_sets[-1])], constraint_sets[-1]
+    )
+
 
 def test_mixture():
-
     A = mg.Alloy("Cu50Zr50")
 
     mixed = mg.generate.mixture([A])

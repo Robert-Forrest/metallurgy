@@ -29,8 +29,8 @@ def list_functions(mod):
 
 
 def get_property_function(property_name: str) -> Union[Callable, None]:
-    """Get the function responsible for calculating a particular property, if it
-    exists in metallurgy.
+    """Get the function responsible for calculating a particular
+    property, if it exists in metallurgy.
 
     :group: utils
 
@@ -45,7 +45,8 @@ def get_property_function(property_name: str) -> Union[Callable, None]:
     # Get all modules in metallurgy
     modules = inspect.getmembers(mg, inspect.ismodule)
     for module in modules:
-        # For each function in the module, check if the name matches the property
+        # For each function in the module, check if the name
+        # matches the property
         for func in list_functions(module[1]):
             if func == property_name:
                 return getattr(module[1], func)
@@ -91,7 +92,7 @@ def get_all_complex_properties() -> List[str]:
 
 
 def get_all_properties(add_suffixes: bool = False) -> List[str]:
-    """Returns every calculatable property for alloy compositions.
+    """Returns every calculable property for alloy compositions.
 
     :group: utils
     """
@@ -131,8 +132,8 @@ def calculate(
     uncertainty: bool = False,
 ) -> Union[float, None, List[Union[float, None]]]:
     """Returns the a particular property calculated for an alloy, using other
-    calculation functions provided by metallurgy. The property_name must match a
-    function name in a metallurgy module, or be suffixed with _linearmix or
+    calculation functions provided by metallurgy. The property_name must match
+    a function name in a metallurgy module, or be suffixed with _linearmix or
     _deviation to denote linear mixture or deviation of an elemental property.
 
     :group: calculations
@@ -237,7 +238,7 @@ def linear_mixture(
     alloy : Alloy, str, dict
         The alloy for which to calculate the linear mixture.
     property_name : str
-        The elemental property to calcualate the linear mixture of.
+        The elemental property to calculate the linear mixture of.
 
     """
 
@@ -290,7 +291,7 @@ def deviation(
     alloy
         The alloy for which to calculate the deviation.
     property_name
-        The elemental property to calcualate the linear mixture of.
+        The elemental property to calculate the linear mixture of.
 
     """
 
@@ -304,13 +305,11 @@ def deviation(
 
     # Deviation only makes sense for multi-element alloys
     if len(alloy.elements) > 1:
-
         # If property is numerical, calculate the deviation of the values
         if isinstance(
             mg.periodic_table.elements[alloy.elements[0]][property_name],
             (Number, list),
         ):
-
             # Calculate the mean value of the property in the alloy
             mean = 0
             for element in alloy.elements:
@@ -356,7 +355,6 @@ def deviation(
         # If property is non-numerical, calculate the shannon entropy of the
         # values
         else:
-
             # Count unique values of the property
             value_count = {}
             for element in alloy.elements:
@@ -398,7 +396,7 @@ def range(
     alloy : Alloy, str, dict
         The alloy for which to calculate the range.
     property_name : str
-        The elemental property to calcualate the linear mixture of.
+        The elemental property to calculate the linear mixture of.
 
     """
 
@@ -431,7 +429,7 @@ def maximum(
     alloy : Alloy, str, dict
         The alloy for which to calculate the maximum.
     property_name : str
-        The elemental property to calcualate the linear mixture of.
+        The elemental property to calculate the linear mixture of.
 
     """
 
@@ -466,7 +464,7 @@ def minimum(
     alloy : Alloy, str, dict
         The alloy for which to calculate the minimum.
     property_name : str
-        The elemental property to calcualate the linear mixture of.
+        The elemental property to calculate the linear mixture of.
 
     """
 

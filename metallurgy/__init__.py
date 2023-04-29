@@ -1,41 +1,45 @@
 """Metallurgy
 
-A tool for manipulating alloy compositions, and calculation of their approximate
-characteristics based on the linear mixture of elemental properties.
+A tool for manipulating alloy compositions, and calculation of their
+approximate characteristics based on the linear mixture of elemental
+properties.
 """
+# isort: skip_file
 
-from typing import Union, Optional, List
+from typing import List, Optional, Union
 
 import pandas as pd
 from elementy import PeriodicTable
 
 from .alloy import Alloy
-from .prototype import Prototype
+from . import (
+    analyse,
+    constants,
+    density,
+    enthalpy,
+    entropy,
+    generate,
+    plots,
+    price,
+    properties,
+    prototypes,
+    radii,
+    ratios,
+    valence,
+    viscosity,
+)
 from .calculate import (
     calculate,
-    linear_mixture,
     deviation,
-    range,
+    get_all_properties,
+    get_property_function,
+    linear_mixture,
     maximum,
     minimum,
-    get_property_function,
-    get_all_properties,
+    range,
 )
 from .plots import plot
-from . import prototypes
-from . import properties
-from . import density
-from . import valence
-from . import entropy
-from . import enthalpy
-from . import radii
-from . import viscosity
-from . import price
-from . import generate
-from . import ratios
-from . import plots
-from . import analyse
-from . import constants
+from .prototype import Prototype
 
 # from . import rdf
 
