@@ -1437,12 +1437,18 @@ def parse_constraints(
             percentages = tmp_percentages
 
     for element in percentages:
-        if "min" not in percentages[element]:
+        if (
+            "min" not in percentages[element]
+            or percentages[element]["min"] is None
+        ):
             percentages[element]["min"] = 0.0
         else:
             percentages[element]["min"] = max(percentages[element]["min"], 0.0)
 
-        if "max" not in percentages[element]:
+        if (
+            "max" not in percentages[element]
+            or percentages[element]["max"] is None
+        ):
             percentages[element]["max"] = 1.0
         else:
             percentages[element]["max"] = min(percentages[element]["max"], 1.0)
