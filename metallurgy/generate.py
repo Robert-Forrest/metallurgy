@@ -1,4 +1,3 @@
-import copy
 import re
 from numbers import Number
 from typing import List, Optional, Union
@@ -14,9 +13,9 @@ from .prototypes import get_random_prototype
 def random_alloy(
     min_elements: int = 1,
     max_elements: int = 10,
-    percentage_constraints={},
-    percentage_step: float = 0.01,
-    allowed_elements=[e for e in elementy.PeriodicTable().elements],
+    percentage_constraints: Optional[dict] = None,
+    percentage_step: Optional[float] = None,
+    allowed_elements: Optional[list] = None,
     constrain_alloy: bool = False,
     structure: bool = False,
 ):
@@ -32,6 +31,13 @@ def random_alloy(
 
     """
 
+    if allowed_elements is None:
+        allowed_elements = [e for e in elementy.PeriodicTable().elements]
+    if percentage_step is None:
+        percentage_step = 0.01
+
+    if percentage_constraints is None:
+        percentage_constraints = {}
     if isinstance(percentage_constraints, (list)):
         parsed_percentage_constraints = {}
         for element in percentage_constraints:
@@ -87,8 +93,10 @@ def random_alloy(
             composition[elements[j]] = percentages[j]
     else:
         composition = "".join(elements)
-
-        composition += "[" + get_random_prototype().name + "]"
+        if isinstance(structure, bool):
+            composition += "[" + get_random_prototype().name + "]"
+        else:
+            composition += "[" + get_random_prototype(structure).name + "]"
 
     alloy = mg.Alloy(
         composition,
@@ -103,6 +111,8 @@ def random_alloy(
 
     if not constrain_alloy:
         alloy.constraints = None
+    else:
+        alloy.rescale()
 
     return alloy
 
@@ -111,7 +121,7 @@ def random_alloys(
     num_alloys: int,
     min_elements: int = 1,
     max_elements: int = 10,
-    percentage_constraints: dict = {},
+    percentage_constraints: Optional[dict] = None,
     percentage_step=0.01,
     allowed_elements: list = [e for e in elementy.PeriodicTable().elements],
     constrain_alloys=False,
@@ -438,7 +448,6 @@ def ternary(
                 tmp_percentages[2] -= step
 
                 if sum(tmp_percentages) == 100:
-
                     composition_str = ""
                     for i in range(len(elements)):
                         if tmp_percentages[i] > 0:
