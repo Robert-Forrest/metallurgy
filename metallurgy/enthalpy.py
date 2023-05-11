@@ -434,10 +434,11 @@ def topological_enthalpy(alloy):
 
     topo = 0
     for element in alloy.composition:
-        topo += (
-            mg.periodic_table.elements[element]["fusion_enthalpy"]
-            * alloy.composition[element]
-        )
+        if mg.periodic_table.elements[element]["fusion_enthalpy"] is not None:
+            topo += (
+                mg.periodic_table.elements[element]["fusion_enthalpy"]
+                * alloy.composition[element]
+            )
 
     return topo
 
