@@ -575,18 +575,37 @@ def perturb(alloy, size=0.05):
             if element in allowed_elements:
                 allowed_elements.remove(element)
         if len(allowed_elements) > 0:
-            composition[np.random.choice(allowed_elements)] = round(
-                float(np.random.random(1)) * size, 2
-            )
+            element = np.random.choice(allowed_elements)
+            existing_element = np.random.choice(list(composition.keys()))
+            composition[element] = composition[existing_element]
+            del composition[existing_element]
 
-    elif len(composition) > 1 and np.random.random(1) > 0.1:
-        to_delete = np.random.choice(list(composition.keys()))
-        if not (
-            constraints is not None
-            and to_delete in constraints["percentages"]
-            and constraints["percentages"][to_delete]["precedence"] > 0
-        ):
-            del composition[to_delete]
+    if np.random.random(1) > 0.1:
+        allowed_elements = list(mg.periodic_table.elements.keys())
+        if constraints is not None and "allowed_elements" in constraints:
+            allowed_elements = constraints["allowed_elements"][:]
+        for element in composition:
+            if element in allowed_elements:
+                allowed_elements.remove(element)
+        if len(allowed_elements) > 0:
+            element = np.random.choice(allowed_elements)
+            composition[element] = round(float(np.random.random(1)) * size, 2)
+
+    if len(composition) > 1 and np.random.random(1) > 0.1:
+        not_deleted = True
+        deletable = list(composition.keys())
+        while not_deleted or len(deletable) > 1:
+            to_delete = np.random.choice(deletable)
+            deletable.remove(to_delete)
+
+            if not (
+                constraints is not None
+                and to_delete in constraints["percentages"]
+                and constraints["percentages"][to_delete]["precedence"] > 0
+            ):
+                del composition[to_delete]
+                not_deleted = False
+                break
 
     if structure is not None and np.random.random(1) > 0.1:
         structure = get_random_prototype()
