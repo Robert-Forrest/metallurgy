@@ -48,7 +48,12 @@ def random_alloy(
         num_extra_elements = np.random.randint(min_elements, max_elements + 1)
     else:
         num_extra_elements = max_elements
-    num_extra_elements -= len(percentage_constraints)
+
+    constrained_elements = list(percentage_constraints.keys())
+    if "*" in constrained_elements:
+        constrained_elements.remove("*")
+    num_constrained_elements = len(constrained_elements)
+    num_extra_elements -= num_constrained_elements
 
     if num_extra_elements > 0:
         other_elements = allowed_elements[:]
@@ -56,7 +61,7 @@ def random_alloy(
             if element in other_elements:
                 other_elements.remove(element)
 
-        elements = list(percentage_constraints.keys()) + list(
+        elements = constrained_elements + list(
             np.random.choice(
                 other_elements,
                 min(num_extra_elements, len(other_elements)),
@@ -65,16 +70,24 @@ def random_alloy(
         )
 
     elif max_elements == min_elements:
-        if max_elements == len(list(percentage_constraints.keys())):
-            elements = list(percentage_constraints.keys())
+        if max_elements == num_constrained_elements:
+            elements = constrained_elements
         elif max_elements == len(allowed_elements):
             elements = allowed_elements[:]
+        else:
+            elements = list(
+                np.random.choice(
+                    allowed_elements,
+                    max_elements,
+                    replace=False,
+                )
+            )
 
     else:
         elements = list(
             np.random.choice(
-                list(percentage_constraints.keys()),
-                num_extra_elements + len(percentage_constraints.keys()),
+                constrained_elements,
+                num_extra_elements + num_constrained_elements,
                 replace=False,
             )
         )

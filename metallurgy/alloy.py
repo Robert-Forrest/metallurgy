@@ -1436,6 +1436,12 @@ def parse_constraints(
                 tmp_percentages[element] = {}
             percentages = tmp_percentages
 
+    if "*" in percentages:
+        for element in allowed_elements:
+            if element not in percentages:
+                percentages[element] = copy.deepcopy(percentages["*"])
+        del percentages["*"]
+
     for element in percentages:
         if (
             "min" not in percentages[element]
