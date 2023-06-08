@@ -83,8 +83,9 @@ class Alloy:
         self.composition = filter_order_composition(self.original_composition)
 
         if self.composition is None or len(composition) == 0:
-            raise Exception("Invalid composition:", composition)
-        if structure is None and composition_structure is not None:
+            raise ValueError("Invalid composition:", composition)
+
+        if structure is None and composition_structure is not None and rescale:
             structure = composition_structure
 
         self.constraints = None
