@@ -168,7 +168,14 @@ def binary(
             if labels is not None:
                 label = labels[i]
 
-            ax1.plot(percentages, [d[i] for d in data], label=label)
+            ax1.plot(
+                percentages,
+                [d[i] for d in data],
+                "-x",
+                label=label,
+                markersize=4,
+                mfc="k",
+            )
 
     elif isinstance(data[0], tuple):
         if isinstance(data[0][0], list):
@@ -177,7 +184,14 @@ def binary(
                 if labels is not None:
                     label = labels[i]
 
-                ax1.plot(percentages, [d[0][i] for d in data], label=label)
+                ax1.plot(
+                    percentages,
+                    [d[0][i] for d in data],
+                    "-x",
+                    label=label,
+                    markersize=4,
+                    mfc="k",
+                )
                 ax1.fill_between(
                     percentages,
                     [d[0][i] - d[1][i] for d in data],
@@ -186,7 +200,9 @@ def binary(
                 )
 
         else:
-            ax1.plot(percentages, [d[0] for d in data])
+            ax1.plot(
+                percentages, [d[0] for d in data], "-x", markersize=4, mfc="k"
+            )
             ax1.fill_between(
                 percentages,
                 [d[0] - d[1] for d in data],
@@ -195,7 +211,7 @@ def binary(
             )
 
     else:
-        ax1.plot(percentages, data)
+        ax1.plot(percentages, data, "-x", markersize=4, mfc="k")
 
     if scatter_data is not None and len(scatter_data) > 0:
         for scatter_datum in scatter_data:
