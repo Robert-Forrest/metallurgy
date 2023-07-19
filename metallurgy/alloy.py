@@ -331,6 +331,21 @@ class Alloy:
         """
         return sum(self.composition.values())
 
+    @property
+    def is_metallic(self) -> bool:
+        """True if material contains a metallic element.
+
+        :group: alloy
+        """
+        metallic_elements = list(
+            filter(
+                lambda e: "metal"
+                in elementy.PeriodicTable().elements[e].series,
+                elementy.PeriodicTable().elements,
+            )
+        )
+        return any(element in self.elements for element in metallic_elements)
+
     def add_element(self, element: str, percentage: Optional[float] = 0.0):
         """Adds an element to the alloy composition.
 
