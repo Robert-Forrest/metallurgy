@@ -1014,7 +1014,7 @@ class Alloy:
 
         :group: alloy.utils
         """
-        numbers = re.compile(r"(\d+)")
+        numbers = re.compile(r"(\d+\.?\d+)")
         return numbers.sub(r"$_{\1}$", self.to_string())
 
     def to_dict(self) -> dict:
