@@ -314,6 +314,16 @@ class Alloy:
         return len(self.elements)
 
     @property
+    def major_element(self) -> str:
+        """Element with the largest percentage in the alloy.
+
+        :group: alloy
+        """
+        return list(self.composition.keys())[
+            np.argmax(self.composition.values())
+        ]
+
+    @property
     def total_percentage(self) -> float:
         """Sum of percentages in the alloy composition.
 
