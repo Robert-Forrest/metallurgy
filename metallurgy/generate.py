@@ -557,10 +557,11 @@ def perturb(alloy, size=0.05):
     composition = dict(alloy.composition)
     structure = alloy.structure
     constraints = alloy.constraints
-    if "local_percentages" in constraints:
-        del constraints["local_percentages"]
-    if "digits" in constraints:
-        del constraints["digits"]
+    if constraints is not None:
+        if "local_percentages" in constraints:
+            del constraints["local_percentages"]
+        if "digits" in constraints:
+            del constraints["digits"]
 
     for element in composition:
         composition[element] += round(
